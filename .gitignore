@@ -44,3 +44,21 @@ data/
 # ======================
 results/*.csv
 results/*.json
+
+# Archivos auxiliares LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.lol
+
+# Ignorar todos los PDF...
+*.pdf
+
+# ...excepto el final
+!Latex/main.pdf
