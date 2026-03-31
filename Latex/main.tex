@@ -507,7 +507,7 @@ Análisis del estado del arte: se realiza un estudio de las técnicas empleadas 
 
 Análisis de fuentes de datos: se estudian diferentes bases de datos públicas disponibles relacionadas con el consumo eléctrico con etiquetado de usuarios con fraude/no fraude o sin etiquetado. Además, de sus características principales o frecuencia.
 
-Estudio e implementación de métodos: se seleccionan e implementan distintas técnicas de aprendizaje automático, estas se diferencian en offline o online. Exactamente serán 10 en total, 5 para cada opción.
+Estudio e implementación de métodos: se seleccionan e implementan distintas técnicas de aprendizaje automático, estas se diferencian en offline o online. La idea, en un principio, era de 10 técnicas en total, 5 para cada opción. Finalmente, se implementó una offline más que es esencial para este trabajo, debido a su mejor rendimiento en comparación al resto.
 
 Evaluación y comparación de métodos: se realiza una comparativa entre los enfoques offline y online analizando, la capacidad de detección de fraude, la robustez ante datos desbalanceados, la adaptabilidad a cambios en el patrón de consumo y el coste computacional.
 
@@ -527,7 +527,7 @@ Conclusiones: se presentan las conclusiones obtenidas a partir del estudio compa
 
 El principal objetivo es diseñar e implementar un sistema de detección de fraude en el consumo eléctrico de un determinado conjunto de datos basado en técnicas de aprendizaje automático, permitiendo comparar el rendimiento de modelos de aprendizaje offline y modelos de aprendizaje online.
 
-Para alcanzar este objetivo general, se plantean los siguientes objetivos específicos: implementación de 5 técnicas representativas de aprendizaje offline, implementación de 5 técnicas representativas de aprendizaje online, evaluación de ambos grupos de modelos utilizando métricas adecuadas, determinación de la técnica con mejor rendimiento dentro de cada categoría (offline y online) e integración de los modelos seleccionados en un prototipo software que permita la visualización de los resultados y métricas de forma comparativa.
+Para alcanzar este objetivo general, se plantean los siguientes objetivos específicos: implementación de 6 técnicas representativas de aprendizaje offline, implementación de 5 técnicas representativas de aprendizaje online, evaluación de ambos grupos de modelos utilizando métricas adecuadas, determinación de la técnica con mejor rendimiento dentro de cada categoría (offline y online) e integración de los modelos seleccionados en un prototipo software que permita la visualización de los resultados y métricas de forma comparativa.
 
 
 El sistema desarrollado debe de permitir analizar el comportamiento de los modelos en un entorno controlado, facilitando la comparación objetiva entre modelos online y offline.
@@ -922,7 +922,7 @@ Para terminar el proceso, se detiene el proceso de boosting cuando se cumpla un 
 
 Este enfoque presenta varias ventajas en el contexto de detección de fraude como la alta capacidad para modelar relaciones complejas, el buen rendimiento en datos desbalanceados y la mayor precisión en comparación con modelos individuales. Debido a estas características, los métodos de boosting son frecuentemente utilizados en aplicaciones reales de detección de fraude.
 
-Como posible mejora, se plantea el uso de XGBoost, una versión optimizada del Gradient Boosting ampliamente utilizada en problemas de detección de fraude y en trabajos como \cite{articulo3}.
+Como posible mejora, se emplea, en unas secciones más abajo, el uso de XGBoost, una versión optimizada del Gradient Boosting ampliamente utilizada en problemas de detección de fraude y en trabajos como \cite{articulo3}.
 
 
 \subsubsection{Support Vector Machine}
@@ -956,7 +956,7 @@ Este tipo de modelos resulta especialmente útil en problemas con alta dimension
 Sin embargo, su coste computacional puede ser elevado en grandes volúmenes de datos, lo que limita su escalabilidad en comparación con otros métodos como Random Forest o Gradient Boosting.
 
 
-\subsubsection{K Vecinos más cercanos}
+\subsubsection{k-Nearest Neighbors}
 
 K vecinos más cercanos (KNN) es un algoritmo de aprendizaje automático, utilizado en diversos trabajos como \cite{articulo1}, \cite{articuloBase} y \cite{articulo2}, basado en instancias que clasifica nuevas observaciones en función de la clase mayoritaria entre sus vecinos más cercanos. Además, es uno de los métodos de clasificación y regresión más populares y sencillos que se emplean actualmente.
 
@@ -1018,6 +1018,44 @@ Este enfoque permite analizar la similitud entre patrones de consumo eléctrico,
 No obstante, su rendimiento depende fuertemente de la elección del parámetro k y de la escala de las variables, además de presentar limitaciones en términos de eficiencia computacional para grandes conjuntos de datos.
 
 
+\subsubsection{XGBoost}
+
+Conocido como eXtreme Gradient Boosting, utilizado en la literatura en trabajos como \cite{articulo3}, es un algoritmo de aprendizaje automático supervisado basado en árboles de decisión que implementa una versión optimizada del método de \emph{gradient boosting}. Su objetivo es construir un modelo predictivo fuerte a partir de la combinación secuencial de múltiples modelos débiles, generalmente árboles de decisión de poca profundidad. 
+
+A diferencia de otros métodos de ensemble, los modelos no se entrenan de forma independiente, sino que cada árbol nuevo se construye específicamente para corregir los errores cometidos por los anteriores. Es conocido por su velocidad, eficiencia y capacidad de escalar bien con grandes conjuntos de datos.
+El funcionamiento del algoritmo se basa en un proceso iterativo en el que, en cada paso, se añade un nuevo árbol que intenta aproximar los residuos o errores del modelo actual. Estos residuos representan la diferencia entre los valores reales y las predicciones realizadas hasta ese momento. 
+
+El proceso de aplicación del algoritmo desde la práctica comienza con la preparación de los datos. En primer lugar, es necesario dividir el conjunto de datos en dos subconjuntos: uno de entrenamiento, utilizado para construir el modelo, y otro de prueba, destinado a evaluar su rendimiento. Posteriormente, los datos se transforman al formato DMatrix, que es la estructura interna optimizada de XGBoost. Este formato está diseñado para mejorar la eficiencia tanto en el uso de memoria como en la velocidad de entrenamiento, que resulta imprescindible en problemas con grandes volúmenes de datos.
+
+Una vez preparados los datos, se procede a la generación del modelo. Para ello, se instancia el algoritmo y se selecciona una función objetivo adecuada en función del tipo de problema. A continuación, el modelo se entrena utilizando el conjunto de entrenamiento y se generan predicciones sobre el conjunto de prueba. La evaluación del modelo se realiza comparando las predicciones con los valores reales mediante métricas como la exactitud, la precisión, la sensibilidad (recall) o la puntuación F1 (F1-score). Además, el uso de la matriz de confusión permite analizar con mayor detalle los aciertos y errores del modelo.
+
+Para mejorar el rendimiento del modelo, es habitual realizar un proceso de ajuste de hiperparámetros. Este proceso consiste en encontrar la combinación óptima de parámetros que maximicen la capacidad predictiva del modelo. Técnicas como la búsqueda en cuadrícula y la validación cruzada permiten explorar diferentes configuraciones de manera sistemática. Este paso es especialmente importante, ya que el rendimiento depende en gran medida de una adecuada selección de hiperparámetros.
+
+Entre los hiperparámetros más relevantes destaca la tasa de aprendizaje, que controla la contribución de cada árbol al modelo final. Valores bajos de este parámetro hacen que el aprendizaje sea más lento pero más robusto, reduciendo el riesgo de sobreajuste, mientras que valores altos aceleran el aprendizaje a costa de una posible pérdida de generalización. 
+
+Otro parámetro fundamental es \emph{n\_estimators}, que determina el número de árboles en el modelo. Un mayor número de árboles permite capturar patrones más complejos, aunque también incrementa el riesgo de sobreajuste y el coste computacional, por lo que suele ajustarse conjuntamente con la tasa de aprendizaje.
+
+Además, el parámetro \emph{gamma} regula la creación de nuevas divisiones en los árboles, estableciendo la reducción mínima de la función de pérdida necesaria para realizar un nuevo corte. Valores altos hacen que el modelo sea más conservador, mientras que valores bajos permiten un crecimiento más agresivo de los árboles.
+
+Por otro lado, \emph{max\_depth} define la profundidad máxima de cada árbol, controlando directamente la complejidad del modelo. Árboles más profundos pueden capturar relaciones más complejas, pero también son más propensos al sobreajuste.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagenes/xgboostProceso.png}
+    \caption{Funcionamiento XGBoost}
+\end{figure}
+
+Una de sus características más importantes es la incorporación de mecanismos de regularización que ayudan a evitar el sobreajuste. Estos mecanismos penalizan la complejidad del modelo, limitando el crecimiento excesivo de los árboles y favoreciendo soluciones más generalizables. Además, el algoritmo incluye técnicas avanzadas como la poda de árboles, el manejo automático de valores faltantes y la selección eficiente de características durante el proceso de entrenamiento.
+
+En cuanto al rendimiento, está diseñado para ser altamente eficiente y escalable. Permite la paralelización durante la construcción de los árboles, lo que reduce significativamente los tiempos de entrenamiento en comparación con otros métodos de boosting. También optimiza el uso de memoria y es capaz de trabajar con grandes volúmenes de datos, lo que lo hace especialmente adecuado para aplicaciones en entornos reales y problemas de gran escala.
+
+Otra ventaja a destacar, es su flexibilidad, ya que permite utilizar diferentes funciones de pérdida dependiendo del problema. Esto lo convierte en una herramienta versátil dentro del ámbito del aprendizaje automático. Además, su capacidad para capturar relaciones no lineales y manejar interacciones complejas entre variables lo hace especialmente efectivo en problemas con datos estructurados o tabulares.
+
+Sin embargo, este método también presenta ciertas limitaciones. Su correcto funcionamiento depende en gran medida del ajuste de hiperparámetros, lo que puede requerir un proceso de optimización complejo. Además, sigue siendo menos transparente que modelos más simples. Por último, su complejidad computacional, aunque optimizada, puede ser elevada en comparación con algoritmos más básicos.
+
+Para terminar, XGBoost representa una evolución avanzada del \emph{gradient boosting} que combina precisión, eficiencia y robustez. Gracias a sus mejoras en optimización, regularización y escalabilidad, se ha convertido en uno de los algoritmos más utilizados en el ámbito del aprendizaje automático, especialmente en problemas donde se requiere un alto rendimiento predictivo.
+
+
 \subsubsection{Justificación de la selección}
 
 Las técnicas seleccionadas representan distintos enfoques dentro del aprendizaje automático supervisado, lo que permite realizar un análisis comparativo completo.
@@ -1034,7 +1072,7 @@ Método basado en instancia: k-NN.
 
 Esta diversidad metodológica permite evaluar cómo distintos tipos de modelos se adaptan a la detección de fraude eléctrico, identificando cuáles ofrecen un mejor equilibrio entre precisión, interpretabilidad y coste computacional.
 
-Además, la elección e inclusión de un modelo baseline permite observar y calificar la mejora real obtenida mediante el uso de técnicas más avanzadas.
+Además, la elección e inclusión de un modelo baseline permite observar y calificar la mejora real obtenida mediante el uso de técnicas más avanzadas. Finalmente, se decidió añadir un último método más debido a su buen rendimiento en problemas de detección de fraude.
 
 Como línea futura, se propone el uso de modelos de deep learning como LSTM o CNN, ampliamente utilizados en la literatura en trabajos como \cite{articuloBase} y \cite{articulo3} para el modelado de series temporales. No fueron escogidos debido a que requieren mayores recursos computacionales en comparación a los analizados.
 
@@ -2008,6 +2046,169 @@ Finalmente, las métricas obtenidas se almacenan, permitiendo realizar un análi
 
 \subsubsection{Support Vector Machine}
 
+Las Máquinas de Vectores de Soporte, SVM, son algoritmos de aprendizaje supervisado ampliamente utilizados en problemas de clasificación. Su objetivo principal es encontrar un hiperplano que separe de forma óptima las distintas clases del conjunto de datos, maximizando la distancia entre dicho hiperplano y los puntos más cercanos de cada clase, conocidos como vectores de soporte.
+
+En este proyecto se emplea la implementación \emph{SVC} de la librería \emph{Scikit-learn}, utilizando un kernel de tipo radial (\emph{RBF}), que permite capturar relaciones no lineales entre las variables.
+
+El modelo se define dentro de un \emph{pipeline} que incluye una etapa de normalización de los datos mediante \emph{StandardScaler}, seguida del clasificador SVM.
+
+\medskip
+
+\begin{lstlisting}[caption={Pipeline del modelo SVM}]
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", SVC(
+        kernel="rbf",
+        C=1.0,
+        gamma="scale",
+        class_weight="balanced",
+        probability=True,
+        random_state=42
+    ))
+])
+\end{lstlisting}
+
+El uso de normalización resulta fundamental en este tipo de modelos, ya que SVM se basa en el cálculo de distancias entre observaciones, siendo altamente sensible a la escala de las variables.
+
+A continuación, se describen los principales parámetros utilizados en la configuración del modelo.
+
+\emph{kernel}: define la función utilizada para proyectar los datos a un espacio de mayor dimensión. En este caso se utiliza el kernel radial (\emph{RBF}), adecuado para capturar relaciones no lineales.
+
+\emph{C}: parámetro de regularización que controla el equilibrio entre maximizar el margen de separación y minimizar los errores de clasificación.
+
+\emph{gamma}: define la influencia de cada muestra en la construcción del modelo. Valores altos generan modelos más complejos, mientras que valores bajos producen modelos más suaves.
+
+\emph{class\_weight} = ``balanced'': permite compensar el desbalance de clases asignando mayor peso a la clase minoritaria.
+
+\emph{probability} = \emph{True}: habilita el cálculo de probabilidades mediante el método \emph{predict\_proba}, lo que resulta necesario para la evaluación del modelo mediante métricas como ROC-AUC.
+
+\medskip
+
+Para la construcción del modelo sería lo ideal con los parámetros vistos con anterioridad, pero debido al gran coste computacional de SVM, se han tenido que optimizar algunos parámetros.
+
+El uso de SVM con kernel no lineal, RBF, presenta un alto coste computacional en conjuntos de datos de gran tamaño, por lo que se opta por un kernel lineal que permite reducir significativamente el tiempo de entrenamiento manteniendo un rendimiento competitivo. Además, para ROC no se necesitan probabilidades reales.
+
+\begin{lstlisting}[caption={Pipeline del modelo SVM Optimizado}]
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", SVC(
+        kernel="linear",
+        C=1.0,
+        class_weight="balanced",
+        probability=False,
+        random_state=42
+    ))
+])
+\end{lstlisting}
+
+Debido al alto coste computacional del algoritmo SVM en conjuntos de datos de gran tamaño, se prescinde de la validación cruzada estratificada, evaluando el modelo directamente sobre el conjunto de prueba.
+
+Una vez entrenado el modelo, se realizan predicciones sobre el conjunto de prueba y se calculan las métricas de evaluación seleccionadas. Para el cálculo de la curva ROC y el AUC se utiliza la función \emph{decision\_function}, que proporciona la distancia al hiperplano de decisión.
+
+A diferencia de otros modelos como Random Forest o Gradient Boosting, SVM no proporciona de forma directa medidas de importancia de las variables, lo que limita su interpretación. Sin embargo, su capacidad para modelar fronteras de decisión complejas lo convierte en un método importante en problemas de clasificación.
+
+Por último, como ya se destacó que su coste computacional puede ser elevado en conjuntos de datos de gran tamaño, como es el caso del conjunto de datos del proyecto, puede limitar su escalabilidad.
+
+
+\subsubsection{k-Nearest Neighbors}
+
+El algoritmo k vecinos más cercanos (kNN) es un método de aprendizaje supervisado basado en instancias, que clasifica una observación en función de las etiquetas de sus vecinos más cercanos en el espacio de características.
+
+A diferencia de otros modelos, kNN no construye un modelo explícito durante la fase de entrenamiento, sino que almacena el conjunto de datos y realiza las predicciones en tiempo de inferencia. Para clasificar una nueva instancia, el algoritmo calcula la distancia entre dicha instancia y todas las observaciones del conjunto de entrenamiento, seleccionando las k más cercanas. La clase final se determina mediante votación mayoritaria o ponderada entre estos vecinos.
+
+El modelo se implementa mediante la clase \emph{KNeighborsClassifier} de la librería \emph{Scikit-learn}, configurado con los siguientes parámetros principales:
+
+\medskip
+
+\begin{lstlisting}[caption={Creación del modelo kNN}]
+pipeline = Pipeline([
+("scaler", StandardScaler()),
+("model", KNeighborsClassifier(
+n_neighbors=5,
+weights="distance",
+metric="minkowski",
+p=2,
+algorithm="auto",
+n_jobs=-1
+))
+])
+\end{lstlisting}
+
+\medskip
+
+\emph{n\_neighbors}: número de vecinos considerados en la clasificación.
+
+\emph{weights}: tipo de ponderación utilizada en la votación, donde \emph{"distance"} asigna mayor peso a los vecinos más cercanos.
+
+\emph{metric}: métrica de distancia empleada. En este caso se utiliza la distancia de Minkowski.
+
+\emph{p}: parámetro de la distancia de Minkowski. Con p=2 se obtiene la distancia euclídea.
+
+\emph{algorithm}: estrategia utilizada para la búsqueda de vecinos. El valor \emph{"auto"} permite al algoritmo seleccionar automáticamente el método más eficiente según el tamaño y características del conjunto de datos.
+
+\emph{n\_jobs}: número de núcleos del procesador utilizados para el cálculo de los vecinos. Se configura como -1, lo que indica que se emplean todos los núcleos disponibles, reduciendo así el tiempo de ejecución.
+
+Dado que kNN se basa en distancias, es fundamental escalar previamente las variables para evitar que aquellas con mayor rango dominen el cálculo de distancias. Por este motivo, se emplea un \emph{Pipeline} que incluye un \emph{StandardScaler} antes del modelo.
+
+Cabe destacar que, debido a su naturaleza basada en instancias, este método presentaría un alto coste computacional en el conjunto de datos del proyecto, ya que es un conjunto grande y requiere calcular distancias frente a todas las observaciones en cada predicción. El uso del parámetro \emph{algorithm="auto"} permite optimizar este proceso seleccionando internamente estructuras de datos más eficientes como \emph{KD-Tree} o \emph{Ball Tree} cuando resulta conveniente.
+
+Para el cálculo de distancias entre instancias se utiliza la métrica de Minkowski con p=2, equivalente a la distancia euclídea. Esta elección se debe a que se trata de la métrica más común en problemas de clasificación con kNN y presenta un buen comportamiento en conjuntos de datos numéricos previamente normalizados.
+
+De forma análoga a los modelos anteriores, se aplica validación cruzada estratificada con 5 particiones para evaluar la capacidad de generalización del modelo.
+
+Finalmente, se calculan las métricas de evaluación sobre el conjunto de prueba, permitiendo comparar el rendimiento de este modelo con el resto de algoritmos implementados en el proyecto.
+
+
+\subsubsection{XGBoost}
+
+El algoritmo XGBoost es una técnica avanzada de aprendizaje supervisado basada en métodos de \emph{gradient boosting}, diseñada para mejorar el rendimiento y la eficiencia del Gradient Boosting tradicional.
+
+Al igual que este último, XGBoost construye los árboles de decisión de forma secuencial, donde cada nuevo árbol se entrena para corregir los errores cometidos por los anteriores. Sin embargo, introduce mejoras significativas como regularización, paralelización y optimización del proceso de entrenamiento, lo que lo convierte en uno de los modelos más eficaces para datos tabulares.
+
+Este modelo se incluye como modelo de referencia avanzado, permitiendo evaluar si técnicas de boosting optimizadas ofrecen mejoras significativas frente a métodos clásicos.
+
+El modelo se implementa mediante la clase \emph{XGBClassifier} de la librería \emph{xgboost}, configurado con los siguientes parámetros principales:
+
+\emph{n\_estimators}: número de árboles que componen el modelo.
+
+\emph{learning\_rate}: controla la contribución de cada árbol al modelo final.
+
+\emph{max\_depth}: profundidad máxima de los árboles.
+
+\emph{scale\_pos\_weight}: parámetro utilizado para ajustar el desbalance de clases, incrementando el peso de la clase minoritaria.
+
+\emph{n\_jobs}: número de núcleos utilizados para el entrenamiento, permitiendo acelerar el proceso computacional.
+
+\emph{eval\_metric="logloss"} indica que el modelo se evalúa durante el entrenamiento mediante la pérdida logarítmica.
+
+\medskip
+
+\begin{lstlisting}[caption={Creación del modelo XGBoost}]
+ model = XGBClassifier(
+ n_estimators=200,
+ learning_rate=0.1,
+ max_depth=6,
+ scale_pos_weight=scale_pos_weight,
+ random_state=42,
+ n_jobs=-1,
+ eval_metric="logloss"
+ )
+ \end{lstlisting}
+
+Dado que el conjunto de datos presenta desbalance de clases, se utiliza el parámetro \emph{scale\_pos\_weight}, calculado como la proporción entre la clase mayoritaria y la minoritaria. Este ajuste permite mejorar la capacidad del modelo para detectar casos de fraude.
+
+Aunque la evaluación final del modelo se realiza mediante las métricas mencionadas con anterioridad, el uso de \emph{logloss} durante el entrenamiento permite una optimización más estable del modelo al trabajar directamente con probabilidades. Esta métrica mide la diferencia entre las probabilidades predichas y las clases reales, penalizando especialmente las predicciones incorrectas con alta confianza.
+
+Además, este método incorpora mecanismos de regularización que permiten controlar la complejidad del modelo y reducir el sobreajuste, lo que supone una ventaja frente al Gradient Boosting tradicional.
+
+Al igual que en los modelos anteriores, se aplica validación cruzada estratificada con 5 particiones para evaluar la capacidad de generalización.
+
+Tras el entrenamiento, se obtienen las predicciones sobre el conjunto de prueba y se calculan las métricas de evaluación correspondientes.
+
+También destacar, que se pueden obtener la importancia de las variables, calculada en función de la contribución de cada característica a la reducción del error en los árboles. Esta información resulta útil para interpretar el comportamiento del modelo.
+
+Finalmente, los resultados se almacenan para su posterior comparación con el resto de modelos implementados en el estudio.
+
 
 \subsection{Modelos Online Implementados}
 
@@ -2205,6 +2406,10 @@ Disponible en: \url{https://www.ibm.com/es-es/think/topics/support-vector-machin
 ¿Qué es el algoritmo de k vecinos más cercanos (KNN)?
 Disponible en: \url{https://www.ibm.com/mx-es/think/topics/knn}
 
+\bibitem{XGBoost}
+¿Qué es XGBoost?
+Disponible en: \url{https://www.ibm.com/mx-es/think/topics/xgboost}
+
 \bibitem{Perceptrón}
 Perceptrón.
 Disponible en: \url{https://es.wikipedia.org/wiki/Perceptr%C3%B3n}
@@ -2257,9 +2462,21 @@ Disponible en: \url{https://scikit-learn.org/stable/modules/generated/sklearn.li
 Random Forest Classifier
 Disponible en: \url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html}
 
-\bibitem{Gradient Boosting}
+\bibitem{Gradient Boosting Python}
 Gradient Boosting Classifier
 Disponible en: \url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html}
+
+\bibitem{SVM Python}
+Support Vector Machines
+Disponible en: \url{https://scikit-learn.org/stable/modules/svm.html}
+
+\bibitem{k-Nearest Neighbors Python}
+Nearest Neighbors
+Disponible en: \url{https://scikit-learn.org/stable/modules/neighbors.html}
+
+\bibitem{XGBoost Python}
+XGBoost Python Package
+Disponible en: \url{https://xgboost.readthedocs.io/en/stable/python/python_intro.html}
 
 \end{thebibliography}
 

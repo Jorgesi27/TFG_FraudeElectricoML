@@ -76,7 +76,6 @@ plt.grid()
 
 # Guardar imagen
 plt.savefig("results/roc_gradientBoosting.png", dpi=300)
-plt.show()
 plt.close()
 
 # Resultados
