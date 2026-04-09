@@ -2212,6 +2212,67 @@ Finalmente, los resultados se almacenan para su posterior comparación con el re
 
 \subsection{Modelos Online Implementados}
 
+Todos los modelos de aprendizaje online implementados en el proyecto siguen un procedimiento común de preparación de datos, entrenamiento incremental y evaluación continua. Este procedimiento permite comparar los distintos algoritmos bajo las mismas condiciones en un entorno que simula un flujo de datos en tiempo real.
+
+\medskip
+
+En primer lugar, se realiza la carga del conjunto de datos utilizando la librería \emph{Pandas}. A continuación, se lleva a cabo el preprocesamiento de los datos de forma similar que en los métodos offline.
+
+La variable \emph{theft}, que indica si existe fraude en el consumo, se transforma en una variable binaria, donde el valor 0 representa consumo normal y el valor 1 indica fraude. Además, las variables categóricas del conjunto de datos se convierten en variables numéricas mediante la técnica de \emph{one-hot encoding}, utilizando la función \emph{get\_dummies()}.
+
+Una vez definidas las variables independientes y la variable objetivo, se aplica un proceso de escalado de características mediante \emph{StandardScaler}. Este paso se aplica solamente en modelos lineales online, ya que mejora la estabilidad y convergencia del aprendizaje incremental.
+
+\medskip
+
+A diferencia de los métodos offline, en los online no se realiza una división del conjunto de datos en entrenamiento y prueba. En su lugar, se simula un flujo continuo de datos, procesando el conjunto completo de forma secuencial. Para ello, el conjunto de datos se divide en bloques de tamaño fijo llamados \emph{batches}. Cada uno de estos bloques es un conjunto de nuevos datos que llegan al sistema en tiempo real.
+
+\medskip
+
+El proceso de entrenamiento y evaluación se realiza de forma iterativa sobre estos bloques de datos. En cada iteración, el modelo realiza primero predicciones sobre el nuevo bloque utilizando el conocimiento previamente adquirido. Estas predicciones se utilizan para evaluar el rendimiento del modelo en condiciones realistas, donde los datos aún no han sido vistos.
+
+Posteriormente, el modelo se actualiza mediante el método \emph{partial\_fit}, incorporando la nueva información y ajustando sus parámetros de forma incremental. Este proceso permite que el modelo aprenda de manera continua sin necesidad de reentrenarse desde cero.
+
+\medskip
+
+Para poder utilizar el método \emph{partial\_fit}, es necesario especificar previamente el conjunto de clases posibles del problema, lo cual se realiza mediante la obtención de los valores únicos de la variable objetivo.
+
+Durante todo el proceso, se almacenan las predicciones y los valores reales correspondientes a cada bloque, lo que permite calcular las métricas de evaluación de forma acumulada al finalizar el flujo de datos. Las métricas utilizadas son las mismas empleadas en los métodos offline, lo que permite realizar una comparación directa entre ambos enfoques.
+
+En especial, para el cálculo de la curva ROC y la métrica ROC-AUC, se utilizan las puntuaciones continuas generadas por el modelo, dado que algunos algoritmos online no proporcionan probabilidades de forma directa.
+
+\medskip
+
+Los resultados obtenidos se almacenan en un archivo CSV común junto con los modelos offline, lo que facilita el análisis comparativo y la reproducibilidad de los experimentos. Además, se generan las correspondientes curvas ROC, permitiendo evaluar visualmente la capacidad discriminativa de cada modelo.
+
+
+\subsubsection{Perceptrón}
+
+El Perceptrón es un algoritmo de aprendizaje supervisado que pertenece a la familia de los modelos lineales, diseñado para problemas de clasificación binaria y corresponde al modelo baseline online del proyecto. Su objetivo es encontrar una frontera de decisión lineal que permita separar las clases mediante la combinación lineal de las variables de entrada.
+
+Este modelo se implementa mediante la clase \emph{Perceptron} de la librería \emph{Scikit-learn}, configurada con el parámetro \emph{random\_state}, que garantiza la reproducibilidad de los resultados.
+
+\medskip
+
+A diferencia de otros modelos más complejos, el Perceptrón actualiza sus parámetros de forma directa en función de los errores cometidos. En cada iteración, si una muestra es clasificada incorrectamente, el modelo ajusta los pesos asociados a las variables con el objetivo de reducir dicho error. Este mecanismo de actualización lo convierte en un modelo especialmente adecuado para entornos de aprendizaje online.
+
+\medskip
+
+En este trabajo, el entrenamiento del modelo se realiza utilizando el método \emph{partial\_fit}, que permite la actualización incremental del modelo a medida que se procesan nuevos bloques de datos. Para ello, es necesario especificar previamente el conjunto de clases del problema mediante los valores únicos de la variable objetivo.
+
+\medskip
+
+\begin{lstlisting}[caption={Creación del modelo Perceptrón}]
+model = Perceptron(random_state=42)
+\end{lstlisting}
+
+Dado que el Perceptrón no proporciona probabilidades de clasificación de forma directa, se utiliza la función \emph{decision\_function} para obtener una puntuación continua que representa la distancia de cada muestra al hiperplano de decisión. Esta puntuación permite evaluar la capacidad discriminativa del modelo.
+
+\medskip
+
+Este método se utiliza en este trabajo como modelo base dentro del entorno de aprendizaje online. Su simplicidad, bajo coste computacional y capacidad de actualización incremental lo convierten en una referencia adecuada para comparar con modelos más avanzados.
+
+Sin embargo, al tratarse de un modelo lineal, presenta limitaciones en la capacidad de capturar relaciones no lineales en los datos, lo que puede afectar a su rendimiento en problemas complejos.
+
 
 \subsection{Configuración y parámetros}
 
