@@ -14,6 +14,9 @@
 \usepackage{amsmath}
 \usepackage{bm}
 \usepackage{listings}
+\usepackage{indentfirst}
+\setlength{\parindent}{15pt}
+\setlength{\parskip}{6pt}
 
 \lstset{
 language=Python,
@@ -34,8 +37,6 @@ frame=single
   right=3cm
 }
 
-\setlength{\parskip}{1em}
-\setlength{\parindent}{0pt}
 \usepackage{url}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
@@ -2272,6 +2273,19 @@ Dado que el Perceptrón no proporciona probabilidades de clasificación de forma
 Este método se utiliza en este trabajo como modelo base dentro del entorno de aprendizaje online. Su simplicidad, bajo coste computacional y capacidad de actualización incremental lo convierten en una referencia adecuada para comparar con modelos más avanzados.
 
 Sin embargo, al tratarse de un modelo lineal, presenta limitaciones en la capacidad de capturar relaciones no lineales en los datos, lo que puede afectar a su rendimiento en problemas complejos.
+
+
+\subsubsection{Naive Bayes incremental}
+
+El modelo Naive Bayes es un algoritmo de clasificación probabilístico basado en el teorema de Bayes, que asume independencia condicional entre las variables de entrada. Bajo esta hipótesis, el modelo estima la probabilidad de pertenencia a cada clase a partir de la distribución de las características, asignando la clase con mayor probabilidad. En este trabajo se utiliza la variante \emph{Gaussian Naive Bayes} adecuada para variables numéricas continuas. Este modelo asume que cada característica sigue una distribución normal dentro de cada clase. A diferencia de los modelos lineales, este modelo no requiere escalado previo de las variables, ya que su funcionamiento se basa en la estimación de distribuciones estadísticas y no en distancias o márgenes de separación.
+
+\medskip
+
+El modelo se entrena de forma incremental mediante el método \emph{partial\_fit}, lo que permite actualizar las estimaciones de las distribuciones a medida que se procesan nuevos bloques de datos. Este proceso resulta muy eficiente desde el punto de vista computacional, ya que el modelo únicamente necesita mantener estadísticas agregadas de cada clase. Durante la evaluación, se utilizan directamente las probabilidades de pertenencia a la clase positiva obtenidas mediante la función \emph{predict\_proba}. Esto permite calcular la curva ROC y la métrica ROC-AUC de forma directa, sin necesidad de aproximaciones adicionales como ocurre en otros modelos lineales.
+
+\medskip
+
+El modelo Naive Bayes se incluye como una alternativa probabilística ligera dentro del aprendizaje automático online. Su principal ventaja es su rapidez y simplicidad, lo que lo hace adecuado para escenarios con grandes volúmenes de datos o restricciones computacionales. No obstante, la hipótesis de independencia entre variables puede limitar su capacidad de capturar relaciones complejas presentes en los datos, lo que puede traducirse en un rendimiento inferior frente a modelos más avanzados.
 
 
 \subsection{Configuración y parámetros}
