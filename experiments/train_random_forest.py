@@ -23,14 +23,14 @@ df = pd.read_csv("data/df.csv", index_col=0)
 
 # Convertir variables categóricas
 df["theft"] = df["theft"].str.strip()
-df["theft"] = (df["theft"] != "Normal").astype(int)
-df = df.dropna(subset=["theft"])
+df["theft"] = (df["theft"] != "Normal").astype(int)         # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude)
+df = df.dropna(subset=["theft"])                            # Eliminar valores nulos en la variable objetivo
 
-df = pd.get_dummies(df, columns=["Class"])
+df = pd.get_dummies(df, columns=["Class"])                  # Convertir categorías en variables numéricas, One-Hot encoding.
 
 # Separar variables
-X = df.drop("theft", axis=1)
-y = df["theft"]
+X = df.drop("theft", axis=1)                                # X → variables predictoras.
+y = df["theft"]                                             # y → variable objetivo.
 
 # Dividir dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)

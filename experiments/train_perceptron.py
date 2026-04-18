@@ -24,14 +24,14 @@ df = pd.read_csv("data/df.csv", index_col=0)
 
 # Preprocesamiento
 df["theft"] = df["theft"].str.strip()
-df["theft"] = (df["theft"] != "Normal").astype(int)     # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude)
-df = df.dropna(subset=["theft"])                        # Eliminar valores nulos en la variable objetivo
+df["theft"] = (df["theft"] != "Normal").astype(int)     # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude).
+df = df.dropna(subset=["theft"])                        # Eliminar valores nulos en la variable objetivo.
 
 df = pd.get_dummies(df, columns=["Class"])              # Convertir categorías en variables numéricas, One-Hot encoding.
 
 # Separar variables
-X = df.drop("theft", axis=1)                            # X → variables predictoras
-y = df["theft"].values                                  # y → variable objetivo
+X = df.drop("theft", axis=1)                            # X → variables predictoras.
+y = df["theft"].values                                  # y → variable objetivo.
 
 # Escalado
 scaler = StandardScaler()
