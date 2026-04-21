@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import pickle
 
 from river import forest
 
@@ -24,14 +25,14 @@ df = pd.read_csv("data/df.csv", index_col=0)
 
 # Preprocesamiento
 df["theft"] = df["theft"].str.strip()
-df["theft"] = (df["theft"] != "Normal").astype(int)
-df = df.dropna(subset=["theft"])
+df["theft"] = (df["theft"] != "Normal").astype(int)                 # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude).
+df = df.dropna(subset=["theft"])                                    # Eliminar valores nulos en la variable objetivo.
 
-df = pd.get_dummies(df, columns=["Class"])
+df = pd.get_dummies(df, columns=["Class"])                          # Convertir categorías en variables numéricas, One-Hot encoding.
 
 # Separar variables
-X = df.drop("theft", axis=1)
-y = df["theft"]
+X = df.drop("theft", axis=1)                                        # X → variables predictoras.
+y = df["theft"]                                                     # y → variable objetivo.
 
 # Escalado
 scaler = StandardScaler()
@@ -40,7 +41,7 @@ X_scaled = scaler.fit_transform(X)
 # Convertir a formato river
 X_stream = [dict(zip(X.columns, row)) for row in X_scaled]
 
-# Crear modelo Adaptive Random Forest
+# Crear modelo
 model = forest.ARFClassifier(
     n_models=10,
     seed=42
@@ -82,6 +83,14 @@ roc_auc = roc_auc_score(y_true_all, y_scores_all)
 
 # Curva ROC
 fpr_curve, tpr_curve, _ = roc_curve(y_true_all, y_scores_all)
+
+# Guardar datos de la curva ROC para la comparación conjunta
+with open("results/roc_adaptive_random_forest.pkl", "wb") as f:
+    pickle.dump({
+        "fpr": fpr_curve,
+        "tpr": tpr_curve,
+        "auc": roc_auc
+    }, f)
 
 plt.figure()
 plt.plot(fpr_curve, tpr_curve, label=f"Adaptive Random Forest (AUC = {roc_auc:.3f})")

@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import pickle
 
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression
@@ -66,6 +67,14 @@ roc_auc = roc_auc_score(y_test, y_prob)
 
 # Curva ROC
 fpr_curve, tpr_curve, _ = roc_curve(y_test, y_prob)
+
+# Guardar datos de la curva ROC para la comparación conjunta
+with open("results/roc_logistic_regression.pkl", "wb") as f:
+    pickle.dump({
+        "fpr": fpr_curve,
+        "tpr": tpr_curve,
+        "auc": roc_auc
+    }, f)
 
 # Guardar para comparativa con los otros métodos (Solo se añade en el script final)
 roc_data.append(("Logistic Regression", fpr_curve, tpr_curve, roc_auc))

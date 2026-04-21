@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import pickle
 
 from river import tree
 
@@ -79,6 +80,14 @@ roc_auc = roc_auc_score(y_true_all, y_scores_all)
 
 # Curva ROC
 fpr_curve, tpr_curve, _ = roc_curve(y_true_all, y_scores_all)
+
+# Guardar datos de la curva ROC para la comparación conjunta
+with open("results/roc_hoeffding_tree.pkl", "wb") as f:
+    pickle.dump({
+        "fpr": fpr_curve,
+        "tpr": tpr_curve,
+        "auc": roc_auc
+    }, f)
 
 plt.figure()
 plt.plot(fpr_curve, tpr_curve, label=f"Hoeffding Tree (AUC = {roc_auc:.3f})")

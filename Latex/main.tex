@@ -1152,7 +1152,104 @@ Este modelo presenta un mayor coste computacional en comparación con otros mét
 
 \subsection{Resultados experimentales}
 
+En esta sección se presentan los resultados obtenidos tras la evaluación de los distintos modelos de aprendizaje automático, tanto en su variante \emph{offline} como \emph{online}. Para garantizar una comparación homogénea, todos los modelos han sido evaluados utilizando las mismas métricas: \emph{Accuracy}, Precisión, \emph{Recall}, F1-\emph{score}, coeficiente Kappa, FPR y ROC-AUC. A continuación para facilitar la interpretación de los resultados, se presentan por separado los modelos \emph{offline} y los modelos \emph{online} con sus respectivos resultados redondeados.
+
+\begin{table}[H]
+\centering
+\caption{Resultados obtenidos por los modelos \emph{offline}.}
+\begin{tabular}{lccccccc}
+\hline
+\textbf{Modelo} & \textbf{Acc} & \textbf{Prec} & \textbf{Rec} & \textbf{F1} & \textbf{Kappa} & \textbf{FPR} & \textbf{ROC-AUC} \\
+\hline
+Logistic Regression & 0.711 & 0.628 & 0.719 & 0.670 & 0.416 & 0.294 & 0.760 \\
+Random Forest & 0.956 & 0.998 & 0.894 & 0.943 & 0.908 & \textbf{0.001} & 0.954 \\
+Gradient Boosting & 0.941 & 0.981 & 0.873 & 0.924 & 0.876 & 0.012 & 0.949 \\
+kNN & 0.926 & 0.924 & 0.892 & 0.907 & 0.846 & 0.051 & 0.921 \\
+XGBoost & \textbf{0.957} & \textbf{0.999} & \textbf{0.895} & \textbf{0.944} & \textbf{0.909} & \textbf{0.001} & \textbf{0.956} \\
+MLP & 0.937 & 0.974 & 0.869 & 0.918 & 0.867 & 0.016 & 0.948 \\
+\hline
+\end{tabular}
+\label{tab:resultados_offline}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Resultados obtenidos por los modelos \emph{online}.}
+\begin{tabular}{lccccccc}
+\hline
+\textbf{Modelo} & \textbf{Acc} & \textbf{Prec} & \textbf{Rec} & \textbf{F1} & \textbf{Kappa} & \textbf{FPR} & \textbf{ROC-AUC} \\
+\hline
+Perceptrón Online & 0.685 & 0.609 & 0.635 & 0.622 & 0.352 & 0.281 & 0.716 \\
+Naive Bayes Incremental & 0.493 & 0.439 & \textbf{0.872} & 0.584 & 0.090 & 0.768 & 0.596 \\
+kNN Online & 0.893 & 0.902 & 0.828 & 0.863 & 0.776 & 0.062 & 0.897 \\
+Hoeffding Tree & 0.874 & 0.898 & 0.779 & 0.834 & 0.733 & 0.061 & 0.894 \\
+Adaptive Random Forest & \textbf{0.917} & \textbf{0.960} & 0.831 & \textbf{0.891} & \textbf{0.824} & \textbf{0.024} & \textbf{0.959} \\
+\hline
+\end{tabular}
+\label{tab:resultados_online}
+\end{table}
+
+Con el objetivo de analizar la capacidad discriminativa de los modelos, se han representado las curvas ROC de forma conjunta para los métodos \emph{offline} y \emph{online}. Estas curvas permiten evaluar el comportamiento de los clasificadores para distintos umbrales de decisión, mostrando la relación entre la tasa de verdaderos positivos, TPR, y la tasa de falsos positivos, FPR. La métrica asociada a estas curvas es el área bajo la curva ROC, ROC-AUC, que proporciona una medida global de la capacidad del modelo para distinguir entre las clases. Un valor cercano a 1 indica un alto poder discriminativo, mientras que un valor próximo a 0.5 refleja un comportamiento similar al azar.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{imagenes/roc_comparison_offline.png}
+    \caption{Curvas ROC Métodos \emph{Offline}.}
+    \label{fig:roc_offline}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{imagenes/roc_comparison_online.png}
+    \caption{Curvas ROC Métodos \emph{Online}.}
+    \label{fig:roc_online}
+\end{figure}
+
+Para terminar de mostrar resultados, se añade la influencia de las variables en la detección de fraude eléctrico, con la que se estudia la importancia de características obtenida mediante los modelos \emph{Random Forest}, \emph{Gradient Boosting} y \emph{XGBoost}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{imagenes/random_forest_feature_importance.png}
+\caption{Importancia de variables obtenida con \emph{Random Forest}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{imagenes/gradient_boosting_feature_importance.png}
+\caption{Importancia de variables obtenida con \emph{Gradient Boosting}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{imagenes/xgboost_feature_importance.png}
+\caption{Importancia de variables obtenida con \emph{XGBoost}.}
+\end{figure}
+
+
 \subsection{Análisis y discusión de resultados}
+
+En general, se observa un alto rendimiento en la mayoría de los modelos basados en técnicas de aprendizaje más avanzadas, mientras que los métodos más simples presentan un comportamiento claramente inferior. En primer lugar, la Regresión Logística muestra el peor rendimiento global, con una exactitud del 71.1\% y una puntuación F1 de 0.67. Aunque presenta un valor de \emph{recall} relativamente alto de 0.719, su baja precisión de 0.628 indica una mayor cantidad de falsos positivos. Esto se refleja también en una tasa de falsos positivos (FPR) significativamente alta de 0.294 y un valor de ROC-AUC de 0.76, evidenciando una capacidad limitada para distinguir entre las clases. Estos resultados indican que, si bien el modelo es capaz de detectar una parte considerable de los casos de fraude, lo hace a costa de generar un número elevado de clasificaciones erróneas.
+
+Por otro lado, los modelos basados en técnicas de ensamble muestran un rendimiento notablemente superior. En el caso de \emph{Random Forest}, se obtiene una exactitud del 95.6\% y una puntuación F1 de 0.943, acompañado de una precisión prácticamente perfecta de 0.998. Este modelo presenta además una tasa de falsos positivos extremadamente baja de 0.001, lo que indica una gran capacidad para evitar clasificaciones incorrectas de la clase mayoritaria. Su valor ROC-AUC de 0.954 confirma su elevado poder discriminativo. De forma similar, el modelo \emph{Gradient Boosting} presenta un comportamiento muy competitivo, con una puntuación F1 de 0.924 y una ROC-AUC de 0.949. Aunque su precisión de 0.981 y su tasa de falsos positivos de 0.012 son ligeramente inferiores a las de \emph{Random Forest}, sigue mostrando un equilibrio adecuado entre precisión y capacidad de detección, reflejado en sus métricas globales.
+
+El modelo kNN obtiene resultados algo inferiores en comparación con los métodos anteriores, con una puntuación F1 de 0.907 y una ROC-AUC de 0.921. Aunque mantiene un buen equilibrio entre precisión de 0.924 y \emph{recall} de 0.892, su tasa de falsos positivos de 0.051 es mayor, lo que indica una menor capacidad para discriminar correctamente en comparación con los modelos basados en árboles.
+
+En cuanto al modelo \emph{XGBoost}, presenta el mejor rendimiento global entre todos los métodos evaluados. Destaca por obtener los valores más altos en prácticamente todas las métricas, incluyendo una exactitud del 95.7\%, una puntuación F1 de 0.944 y una ROC-AUC de 0.956. Además, combina una precisión casi perfecta de 0.999 con un elevado \emph{recall} de 0.895, manteniendo al mismo tiempo una tasa de falsos positivos mínima de 0.001. Estos resultados reflejan una excelente capacidad para detectar casos de fraude minimizando los errores.
+
+Finalmente, el Perceptrón Multicapa presenta un rendimiento competitivo, con una puntuación F1 de 0.918 y una ROC-AUC de 0.948. Aunque ligeramente inferior a los modelos de \emph{boosting}, muestra un comportamiento equilibrado entre precisión de 0.974 y \emph{recall} de 0.869, así como una baja tasa de falsos positivos de 0.016. Esto lo sitúa como una alternativa sólida dentro de los modelos evaluados. En conjunto, los resultados muestran una clara diferencia entre los modelos lineales y los modelos más complejos, siendo estos últimos los que alcanzan un mejor equilibrio entre las distintas métricas de evaluación.
+
+Ahora se analiza más detalladamente las curvas ROC, en la Figura \ref{fig:roc_offline} se muestran las curvas ROC correspondientes a los modelos offline. Se observa que los modelos más avanzados, como XGBoost, Random Forest, Gradient Boosting y el Perceptrón Multicapa (MLP), presentan curvas muy próximas entre sí y cercanas al vértice superior izquierdo, lo que indica un rendimiento elevado y muy similar entre ellos. Esta superposición de curvas refleja que todos estos modelos poseen una alta capacidad de discriminación, alcanzando valores de ROC-AUC superiores a 0.94. En particular, XGBoost destaca ligeramente sobre el resto, obteniendo el mayor valor de AUC, lo que confirma su eficacia en la detección de fraude en este problema. Por otro lado, el modelo kNN presenta un rendimiento inferior, aunque sigue mostrando una capacidad discriminativa aceptable. Finalmente, la Regresión Logística presenta la curva más alejada del óptimo, lo que evidencia un rendimiento significativamente menor en comparación con los modelos más complejos.
+
+En la Figura \ref{fig:roc_online}  se presentan las curvas ROC de los modelos online. A diferencia del caso offline, en este escenario se observa una mayor separación entre las curvas, lo que permite distinguir con mayor claridad el rendimiento de cada algoritmo. El modelo Adaptive Random Forest destaca claramente como el mejor método online, alcanzando el mayor valor de ROC-AUC y mostrando una curva más cercana al comportamiento óptimo. Le siguen el kNN online y el Hoeffding Tree, que presentan un rendimiento competitivo y relativamente similar. En contraste, el Perceptrón online y el Naive Bayes incremental muestran un comportamiento notablemente inferior, especialmente este último, cuya curva se aproxima en mayor medida a la línea base, indicando una menor capacidad de discriminación.
+
+Para terminar el estudio de los resultados, es el turno ahora de la importancia de las variables. Para ello se mostraron las gráficas de tres modelos en particular. En primer lugar, el modelo \emph{Random Forest} identifica como variables más relevantes aquellas relacionadas con el consumo eléctrico en distintos componentes del sistema. En particular, destacan  \emph{InteriorEquipment:Electricity},  \emph{InteriorLights:Electricity} y  \emph{Fans:Electricity}, lo que indica que el consumo energético interno del edificio es un factor clave en la detección de comportamientos anómalos. Además, variables relacionadas con el consumo de gas y agua, como  \emph{Water Heater:WaterSystems:Gas} e  \emph{InteriorEquipment:Gas}, también presentan una contribución significativa. Esto sugiere que el fraude no solo se manifiesta en el consumo eléctrico directo, sino también en patrones de consumo energético global.
+
+En el caso de  \emph{Gradient Boosting}, se observa una distribución más concentrada en variables energéticas específicas. Las variables más influyentes corresponden principalmente al consumo eléctrico interno, destacando  \emph{InteriorEquipment:Electricity} e  \emph{InteriorLights:Electricity} como las más relevantes. A diferencia del modelo anterior, este modelo otorga menor importancia a variables categóricas como el tipo de edificio, lo que indica que el modelo prioriza patrones de consumo sobre características estructurales del usuario.
+
+Finalmente, el modelo  \emph{XGBoost} presenta un comportamiento diferenciado respecto a los anteriores. En este caso, las variables más importantes están relacionadas con la tipología del edificio, como  \emph{Class\_SmallOffice},  \emph{Class\_Hospital} y  \emph{Class\_LargeHotel}. Esto indica que este modelo es capaz de capturar relaciones más complejas entre el tipo de instalación y la probabilidad de fraude, incorporando información estructural que otros modelos consideran menos relevante.
+
+En conjunto, los resultados muestran que  \emph{Random Forest} y  \emph{Gradient Boosting} coinciden en otorgar mayor relevancia a variables relacionadas con el consumo energético. Mientras que  \emph{XGBoost}, incorpora con mayor peso variables categóricas relacionadas con el tipo de edificio. Sin embargo, es importante destacar que las medidas de importancia de variables pueden presentar sesgos, especialmente hacia variables con mayor variabilidad o número de categorías, por lo que estos resultados deben interpretarse con cautela.
+
 
 \subsection{Conclusiones}
 
