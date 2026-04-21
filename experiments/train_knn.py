@@ -25,7 +25,7 @@ df = pd.read_csv("data/df.csv", index_col=0)
 
 # Convertir variables categóricas
 df["theft"] = df["theft"].str.strip()
-df["theft"] = (df["theft"] != "Normal").astype(int)         # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude.
+df["theft"] = (df["theft"] != "Normal").astype(int)         # Transformación de variable objetivo, Normal = 0, Resto = 1 (Fraude).
 df = df.dropna(subset=["theft"])                            # Eliminar valores nulos en la variable objetivo.
 
 df = pd.get_dummies(df, columns=["Class"])                  # Convertir categorías en variables numéricas, One-Hot encoding.

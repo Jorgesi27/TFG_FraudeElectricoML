@@ -893,7 +893,7 @@ En el caso de los modelos \emph{offline}, las métricas se calculan sobre un con
 
 \subsection{\emph{Accuracy}}
 
-La \emph{accuracy} o exactitud utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo3}, \cite{articulo4} y \cite{articulo5}, representa la proporción total de instancias correctamente clasificadas respecto al total de predicciones realizadas. Esta métrica tiene en cuenta tanto los verdaderos positivos como los verdaderos negativos, proporcionando una visión global del rendimiento del modelo. Aunque se utilizará como métrica descriptiva general, no será el criterio principal de comparación debido a la posible influencia del desbalance entre clases.
+La \emph{accuracy} o exactitud utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo3} y \cite{articulo5}, representa la proporción total de instancias correctamente clasificadas respecto al total de predicciones realizadas. Esta métrica tiene en cuenta tanto los verdaderos positivos como los verdaderos negativos, proporcionando una visión global del rendimiento del modelo. Aunque se utilizará como métrica descriptiva general, no será el criterio principal de comparación debido a la posible influencia del desbalance entre clases.
 
 \[
 \text{Accuracy} = \frac{\text{Número de predicciones correctas}}{\text{Número total de predicciones}}
@@ -904,7 +904,7 @@ El valor de esta métrica se encuentra entre 0 y 1, donde valores cercanos a 1 i
 
 \subsection{\emph{Precision}}
 
-La precisión utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo4} y \cite{articulo5}, mide la proporción de instancias clasificadas como fraude que realmente corresponden a fraude. Esta métrica permite evaluar el número de falsos positivos generados por el modelo, aspecto esencial para evitar clasificaciones incorrectas de clientes sin comportamiento posible de fraude. Su fórmula es
+La precisión utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2} y \cite{articulo5}, mide la proporción de instancias clasificadas como fraude que realmente corresponden a fraude. Esta métrica permite evaluar el número de falsos positivos generados por el modelo, aspecto esencial para evitar clasificaciones incorrectas de clientes sin comportamiento posible de fraude. Su fórmula es
 
 \[
 \text{Precision} = \frac{TP}{TP + FP}
@@ -915,7 +915,7 @@ donde $TP$ representa el número de verdaderos positivos y $FP$ representa el n�
 
 \subsection{\emph{Recall}}
 
-El \emph{recall} o también conocido en español como exhaustividad, sensibilidad o tasa de verdaderos positivos mide la proporción de fraudes reales correctamente detectados por el modelo. Esta métrica ha sido utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo4} y \cite{articulo5}. En el contexto de detección de fraude eléctrico, esta métrica resulta ser igual que otra métrica de fraudes llamada Tasa de Detección (DR) utilizada en la literatura en trabajos como \cite{articuloBase}.
+El \emph{recall} o también conocido en español como exhaustividad, sensibilidad o tasa de verdaderos positivos mide la proporción de fraudes reales correctamente detectados por el modelo. Esta métrica ha sido utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2} y \cite{articulo5}. En el contexto de detección de fraude eléctrico, esta métrica resulta ser igual que otra métrica de fraudes llamada Tasa de Detección (DR) utilizada en la literatura en trabajos como \cite{articuloBase}.
 
 \[
 \text{Recall} = \frac{TP}{TP + FN}
@@ -926,7 +926,7 @@ donde $TP$ representa el número de verdaderos positivos y $FN$ representa el n�
 
 \subsection{\emph{F1-score}}
 
-La puntuación F1 utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo4} y \cite{articulo5}, es la media armónica entre la precisión y el \emph{recall}, proporcionando una medida equilibrada del rendimiento del modelo cuando existe desbalance de clases, como es este caso. En este estudio, el \emph{F1-score} se considerará una de las métricas principales para la comparación entre técnicas.
+La puntuación F1 utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2} y \cite{articulo5}, es la media armónica entre la precisión y el \emph{recall}, proporcionando una medida equilibrada del rendimiento del modelo cuando existe desbalance de clases, como es este caso. En este estudio, el \emph{F1-score} se considerará una de las métricas principales para la comparación entre técnicas.
 
 Entrando más en detalle, esta métrica equilibra la compensación entre falsos positivos y falsos negativos, y proporciona una medida más precisa del rendimiento del modelo. En la detección de fraude, la precisión por sí sola no es suficiente para comprender la situación completa. Un modelo puede alcanzar una alta precisión, pero si no detecta casos críticos poco frecuentes, podría estar causando más fallos que beneficios. Con esta métrica se estará cubriendo este riesgo. Se define como:
 
@@ -971,7 +971,7 @@ A diferencia de métricas como \emph{accuracy}, \emph{precision} o \emph{recall}
 
 Es una métrica para la visualización de los resultados de algoritmos clasificadores. En definitiva, es una tabla que desglosa el número de instancias de verdad fundamental de una clase específica frente al número de instancias de clase previstas. Las matrices de confusión son una de las diferentes métricas de evaluación que miden el rendimiento de un modelo de clasificación.
 
-Destacar que ninguno de los artículos analizados presenta explícitamente la matriz de confusión, pero todos utilizan métricas que se derivan directamente de ella, por lo que su uso es implícito en todos los trabajos estudiados. Además, esta métrica permite analizar detalladamente los aciertos y errores del modelo, distinguiendo entre verdaderos positivos, falsos positivos, verdaderos negativos y falsos negativos. Una de sus principales ventajas es que pueden utilizarse con cualquier algoritmo clasificador, como Naïve Bayes, modelos de regresión, árboles de decisión, etc, modelos que serán implementados. 
+Destacar que ninguno de los artículos analizados presenta explícitamente la matriz de confusión, pero todos utilizan métricas que se derivan directamente de ella, excepto el artículo \cite{articulo4}, por lo que su uso es implícito en todos los trabajos estudiados. Además, esta métrica permite analizar detalladamente los aciertos y errores del modelo, distinguiendo entre verdaderos positivos, falsos positivos, verdaderos negativos y falsos negativos. Una de sus principales ventajas es que pueden utilizarse con cualquier algoritmo clasificador, como Naïve Bayes, modelos de regresión, árboles de decisión, etc, modelos que serán implementados. 
 
 En la práctica, debido a su amplia aplicabilidad en la ciencia de datos y en los modelos de aprendizaje automático, muchos paquetes y bibliotecas vienen precargados con funciones para crear matrices de confusión en Python. Su análisis resulta fundamental para interpretar el comportamiento del sistema en la detección de fraude.
 
@@ -1068,7 +1068,7 @@ A diferencia de otros métodos offline implementados en este trabajo, en este mo
 Este método se implementa en este estudio como modelo representativo de redes neuronales aplicadas a datos tabulares, permitiendo comparar su rendimiento frente a los métodos clásicos de aprendizaje automático y frente a modelos ensemble más avanzados. Su principal limitación es un mayor coste computacional y una menor interpretabilidad respecto a modelos basados en árboles.
 
 
-\subsubsection{k-Nearest Neighbors}
+\subsubsection{k Vecinos más cercanos}
 
 El algoritmo k vecinos más cercanos (kNN) es un método de aprendizaje supervisado basado en instancias, que clasifica una observación en función de las etiquetas de sus vecinos más cercanos en el espacio de características. A diferencia de otros modelos, kNN no construye un modelo explícito durante la fase de entrenamiento, sino que almacena el conjunto de datos y realiza las predicciones en tiempo de inferencia. Para clasificar una nueva instancia, el algoritmo calcula la distancia entre dicha instancia y todas las observaciones del conjunto de entrenamiento, seleccionando las k más cercanas. La clase final se determina mediante votación mayoritaria o ponderada entre estos vecinos.
 
@@ -1125,13 +1125,36 @@ El modelo Naive Bayes se incluye como una alternativa probabilística ligera den
 
 \subsubsection{k Vecinos más cercanos \emph{online}}
 
+El algoritmo kNN se incluye en el entorno \emph{online} como una versión adaptada al procesamiento en flujo de datos. A diferencia de modelos incrementales puros, no actualiza parámetros internos, sino que su funcionamiento se basa en almacenar instancias previamente observadas y utilizar dichas instancias como referencia para clasificar nuevos datos. En esta implementación, el modelo se adapta a un escenario online mediante una estrategia de memoria incremental. El flujo de datos se divide en bloques o \emph{batches}, y cada nuevo bloque se clasifica utilizando únicamente las instancias vistas hasta ese preciso momento. Una vez realizadas las predicciones, el bloque actual se incorpora al conjunto de referencia, permitiendo que el modelo disponga de información más reciente en iteraciones posteriores. Además, dado que el algoritmo depende directamente del cálculo de distancias entre observaciones, se aplica un proceso de escalado previo, de forma que todas las variables contribuyan de manera equilibrada a la medida de similitud.
+
+Los parámetros principales, para la construcción del modelo, que incluye la configuración son: \emph{n\_neighbors = 5}, que define el número de vecinos considerados para la clasificación; \emph{weights = "distance"}, que asigna mayor peso a los vecinos más cercanos; \emph{metric = "minkowski"} con \emph{p = 2}, equivalente a la distancia euclídea; y \emph{algorithm = \textquotedbl{}auto\textquotedbl{} }, que permite seleccionar automáticamente la estrategia de búsqueda más eficiente. Además, se emplea \emph{n\_jobs = -1} con el fin de utilizar todos los núcleos disponibles del procesador.
+
+En una implementación directa, el algoritmo almacenaría todas las instancias observadas a lo largo del tiempo, incrementando progresivamente el tamaño del conjunto de referencia. Sin embargo, este enfoque presenta importantes limitaciones, tanto en coste computacional como en uso de memoria, particularmente en conjuntos de datos de gran tamaño como el empleado en este estudio. A medida que crece el número de instancias almacenadas, el cálculo de distancias se vuelve cada vez más costoso, lo que dificulta la aplicación del modelo en escenarios de tiempo real. Para mitigar este problema, se introduce una estrategia de ventana deslizante, mediante la cual el modelo conserva únicamente un subconjunto de las instancias más recientes, descartando progresivamente las más antiguas. De este modo, se limita el tamaño del conjunto de referencia y se mantiene un tiempo de respuesta constante a lo largo del flujo de datos.
+
+En problemas como la detección de fraude eléctrico, es posible que los patrones de comportamiento evolucionen con el tiempo. Así, priorizar la información más reciente permite que el modelo se adapte mejor a posibles cambios en la distribución de los datos, es decir, al \emph{concept drift}. Aunque, esta versión no constituye un método \emph{online} puro en sentido estricto, sí representa una adaptación razonable al contexto de flujo continuo y permite comparar su comportamiento con la versión \emph{offline} del mismo algoritmo y con otros métodos online implementados en el proyecto.
+
 
 \subsubsection{\emph{Hoeffding Tree}}
+
+El \emph{Hoeffding Tree} es un algoritmo de aprendizaje incremental basado en árboles de decisión diseñado específicamente para entornos de flujo de datos. A diferencia de los árboles tradicionales, este modelo no requiere almacenar el conjunto completo de datos, sino que construye el árbol de forma progresiva a medida que recibe nuevas instancias. La función principal del algoritmo se basa en el límite de Hoeffding, el cual permite determinar, con alta probabilidad, cuándo se dispone de suficiente información para realizar una división óptima en un nodo del árbol. De este modo, el modelo puede tomar decisiones utilizando únicamente una fracción de los datos, garantizando eficiencia y rapidez en el aprendizaje.
+
+Durante el proceso de aprendizaje, el árbol mantiene estadísticas suficientes en cada nodo para evaluar posibles divisiones basadas en medidas como la ganancia de información. Cuando la diferencia entre las mejores opciones de división supera el umbral establecido por el límite de Hoeffding, se realiza la partición del nodo. El proceso de este algoritmo sigue una estrategia \emph{prequential}, en la que cada nueva instancia es primero utilizada para realizar una predicción y posteriormente se emplea para actualizar el modelo. Una de las principales ventajas de este método es su bajo coste computacional y su capacidad para adaptarse a flujos de datos continuos sin necesidad de almacenar instancias previas. Esto lo convierte en un modelo especialmente adecuado para aplicaciones en tiempo real.
 
 
 \subsubsection{\emph{Adaptive Random Forest}}
 
+El \emph{Adaptive Random Forest} es un modelo de aprendizaje \emph{online} basado en un conjunto de árboles de decisión incrementales, diseñado específicamente para trabajar en entornos de flujo de datos. Su funcionamiento se inspira en los métodos ensemble tradicionales, especialmente en \emph{Random Forest}, pero adaptado al aprendizaje secuencial y a la posible aparición de cambios en la distribución de los datos. A diferencia de un único árbol incremental, ARF construye un conjunto de árboles \emph{Hoeffding}, combinando sus predicciones para obtener una salida final más robusta. Cada árbol se entrena de manera incremental sobre diferentes subconjuntos del flujo de datos, lo que incrementa la diversidad del ensemble y mejora la capacidad de generalización del modelo.
 
+Los parámetros principales, para la construcción del modelo, que incluye la configuración son: \emph{n\_models = 10}, que define el número de árboles que componen el bosque, y \emph{seed = 42}, empleado para garantizar la reproducibilidad de los experimentos. Destacar, que cuando uno de los árboles detecta un deterioro en su rendimiento, puede ser reemplazado por un árbol alternativo, permitiendo que el modelo mantenga su capacidad predictiva en entornos dinámicos. Además, el proceso de evaluación sigue un esquema  \emph{prequential}, en el que cada nueva instancia se utiliza primero para generar una predicción y posteriormente para actualizar el modelo.
+
+Este modelo presenta un mayor coste computacional en comparación con otros métodos online, debido a la construcción simultánea de múltiples árboles incrementales. No obstante, este mayor coste se ve compensado por una mejora en la capacidad predictiva y en la robustez del modelo, especialmente en entornos de flujo de datos con posibles cambios en la distribución. Este algoritmo se incluye en este estudio como uno de los modelos online más avanzados, permitiendo analizar hasta qué punto un ensemble incremental es capaz de aproximarse al rendimiento de los mejores métodos \emph{offline}. Su principal ventaja reside en la combinación de robustez, capacidad adaptativa y eficiencia computacional, lo que lo convierte en una alternativa especialmente adecuada para escenarios de detección de fraude en tiempo real.
+
+
+\subsection{Resultados experimentales}
+
+\subsection{Análisis y discusión de resultados}
+
+\subsection{Conclusiones}
 
 % =========================
 % CAPÍTULO 7
