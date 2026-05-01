@@ -1,11 +1,28 @@
 from fastapi import FastAPI
-from app.api import online, offline
+from app.api import operador
 
 app = FastAPI(
-    title="Electricity Fraud Detection",
-    description="Online vs Offline Fraud Detection",
-    version="1.0.0"
+    title="API de Detección de Fraude Eléctrico",
+    description=(
+        "Sistema para importar curvas de consumo eléctrico y predecir posibles casos "
+        "de fraude mediante modelos de aprendizaje automático."
+    ),
+    version="1.0.0",
+    docs_url="/documentacion",
+    redoc_url=None
 )
 
-app.include_router(online.router, prefix="/online", tags=["Online Detection"])
-app.include_router(offline.router, prefix="/offline", tags=["Offline Detection"])
+app.include_router(
+    operador.router,
+    prefix="/api/operador",
+    tags=["Operador"]
+)
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return {
+        "mensaje": "API de Detección de Fraude Eléctrico",
+        "estado": "activa",
+        "documentacion": "/documentacion"
+    }
