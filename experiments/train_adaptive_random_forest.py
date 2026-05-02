@@ -139,3 +139,19 @@ if os.path.exists(results_file):
     results_df.to_csv(results_file, mode="a", header=False, index=False)
 else:
     results_df.to_csv(results_file, index=False)
+
+# Guardar modelo entrenado para la API
+os.makedirs("models", exist_ok=True)
+
+with open("models/arf_model.pkl", "wb") as f:
+    pickle.dump(model, f)
+
+with open("models/arf_scaler.pkl", "wb") as f:
+    pickle.dump(scaler, f)
+
+with open("models/arf_columns.pkl", "wb") as f:
+    pickle.dump(X.columns.tolist(), f)
+
+print("\nModelo Adaptive Random Forest guardado en models/arf_model.pkl")
+print("Scaler ARF guardado en models/arf_scaler.pkl")
+print("Columnas ARF guardadas en models/arf_columns.pkl")

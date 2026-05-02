@@ -5,7 +5,7 @@ app = FastAPI(
     title="API de Detección de Fraude Eléctrico",
     description=(
         "Sistema para importar curvas de consumo eléctrico y predecir posibles casos "
-        "de fraude mediante modelos de aprendizaje automático."
+        "de fraude mediante modelos de aprendizaje automático previamente entrenados."
     ),
     version="1.0.0",
     docs_url="/documentacion",

@@ -1,7 +1,29 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from enum import Enum
+from pathlib import Path
+
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi.responses import FileResponse
+
+from app.services.prediction_service import (
+    realizar_prediccion_desde_csv,
+    cargar_ultimo_resultado,
+    comprobar_prediccion_previa
+)
 
 router = APIRouter()
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+RESULTS_DIR = BASE_DIR / "results"
+
+
+class OpcionDatosComplementarios(str, Enum):
+    no = "no"
+    si = "si"
+
+
+class ModeloCurvaROC(str, Enum):
+    xgboost = "xgboost"
+    adaptive_random_forest = "adaptive_random_forest"
 
 @router.post(
     "/login",
@@ -9,7 +31,6 @@ router = APIRouter()
     description="Permite al operador iniciar sesión en el sistema."
 )
 def iniciar_sesion(usuario: str, password: str):
-    # Implementación futura: validación contra base de datos o sistema de autenticación.
     if not usuario or not password:
         raise HTTPException(
             status_code=400,
@@ -29,64 +50,87 @@ def iniciar_sesion(usuario: str, password: str):
     summary="Realizar predicción de fraude",
     description=(
         "Permite importar un archivo CSV con curvas de consumo eléctrico y realizar "
-        "una predicción de fraude utilizando los modelos previamente entrenados."
+        "una predicción de fraude usando XGBoost como modelo offline y Adaptive Random "
+        "Forest como modelo online."
     )
 )
-async def realizar_prediccion(archivo: UploadFile = File(...)):
-    # Implementación futura:
-    # 1. Validar CSV
-    # 2. Cargar modelos entrenados
-    # 3. Preprocesar datos
-    # 4. Realizar predicción offline y online
-    # 5. Guardar último resultado
-
-    if not archivo.filename.endswith(".csv"):
+async def realizar_prediccion(
+    archivo: UploadFile = File(...),
+    incluir_datos_complementarios: OpcionDatosComplementarios = Query(
+        default=OpcionDatosComplementarios.no,
+        description="Indica si se desean incluir datos complementarios en la respuesta."
+    )
+):
+    if not archivo.filename.lower().endswith(".csv"):
         raise HTTPException(
             status_code=400,
-            detail="El archivo debe tener formato CSV."
+            detail="El archivo importado debe tener formato CSV."
         )
 
-    return {
-        "mensaje": "Archivo recibido correctamente. La predicción se implementará en la siguiente fase.",
-        "archivo": archivo.filename,
-        "modelos_previstos": [
-            "XGBoost",
-            "Adaptive Random Forest"
-        ],
-        "resultado": "pendiente_implementacion"
-    }
+    contenido = await archivo.read()
+
+    return realizar_prediccion_desde_csv(
+        contenido=contenido,
+        nombre_archivo=archivo.filename,
+        incluir_datos_complementarios=(
+            incluir_datos_complementarios == OpcionDatosComplementarios.si
+        )
+    )
 
 
 @router.get(
     "/ultimo-resultado",
     summary="Consultar último resultado de predicción",
-    description="Devuelve el último resultado de predicción generado por el sistema."
+    description="Devuelve el último resultado de predicción almacenado por el sistema."
 )
-def consultar_ultimo_resultado():
-    # Implementación futura: recuperar último resultado almacenado.
-    return {
-        "mensaje": "Consulta del último resultado de predicción.",
-        "estado": "pendiente_implementacion",
-        "ultimo_resultado": None
-    }
+def consultar_ultimo_resultado(
+    incluir_datos_complementarios: OpcionDatosComplementarios = Query(
+        default=OpcionDatosComplementarios.no,
+        description="Indica si se desean incluir métricas, curvas ROC e importancia de variables."
+    )
+):
+    return cargar_ultimo_resultado(
+        incluir_datos_complementarios=(
+            incluir_datos_complementarios == OpcionDatosComplementarios.si
+        )
+    )
 
 
 @router.get(
-    "/datos-complementarios",
-    summary="Consultar datos complementarios",
+    "/curva-roc",
+    summary="Visualizar curva ROC del modelo",
     description=(
-        "Devuelve información complementaria de los modelos utilizados, como métricas "
-        "de evaluación, curvas ROC e importancia de variables cuando esté disponible."
+        "Devuelve la imagen de la curva ROC asociada al modelo seleccionado. "
+        "La curva ROC permite evaluar la capacidad del modelo para distinguir entre consumo normal y fraude. "
+        "Cuanto más próxima esté la curva a la esquina superior izquierda, mejor será el rendimiento del modelo. "
+        "La diagonal representa un clasificador aleatorio."
     )
 )
-def consultar_datos_complementarios():
-    # Implementación futura: conectar con resultados, curvas ROC e importancia de variables.
-    return {
-        "mensaje": "Consulta de datos complementarios.",
-        "estado": "pendiente_implementacion",
-        "datos_disponibles": {
-            "metricas": True,
-            "curvas_roc": True,
-            "importancia_variables": True
-        }
-    }
+def ver_curva_roc(
+    modelo: ModeloCurvaROC = Query(
+        description="Seleccione el modelo cuya curva ROC desea visualizar."
+    )
+):
+    comprobar_prediccion_previa()
+
+    if modelo == ModeloCurvaROC.xgboost:
+        ruta = RESULTS_DIR / "roc_xgboost.png"
+    elif modelo == ModeloCurvaROC.adaptive_random_forest:
+        ruta = RESULTS_DIR / "roc_arf.png"
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="Modelo no reconocido."
+        )
+
+    if not ruta.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="La curva ROC solicitada no está disponible."
+        )
+
+    return FileResponse(
+        path=ruta,
+        media_type="image/png",
+        filename=ruta.name
+    )
