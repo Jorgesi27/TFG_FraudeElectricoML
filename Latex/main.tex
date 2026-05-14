@@ -147,13 +147,10 @@ Fdo.: Jorge Antonio Sánchez Benítez
 
 \section*{Resumen}
 
-El proyecto presenta una comparativa de diferentes técnicas para la detección de fraudes en el consumo eléctrico, abarcando tanto enfoques de aprendizaje automático clásicos como técnicas de aprendizaje \emph{online}. Para ello, se analizan bases de datos existentes de consumo eléctrico que incluyen casos con y sin fraude, sobre las que se implementan y entrenan modelos de aprendizaje tanto \emph{online} como \emph{offline}. A partir de estos datos, se aplican algoritmos de detección de anomalías con el objetivo de identificar comportamientos atípicos que puedan indicar la presencia de fraude.
-
-Finalmente, se evalúa la precisión de los modelos mediante métricas adecuadas para realizar la comparativa entre las técnicas empleadas y se desarrolla un prototipo que simula un escenario real en el que se aplican los modelos entrenados, ofreciendo además resultados visuales que facilitan la interpretación de los resultados obtenidos.
-
+El proyecto lleva a cabo una comparación de varias técnicas para identificar fraudes en el consumo eléctrico, que abarcan métodos \emph{offline} de aprendizaje automático y métodos de aprendizaje \emph{online}. Para desarrollar y usar estos métodos se emplean datos de consumo eléctrico, los cuales incluyen situaciones fraudulentas y no fraudulentas. Se implementan algoritmos para detectar comportamientos que no son normales en estos datos, con el objetivo de identificar comportamientos raros que pueden revelar la posibilidad de fraude. Por último, se examina la exactitud de los modelos a través de métricas apropiadas para comparar las técnicas utilizadas y se crea un prototipo que reproduce una situación real en la que se implementan los modelos entrenados. Este prototipo ofrece resultados visuales que permiten interpretar más fácilmente los datos obtenidos.
 \medskip
 
-\noindent\textbf{Palabras clave:} detección de fraude, consumo eléctrico, aprendizaje automático, aprendizaje \emph{online}, detección de anomalías
+\noindent\textbf{Palabras clave:} detección de fraude, consumo eléctrico, aprendizaje automático, aprendizaje \emph{online}, aprendizaje \emph{offline}, detección de anomalías
 
 % =========================
 % ÍNDICE GENERAL
@@ -199,21 +196,18 @@ Finalmente, se evalúa la precisión de los modelos mediante métricas adecuadas
 
 \section{Motivación}
 
-El fraude en el consumo eléctrico es uno de los principales problemas para las empresas de energía eléctrica en todo el mundo, ya que generan enormes pérdidas económicas afectando a la estabilidad y sostenibilidad de las redes eléctricas. Existen dos tipos de conexiones irregulares al suministro eléctrico: los enganches directos sin contrato de suministro y las manipulaciones que afectan tanto al contador como a la instalación.
+El fraude dentro del consumo eléctrico es uno de los problemas principales para las empresas de energía eléctrica en todo el mundo, ya que suponen pérdidas enormes económicas afectando a la estabilidad y sostenibilidad de las redes eléctricas. Existen dos tipos de conexiones irregulares al suministro eléctrico, los enganches directos sin contrato de suministro y las manipulaciones que afectan tanto al contador como a la instalación. En el ámbito nacional, según la empresa Endesa \cite{endesa}, casi el 60 por ciento de estos fraudes de electricidad se realizan a través de un enganche ilegal de luz conectado directamente a la red de baja tensión o de alumbrado. Además, las manipulaciones del contador son casos en los que se tiene un contrato en vigor y se manipula la instalación o el contador para que no registre todo lo que se está consumiendo. Se han detectado en España en los últimos 5 años más de 300.000 casos de fraude, y en los primeros meses de 2025, se detectaron 60.525 fraudes; prácticamente 200 casos diarios.
 
-En el ámbito nacional, según la empresa Endesa \cite{endesa}, casi el 60 por ciento de estos fraudes de electricidad se realizan a través de un enganche ilegal de luz conectado directamente a la red de baja tensión o de alumbrado. Además, las manipulaciones del contador son casos en los que se tiene un contrato en vigor y se manipula la instalación o el contador para que no registre todo lo que se está consumiendo. Se han detectado en España en los últimos 5 años más de 300.000 casos de fraude, y en los primeros meses de 2025, se detectaron 60.525 fraudes; prácticamente 200 casos diarios.
-
-Para detectar estos fraudes se utilizan técnicas de aprendizaje supervisado en modo \emph{offline}, donde los modelos se entrenan con conjuntos de datos históricos completos. Sin embargo, con la implementación de redes inteligentes y la digitalización de los sistemas de medición a través de contadores inteligentes abren la puerta a la aplicación de técnicas \emph{onlines} de aprendizaje automático para detectar patrones anómalos asociados al fraude. Esto resulta interesante comparar la diferencia de rendimiento entre técnicas \emph{offlines}, más clásicas, y técnicas \emph{online}, más modernas. Así, se podrá analizar sus capacidades de detección, adaptabilidad y viabilidad en escenarios reales. Además, de desarrollar un prototipo funcional que simule un entorno web operativo que permita evaluar la práctica de estas técnicas más allá del análisis teórico.
+Para detectar estos fraudes se utilizan técnicas de aprendizaje supervisado en modo \emph{offline}, donde los modelos se entrenan con conjuntos de datos históricos completos. Sin embargo, con la implementación de redes inteligentes y la digitalización de los sistemas de medición a través de contadores inteligentes abren la puerta a la aplicación de técnicas \emph{onlines} de aprendizaje automático para detectar patrones anómalos relacionados con el fraude. Por ello, es interesante comparar la diferencia de rendimiento entre técnicas \emph{offlines}, más clásicas, y técnicas \emph{online}, más modernas. Así, se podrá analizar sus capacidades de detección, adaptabilidad y viabilidad en escenarios reales. Además, de desarrollar un prototipo funcional que simule un entorno web operativo que permita evaluar la práctica de estas técnicas más allá del análisis teórico.
 
 
 \section{Estado del arte}
 
-La detección y prevención del robo de electricidad son un problema complejo y multidisciplinario, ya que involucra conocimientos de ingeniería eléctrica, comunicaciones, ciberseguridad, análisis de datos y aprendizaje automático. Durante la última década, se han propuesto numerosos enfoques para enfrentar este problema, cada uno con distintos supuestos, capacidades y limitaciones.
-
+La detección y prevención del robo de electricidad son un problema complejo y multidisciplinario, ya que se relaciona con conocimientos de ingeniería eléctrica, comunicaciones, ciberseguridad, análisis de datos y aprendizaje automático. Durante la última década, se han propuesto numerosos métodos o estrategias para enfrentar este problema, cada uno con distintos supuestos, capacidades y limitaciones.
 
 \subsection{Métodos de detección de fraude eléctrico}
 
-El fraude eléctrico es ampliamente estudiado en la literatura científica, dando lugar a varios y distintos enfoques metodológicos. Según el artículo \cite{articulo1}, se clasifican los estudios actuales en cuatro grandes categorías: métodos basados en teoría de juegos, métodos basados en análisis de la red eléctrica, métodos basados en hardware y métodos basados en aprendizaje automático. A continuación, se van a describir estas categorías en base a trabajos, proyectos o artículos que estudian la detección de fraude eléctrico.
+El fraude eléctrico se estudia y analiza en la literatura científica, dando como resultados distintas metodologías. Según el artículo \cite{articulo1}, se clasifican los estudios actuales en cuatro grandes categorías: métodos basados en teoría de juegos, métodos basados en análisis de la red eléctrica, métodos basados en hardware y métodos basados en aprendizaje automático. Se van a describir estas categorías en base a trabajos, proyectos o artículos que estudian la detección de fraude eléctrico.
 
 \begin{figure}[H]
     \centering
@@ -223,16 +217,12 @@ El fraude eléctrico es ampliamente estudiado en la literatura científica, dand
 
 \subsubsection{Métodos basados en teoría de juegos}
 
-Según \cite{articulo1}, la teoría de juegos es una disciplina que estudia la toma de decisiones interactivas entre agentes que compiten entre sí, y ha sido aplicada con éxito en numerosos campos. En el contexto de la detección del robo de electricidad, ofrece una nueva perspectiva estratégica para modelar la interacción entre las empresas eléctricas y los usuarios fraudulentos, permitiendo analizar sus comportamientos de forma racional y sistemática.
-
-Para empezar, todos los participantes actúan de manera racional, es decir, buscan maximizar su beneficio individual.  Mientras que los ladrones de electricidad intentan maximizar la cantidad de energía robada minimizando la probabilidad de ser pillados, las empresas eléctricas buscan maximizar la tasa de detección y, al mismo tiempo, minimizar los costes operativos de actividades de inspección y control. El robo de electricidad se modela como un juego estratégico en el que cada parte ajusta su comportamiento en respuesta a la estrategia de la otra. En lo principal que destaca esta categoría es que proporcionan un marco teórico fuerte y que ayudan a diseñar estrategias de detección y disuasión más eficientes Por último, analizando sus principales limitaciones se puede observar que requieren suposiciones fuertes sobre el comportamiento de los actores, la construcción de funciones de utilidad realistas es compleja y su implementación práctica es limitada.
+De acuerdo con \cite{articulo1}, la teoría de juegos es una rama de estudio basada en el proceso de tomar decisiones interactivas entre agentes que compiten entre sí. En la detección del robo de electricidad, proporciona un método nuevo para analizar cómo interactúan las compañías eléctricas con los consumidores fraudulentos, lo que permite un análisis racional y sistemático de sus conductas. Todos los participantes se comportan racionalmente y persiguen maximizar su beneficio personal. Las compañías tratan de maximizar la tasa de detección y minimizar los costos operativos de las actividades de control e inspección, mientras que los ladrones intentan reducir al mínimo la probabilidad de ser atrapados con el fin de robar la mayor cantidad posible de energía. El robo es un juego estratégico en el que cada parte modifica su conducta en función de la otra. Esta categoría se caracteriza porque brinda una sólida base teórica y colabora en la creación de estrategias de detección y disuasión más eficaces. Al examinar sus limitaciones fundamentales, se puede notar que necesita suposiciones robustas acerca de la conducta de los actores, que es difícil elaborar funciones de utilidad realistas y que su implementación práctica es bastante limitada.
 
 
 \subsubsection{Métodos basados en el análisis de la red eléctrica}
 
-Los métodos basados en el análisis de la red eléctrica se centran en la detección de comportamientos anómalos de consumo mediante el análisis de parámetros físicos del sistema eléctrico, tales como corrientes, voltajes, flujos de potencia y estados de la red. A diferencia de los enfoques basados en datos históricos de consumo, estos métodos se basan en el modelo físico y operativo de la red de distribución.  Además de las mediciones de consumo, se utilizan múltiples fuentes de información como datos de la red, datos de sensores e información recolectada por unidades terminales remotas y otros dispositivos de medición.
-
-Según el artículo \cite{articuloAnálisisRedEléctrica}, estos métodos detectan el robo de electricidad mediante el cálculo del sesgo, \emph{bias}, entre los valores estimados obtenidos a partir de modelos eléctricos, y los valores medidos por los dispositivos de la red. Es decir, calculan la diferencia sistemática entre lo que el sistema eléctrico debería consumir (valor estimado) y lo que los medidores realmente registran (valor medido). Este sesgo se compara con un umbral predefinido, cuanto mayor es la diferencia, mayor es la probabilidad de que exista robo de electricidad. Un enfoque básico para estimar las pérdidas no técnicas consiste en realizar un balance energético entre la energía suministrada por el transformador de distribución, y la suma de las lecturas de todos los medidores conectados. Si las pérdidas de línea superan un cierto umbral, se sospecha de consumo anómalo. Sin embargo, este método no distingue entre pérdidas técnicas y no técnicas, por lo que resulta insuficiente en escenarios reales complejos. Por esta razón, se han desarrollado métodos más avanzados y orientados por datos.
+Los métodos de análisis de la red eléctrica buscan comportamientos que no son normales de consumo a través de analizar parámetros físicos del sistema eléctrico, tales como corrientes, voltajes, flujos de potencia y estados de la red. Para diferenciarlos de los métodos basados en datos históricos de consumo, estos métodos se basan en el modelo físico y operativo de la red de distribución. Se utilizan varias fuentes de información como datos de la red, datos de sensores e información recolectada por unidades terminales remotas y otros dispositivos de medición. Según el artículo \cite{articuloAnálisisRedEléctrica}, estos métodos detectan el robo de electricidad mediante el cálculo del sesgo, \emph{bias}, entre los valores estimados obtenidos a partir de modelos eléctricos, y los valores medidos por los dispositivos de la red. Calculan la diferencia entre lo que el sistema eléctrico debería consumir, valor estimado, y lo que los medidores realmente registran, valor medido. Este sesgo se compara con un umbral predefinido, cuanto mayor es la diferencia, mayor es la probabilidad de que exista robo de electricidad. Para estimar las pérdidas no técnicas conviene realizar un balance energético entre la energía suministrada por el transformador de distribución, y la suma de las lecturas de todos los medidores conectados. Si las pérdidas de línea superan un cierto umbral, se sospecha de consumo anómalo. Sin embargo, este método no distingue entre pérdidas técnicas y no técnicas, por lo que no resulta suficiente en escenarios reales complejos.
 
 Esta categoría se divide en dos subcategorías: métodos basados en estimación de estado y métodos basados en análisis de flujo de potencia. La estimación de estado es una técnica fundamental en los sistemas eléctricos utilizada para estimar magnitudes de voltaje en los nodos y ángulos de fase a partir de datos medidos y del modelo de la red. Además de las mediciones tradicionales, estos métodos pueden incorporar: datos de sensores, mediciones de RTU o RFID, o parámetros eléctricos de la red (resistencias e inductancias) con el objetivo de mejorar la precisión de la detección. Para matizar, es importante distinguir RFID, identificación por radiofrecuencia, de RTU, Unidad Terminal Remota. Según el artículo \cite{{articuloRedEléctrica}}, sobre la estimación de estado en corriente alterna, las relaciones entre flujos de potencia, voltajes y ángulos son no lineales, y se expresan como:
 \[z = h(x) + e,\]
@@ -246,99 +236,87 @@ donde $l_t$ representa las pérdidas no técnicas (incluyendo robo de electricid
 
 \subsubsection{Métodos basados en \emph{hardware}}
 
-Los métodos basados en \emph{hardware} se centran en el diseño de dispositivos físicos y estrategias de inspección para detectar o prevenir el robo de electricidad. A diferencia de los métodos algorítmicos, estos enfoques dependen de equipamiento específico desplegado en la red eléctrica. Según el artículo \cite{articulo1}, estos métodos se subdividen en tres categorías principales: desarrollo de dispositivos antirrobo, algoritmos de inspección basados en métodos de búsqueda y estrategias de despliegue de dispositivos de detección.
+Los métodos basados en \emph{hardware} se centran en el diseño de dispositivos físicos y estrategias de inspección para detectar o prevenir el robo de electricidad, dependiendo de equipamiento específico desplegado en la red eléctrica. Según el artículo \cite{articulo1}, estos métodos se dividen en tres categorías principales: desarrollo de dispositivos antirrobo, algoritmos de inspección basados en métodos de búsqueda y estrategias de despliegue de dispositivos de detección.
 
-El desarrollo de dispositivos antirrobo de electricidad se centra en el diseño de equipos de medición o dispositivos especializados capaces de detectar o impedir la manipulación ilegal. Sin embargo, en el artículo se destaca que existen pocos estudios académicos en este ámbito, principalmente por dos razones. Por un lado, los medidores inteligentes actuales ya incorporan múltiples mecanismos antimanipulación, lo que reduce la necesidad de nuevos diseños. Por otro lado, el desarrollo de nuevos dispositivos suele ser realizado por empresas privadas, cuyos diseños no se publican por motivos comerciales.
+El desarrollo de dispositivos antirrobo de electricidad se centra en el diseño de equipos de medición o dispositivos especializados capaces de detectar o impedir la manipulación ilegal. En el último artículo mencionado se destaca que existen pocos estudios académicos en este ámbito, principalmente por dos razones. Los medidores inteligentes actuales ya incorporan varios mecanismos de antimanipulación, lo que reduce la necesidad de nuevos diseños y el desarrollo de nuevos dispositivos suele ser realizado por empresas privadas, cuyos diseños no se publican por motivos comerciales. Los medidores inteligentes utilizan varias técnicas para prevenir y detectar fraude, entre ellas destacan: el sellado físico o interruptores internos que alertan al microcontrolador ante accesos no autorizados, la prevención de manipulación magnética, reemplazando transformadores de corriente por bobinas de Rogowski y la detección de \emph{bypass} de corriente. Estos mecanismos son efectivos contra muchos métodos tradicionales de robo, pero la detección de fraudes sofisticados sigue siendo una lucha continua y cíclica, lo que fomenta la necesidad de desarrollar dispositivos más avanzados.
 
-Los medidores inteligentes utilizan diversas técnicas para prevenir y detectar fraude, entre ellas destacan: el sellado físico o interruptores internos que alertan al microcontrolador ante accesos no autorizados, la prevención de manipulación magnética, reemplazando transformadores de corriente por bobinas de Rogowski y la detección de \emph{bypass} de corriente. Aunque estos mecanismos son efectivos contra muchos métodos tradicionales de robo, la detección de fraudes sofisticados sigue siendo una persecución continua y cíclica, lo que impulsa la necesidad de desarrollar dispositivos más avanzados.
+Los algoritmos de inspección basados en métodos de búsqueda tienen como objetivo encontrar medidores manipulados dentro de una red de área vecinal (NAN) en el menor tiempo posible. Existen dispositivos de búsqueda llamados inspectores, estos están formados por un inspector principal, que detecta comportamientos anómalos a nivel agregado y varios subinspectores, que ayudan a buscar los medidores afectados. La conexión entre medidores y subinspectores puede reconfigurarse sin afectar el suministro eléctrico. Si se sospecha que una NAN contiene usuarios fraudulentos, una inspección secuencial requeriría revisar todos los medidores en el peor de los casos. Los algoritmos de inspección reducen significativamente este tiempo mediante la comparación periódica entre lecturas agregadas de los subinspectores, y la suma de lecturas reportadas por los medidores. Además, del uso de estructuras lógicas para descartar rápidamente grupos de medidores sin necesidad de inspeccionarlos individualmente. Las estrategias para desplegar los dispositivos de detección buscan optimizar la ubicación y el número de dispositivos de monitoreo con el objetivo de reducir costes sin comprometer la capacidad de detección.
 
-Los algoritmos de inspección basados en métodos de búsqueda tienen como objetivo localizar medidores manipulados dentro de una red de área vecinal (NAN) en el menor tiempo posible.  Existen dispositivos de monitoreo llamados inspectores, estos están compuestos por un inspector principal, que detecta comportamientos anómalos a nivel agregado y varios subinspectores, que ayudan a localizar los medidores comprometidos. La conexión entre medidores y subinspectores puede reconfigurarse sin afectar el suministro eléctrico. Si se sospecha que una NAN contiene usuarios fraudulentos, una inspección secuencial requeriría revisar todos los medidores en el peor de los casos. Los algoritmos de inspección reducen significativamente este tiempo mediante la comparación periódica entre lecturas agregadas de los subinspectores, y la suma de lecturas reportadas por los medidores. Además, del uso de estructuras lógicas para descartar rápidamente grupos de medidores sin necesidad de inspeccionarlos individualmente. Las estrategias de despliegue de dispositivos de detección se basan en optimizar la ubicación y el número de dispositivos de monitoreo con el objetivo de reducir costes sin comprometer la capacidad de detección.
-
-Dispositivos como las unidades terminales remotas de alimentador (FRTU) y los relés digitales de protección (DPR) permiten monitorear parámetros eléctricos aguas abajo de una subestación en tiempo real. Estas estrategias comparan la energía registrada por un FRTU con la suma de las lecturas de los medidores inteligentes en su zona. Si la diferencia supera un umbral, esa zona se considera sospechosa. El principal inconveniente es el alto costo de estos dispositivos, haciendo una búsqueda en internet se puede encontrar su precio en un rango de entre 2000 y 4000 euros.
 
 \subsubsection{Métodos basados en aprendizaje automático}
 
-Los métodos basados en aprendizaje automático se utilizan para analizar los datos históricos de consumo eléctrico de los clientes, junto con información adicional, para detectar comportamientos anómalos asociados al robo de electricidad. Según el artículo \cite{articulo1}, estos métodos se clasifican en tres grandes grupos: aprendizaje supervisado, aprendizaje no supervisado y aprendizaje semi supervisado.
+Los métodos basados en aprendizaje automático se utilizan para analizar los datos históricos de consumo eléctrico de los clientes, junto con información adicional, para detectar comportamientos anómalos relacionados con el robo de electricidad. Según el artículo \cite{articulo1}, estos métodos se clasifican en tres grandes grupos: aprendizaje supervisado, aprendizaje no supervisado y aprendizaje semi supervisado.
 
 \medskip
 
 \textbf{Aprendizaje supervisado}
 
-El aprendizaje supervisado consiste en entrenar un modelo a partir de datos etiquetados, donde cada muestra de entrada x tiene asociada una etiqueta y. El objetivo es aprender una función: $f($x$)$ : $x$ → $y$, capaz de predecir correctamente la etiqueta de nuevos datos no vistos. Dado un conjunto de entrenamiento:
+El aprendizaje supervisado de acuerdo con el análisis de \cite{ML Supervisado} consiste en entrenar un modelo a partir de datos etiquetados, donde cada muestra de entrada x tiene asociada una etiqueta y. El objetivo es aprender una función: $f($x$)$ : $x$ → $y$, capaz de predecir correctamente la etiqueta de nuevos datos no vistos. Dado un conjunto de entrenamiento:
 \[\{(x_1, y_1), (x_2, y_2), \dots, (x_N, y_N)\},\]
 El modelo se entrena minimizando la función de pérdida esperada:
 \[f(x) = \arg \min_{\hat{f}} {E}_{x,y}[L(y, \hat{f}(x))],\]
 donde: $L(\cdot)$ es la función de pérdida. Las variables de entrada suelen ser lecturas de medidores inteligentes y características derivadas, mientras que la variable de salida es binaria: $y = 1$: usuario ilegal, $y = 0$: usuario legítimo.
 
-Las tareas de aprendizaje supervisado se pueden dividir generalmente en problemas de clasificación y regresión. La clasificación, en los métodos de aprendizaje automático, utiliza un algoritmo para clasificar los datos en categorías. Reconoce entidades específicas dentro del conjunto de datos e intenta determinar cómo se deben etiquetar o definir esas entidades. Algunos de los algoritmos más comunes son los clasificadores lineales, las máquinas de vectores de soporte (SVM), los árboles de decisión (DT), el k vecino más cercano (KNN), la regresión logística y el bosque aleatorio (RF). Mientras que la regresión se usa para entender la relación entre variables dependientes e independientes. En los problemas de regresión, el resultado es un valor continuo y los modelos intentan predecir el output objetivo. Algunos ejemplos son: la regresión lineal, la regresión de Lasso, la regresión de cresta y la regresión polinomial. El aprendizaje por conjuntos es un metaenfoque del aprendizaje supervisado en el que se entrenan varios modelos en la misma tarea de clasificación o regresión. Los resultados de todos los modelos del grupo se agregan para descubrir el mejor enfoque general para resolver el desafío.
+Las tareas de aprendizaje supervisado se pueden dividir en problemas de clasificación y regresión. La clasificación, en los métodos de aprendizaje automático, utiliza un algoritmo para clasificar los datos en categorías, reconoce entidades específicas dentro del conjunto de datos e intenta determinar cómo se deben etiquetar o definir esas entidades. Algunos de los algoritmos más comunes son los clasificadores lineales, las máquinas de vectores de soporte (SVM), los árboles de decisión (DT), el k vecino más cercano (KNN), la regresión logística y el bosque aleatorio (RF). La regresión se usa para comprender la relación entre variables dependientes e independientes. En los problemas de regresión, el resultado es un valor continuo y los modelos intentan predecir el output objetivo. Algunos ejemplos son: la regresión lineal, la regresión de Lasso, la regresión de cresta y la regresión polinomial. El aprendizaje por conjuntos es un metaenfoque del aprendizaje supervisado en el que se entrenan varios modelos en la misma tarea de clasificación o regresión. Los resultados de todos los modelos del grupo se agregan para descubrir la mejor estrategia general para resolver el desafío.
 
-Los modelos supervisados tradicionales sufren de algunas limitaciones detalladas en el artículo \cite{articulo1} tales como una dificultad para manejar datos de alta dimensionalidad, estos métodos son muy dependiente del conocimiento de un experto, tienen una baja capacidad para distinguir entre robo e irregularidades legítimas y, a veces, pueden ignorar la naturaleza temporal de los datos de consumo. Debido a estas limitaciones se motiva el uso de \emph{deep learning} mediante las redes neuronales. Estas, destacan en el manejo de problemas complejos de clasificación. Una red neuronal es una arquitectura de \emph{deep learning} que procesa datos de entrenamiento con capas de nodos que imitan el cerebro humano. Cada nodo se compone de entradas, ponderaciones, un sesgo y una salida. Si un valor de salida supera un umbral o sesgo preestablecido, el nodo se activa, pasando datos a la siguiente capa de la red.
+Los modelos supervisados tradicionales poseen limitaciones que son analizadas en el artículo \cite{articulo1} tales como una dificultad para manejar datos de alta dimensionalidad, estos métodos son muy dependiente del conocimiento de un experto, tienen una baja capacidad para distinguir entre robo e irregularidades legítimas y, a veces, pueden ignorar la naturaleza temporal de los datos de consumo. Debido a estas limitaciones se motiva el uso de \emph{deep learning} mediante las redes neuronales. Estas, destacan en el manejo de problemas complejos de clasificación. Una red neuronal es una arquitectura de \emph{deep learning} que procesa datos de entrenamiento con capas de nodos que imitan el cerebro humano. Cada nodo se compone de entradas, ponderaciones, un sesgo y una salida. Si un valor de salida supera un umbral o sesgo preestablecido, el nodo se activa, pasando datos a la siguiente capa de la red.
 
-Las principales técnicas supervisadas aplicadas a la detección de robo de electricidad, que se estudian en algunos de los trabajos de la literatura con más relevancia son: Modelos clásicos como SVM, DT, regresión lineal y logística, KNN y \emph{Naïve Bayes}, Métodos ensemble como RF, \emph{Gradient Boosting}, \emph{AdaBoost}, \emph{XGBoost} y \emph{Stacking} y, por último, destacan las redes neuronales, entre ellas el perceptrón multicapa (MLP), redes neuronales convolucionales (CNN), redes neuronales recurrentes (RNN, LSTM, GRU), \emph{autoencoders} (AE) y redes generativas adversarias (GAN).
+Las principales técnicas supervisadas aplicadas a la detección de robo de electricidad, que se estudian en algunos de los trabajos de la literatura con más relevancia son: Modelos clásicos como SVM, DT, regresión lineal y logística, KNN y \emph{Naïve Bayes}, Métodos ensamble como RF, \emph{Gradient Boosting}, \emph{AdaBoost}, \emph{XGBoost} y \emph{Stacking} y, por último, destacan las redes neuronales, entre ellas el perceptrón multicapa (MLP), redes neuronales convolucionales (CNN), redes neuronales recurrentes (RNN, LSTM, GRU), \emph{autoencoders} (AE) y redes generativas adversarias (GAN).
 
 \medskip
 
 \textbf{Aprendizaje no supervisado}
 
-El aprendizaje no supervisado permite extraer patrones y estructuras a partir de datos sin etiquetar, lo que resulta especialmente útil en la detección de robo de electricidad, ya que este problema puede formularse como uno de detección de anomalías. En muchos escenarios reales y varios trabajos vistos en apartados anteriores, las etiquetas de usuarios fraudulentos no están disponibles debido a restricciones legales, de privacidad o de costos de inspección. Su principal objetivo es analizar correlaciones entre los perfiles de consumo individuales y variables agregadas e identificar patrones atípicos mediante técnicas de agrupamiento y detección de valores atípicos. Estos modelos se utilizan para tres tareas principales: \emph{clustering}, correlación y reducción de la dimensionalidad. A continuación se define cada método de aprendizaje y destacaremos los algoritmos y enfoques comunes para llevarlos a cabo con eficacia.
+El aprendizaje no supervisado en base a \cite{ML No Supervisado}, permite extraer patrones y estructuras a partir de datos sin etiquetar, lo que resulta especialmente útil en la detección de robo de electricidad, ya que este problema puede formularse como uno de detección de anomalías. En muchos escenarios reales y varios trabajos vistos, las etiquetas de usuarios fraudulentos no están disponibles debido a restricciones legales, de privacidad o de costos de inspección. Su principal objetivo es analizar correlaciones entre los perfiles de consumo individuales y variables agregadas e identificar patrones atípicos mediante técnicas de agrupamiento y detección de valores atípicos. Estos modelos se utilizan para tres tareas principales: \emph{clustering}, correlación y reducción de la dimensionalidad. A continuación se define cada método de aprendizaje y destacaremos los algoritmos y enfoques comunes para llevarlos a cabo con eficacia.
 
 El \emph{clustering} es una técnica de minería que agrupa datos no etiquetados en base a sus similitudes o diferencias. Sus algoritmos, en el caso de la detección de fraude eléctrico, se utilizan para agrupar clientes con perfiles de consumo similares, aquellos grupos con pocos elementos o perfiles poco regulares se consideran \emph{outliers} y, por tanto, sospechosos. Los algoritmos de clustering se pueden clasificar en varios tipos: exclusivos, superpuestos, jerárquicos y probabilísticos. El exclusivo es una forma de agrupación que estipula que un punto de datos sólo puede existir en un clúster. Mientras que la superposición de clústeres se diferencia en que permite que los puntos de datos pertenezcan a varios clústeres con distintos grados de pertenencia. El jerárquico es un algoritmo de clustering sin supervisión que se puede clasificar de dos maneras: aglomerativo o divisivo. El aglomerativo se considera un “enfoque ascendente”. Sus puntos de datos se aíslan inicialmente como agrupaciones separadas y luego se fusionan iterativamente en función de la similitud hasta lograr un clúster. Y el clustering divisivo, adopta un enfoque descendente, un único clúster de datos se divide en función de las diferencias entre los puntos de datos. Para terminar con el \emph{clustering}, el probabilístico se basa en que los puntos de datos se agrupan en función de la probabilidad de que pertenezcan a una distribución determinada. El modelo de mezcla gaussiana (GMM) es uno de los métodos de clustering probabilístico más utilizados.
 
-Una regla de correlación o asociación es un método basado en reglas para encontrar relaciones entre variables en un conjunto de datos determinado. Para analizar esta regla de correlación se emplean métodos para cuantificar la relación entre: consumo individual, consumo agregado, pérdidas no técnicas y mediciones eléctricas adicionales.
+Una regla de correlación o asociación es un método basado en reglas para encontrar relaciones entre variables en un conjunto de datos determinado. Para analizar esta regla de correlación se emplean métodos para cuantificar la relación entre: consumo individual, consumo agregado, pérdidas no técnicas y mediciones eléctricas adicionales. Cuando la cantidad de dimensiones o características en un conjunto de datos es excesiva, se emplea una técnica llamada reducción de dimensionalidad. Reduce la cantidad de entradas de datos a un tamaño que sea manejable y, simultáneamente, conserva la integridad del conjunto de datos tanto como sea posible. La alta dimensionalidad se vuelve un desafío difícil de afrontar debido a la creciente resolución temporal de los datos que provienen de medidores inteligentes. Se aplican métodos de reducción de dimensionalidad, como la descomposición en valores singulares, el análisis de componentes principales y los autocodificadores con el objetivo de mitigar este problema.
 
-La reducción de dimensionalidad es una técnica utilizada cuando el número de características, o dimensiones, en un conjunto de datos determinado es demasiado alto. Reduce el número de entradas de datos a un tamaño manejable y, al mismo tiempo, preserva la integridad del conjunto de datos en la medida de lo posible. Con la creciente resolución temporal de los datos de medidores inteligentes, la alta dimensionalidad se ha convertido en un reto importante. Para mitigarlo, se utilizan técnicas de reducción de dimensionalidad, tales como: análisis de componentes principales, descomposición de valores singulares y autocodificadores. Estas técnicas facilitan el análisis posterior y reducen el costo computacional.
+El análisis de componentes principales (PCA) es un algoritmo que se emplea para disminuir la dimensionalidad, con el objetivo de eliminar duplicados y comprimir conjuntos de datos a través de la extracción de características. La descomposición en valores singulares (SVD) es un método distinto de reducción de dimensionalidad que fracciona una matriz A en tres matrices con rango reducido. La fórmula A = USVT, en la que $U$ y $V$ son matrices ortogonales, es la que representa el SVD. Los valores de la matriz $S$ son considerados como los valores singulares de la matriz $A$, y esta última es una matriz diagonal. Los autocodificadores utilizan las redes neuronales para la compresión de datos y, posteriormente, para generar una nueva representación de los datos originales.
 
-El análisis de componentes principales (PCA) es un tipo de algoritmo de reducción de dimensionalidad que se utiliza para reducir redundancias y comprimir conjuntos de datos mediante la extracción de características. La descomposición de valores singulares (SVD) es otro enfoque de reducción de dimensionalidad que factoriza una matriz, A, en tres matrices de bajo rango. SVD se representa mediante la fórmula A = USVT, donde $U$ y $V$ son matrices ortogonales. $S$ es una matriz diagonal y los valores $S$ se consideran valores singulares de la matriz $A$. Los autocodificadores aprovechan las redes neuronales para comprimir datos y luego recrear una nueva representación de la entrada de los datos originales.
-
-Las principales técnicas no supervisadas que podrían aplicadarse a la detección de robo de electricidad son:  Redes bayesianas, Análisis de correlación, Técnicas de \emph{clustering}, Métodos basados en entropía, Inferencia difusa, Algoritmos de detección de \emph{outliers}, \emph{Optimum-Path Forest} (OPF), Análisis de Componentes Principales (PCA) y Teoría de matrices aleatorias. Aunque no requieren datos etiquetados, estos métodos pueden generar falsos positivos, son sensibles a la selección de umbrales y tienen dificultades para detectar ataques que imitan patrones normales. Debido a estas limitaciones se promueve el uso de enfoques intermedios como el aprendizaje semisupervisado.
+Las principales técnicas no supervisadas que se aplican a la detección de robo de electricidad son: Redes bayesianas, Análisis de correlación, Técnicas de \emph{clustering}, Métodos basados en entropía, Inferencia difusa, Algoritmos de detección de \emph{outliers}, \emph{Optimum-Path Forest} (OPF), Análisis de Componentes Principales (PCA) y Teoría de matrices aleatorias. Estos métodos pueden generar falsos positivos, ya que son sensibles a la selección de umbrales y tienen dificultades para detectar ataques que imitan patrones normales. Debido a estas limitaciones se promueve el uso de enfoques intermedios como el aprendizaje semisupervisado.
 
 \medskip
 
 \textbf{Aprendizaje semisupervisado}
 
-El aprendizaje semisupervisado combina las ventajas del aprendizaje supervisado y no supervisado, utilizando un pequeño conjunto de datos etiquetados y un gran volumen de datos sin etiquetar. Además, emplea datos etiquetados y no etiquetados para entrenar modelos de inteligencia artificial para tareas de clasificación y regresión. Sus métodos son especialmente relevantes en situaciones en las que obtener una cantidad suficiente de datos etiquetados es increíblemente difícil o costoso, pero grandes cantidades de datos no etiquetados son relativamente fáciles de adquirir. En estos casos, ni los métodos de aprendizaje supervisado ni los no supervisado proporcionarán soluciones adecuadas.
-
-La principal distinción entre semisupervisado y supervisado es que, este último, solo se puede entrenar con conjuntos de datos completamente etiquetados, mientras que el primero, utiliza muestras de datos etiquetadas y no etiquetadas en el proceso de entrenamiento. En cuanto al aprendizaje semisupervisado frente al no supervisado, los algoritmos de aprendizaje no supervisado no utilizan ni funciones de pérdida ni datos etiquetados. El aprendizaje no supervisado evita cualquier situación con la cual se pueda medir y optimizar la precisión del modelo.
+El aprendizaje semisupervisado, según la información de \cite{ML Semisupervisado}, utiliza lo más útil del aprendizaje supervisado y del no supervisado, aprovechando una cantidad pequeña de datos etiquetados y un alto volumen de datos sin etiquetar. Para entrenar modelos de inteligencia artificial en tareas de clasificación y regresión, se usan datos etiquetados y no etiquetados. Sus métodos son muy útiles cuando se trata de situaciones en las que obtener una cantidad apropiada de datos etiquetados es difícil o costoso, mientras que adquirir grandes cantidades de datos no etiquetados es más fácil. En estos casos, las técnicas de aprendizaje no supervisado y supervisado no proporcionarán soluciones adecuadas. La diferencia principal entre el aprendizaje semisupervisado y el supervisado es que, este último solo puede ser entrenado con conjuntos de datos completamente etiquetados, y el primero, también puede usar conjuntos de datos etiquetados como no etiquetados. Los algoritmos de aprendizaje no supervisados se distinguen por no aplicar datos etiquetados ni funciones de pérdida. El aprendizaje no supervisado impide que se produzcan situaciones que hagan posible la evaluación y perfeccionamiento del modelo.
 
 
 \subsection{Conjuntos de datos para detección de fraude eléctrico}
-
-En la literatura sobre detección de fraude eléctrico mediante aprendizaje automático, los conjuntos de datos utilizados presentan características diversas en función de su origen, disponibilidad y estructura. A partir del análisis de distintos trabajos, es posible agruparlos en varias categorías principales.
-
-Una de las principales dificultades es la disponibilidad de datos públicos que permitan entrenar y evaluar modelos de forma reproducible. En este contexto, algunos trabajos utilizan conjuntos de datos accesibles públicamente que incluyen etiquetas explícitas de fraude, lo que facilita la aplicación de técnicas de aprendizaje supervisado. Entre ellos destaca el \textit{Theft Detection Dataset (TDD2022)}, utilizado en diversos estudios como \cite{articulo1} y \cite{articulo2}. Este conjunto de datos contiene registros de consumo eléctrico con una frecuencia horaria durante aproximadamente un año, donde cada instancia está asociada a una etiqueta que indica si el consumo es normal o corresponde a uno de los distintos tipos de fraude existentes con 6 distintos, del 1 al 6.
+En la literatura de la detección de fraude eléctrico mediante técnicas de aprendizaje automático, los conjuntos de datos usados tienen características diferentes dependiendo su procedencia, accesibilidad y estructura. Se pueden clasificar en varias categorías principales, en base al análisis de diferentes trabajos. La disponibilidad de datos públicos que posibilitan la evaluación y el entrenamiento reproducible de modelos es uno de los principales problemas. Algunas investigaciones emplean conjuntos de datos a los que se puede acceder públicamente y que contienen etiquetas claras de fraude, lo cual hace más sencillo el uso de métodos de aprendizaje supervisado. El \textit{Theft Detection Dataset (TDD2022)} es uno de ellos y es empleado en varios trabajos como \cite{articulo1} y \cite{articulo2}. Esta colección de datos incluye registros eléctricos con una frecuencia por hora durante cerca de un año; cada caso tiene una etiqueta que señala si el consumo es normal o está relacionado con uno de los seis tipos de fraude existentes, numerados del 1 al 6.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth, trim=0 15 0 0, clip]{imagenes/tabla_clases.png}
     \caption{Ejemplo de clases asociadas a cada registro.}
+    \label{fig:tabla_clases}
 \end{figure}
 
-Este conjunto de datos permite que cada registro represente un instante concreto, lo que lo hace especialmente adecuado tanto para aprendizaje \emph{offline} como para aprendizaje \emph{online}. En ambos trabajos referenciados antes, este conjunto se emplea junto con esquemas de evaluación \emph{prequential} (test-then-train), en los que el modelo realiza una predicción sobre cada nueva instancia antes de ser actualizado con ella. Este tipo de evaluación es importante sobre todo en entornos dinámicos, aunque puede presentar limitaciones.
+En la Figura~\ref{fig:tabla_clases} se puede ver un ejemplo del conjunto de datos. Este permite que cada registro represente un instante concreto, lo que lo hace adecuado para aprendizaje \emph{offline} como para aprendizaje \emph{online}. En ambos trabajos referenciados, este conjunto se emplea junto con esquemas de evaluación \emph{prequential}, test-then-train, en los que el modelo realiza una predicción sobre cada nueva instancia antes de ser actualizado con ella. Este tipo de evaluación es importante sobre todo en entornos dinámicos, aunque puede presentar limitaciones. Otra categoría importante corresponde a los conjuntos de datos reales proporcionados por compañías eléctricas. Estos reflejan comportamientos de consumo auténticos, lo que los convierte en una fuente de información muy valiosa para la detección de fraudes. Debido a las limitaciones de seguridad y privacidad, en muchos casos estos datos no son accesibles al público. La comparación de resultados con otros estudios es compleja, ya que ciertos trabajos analizados como \cite{articulo3} y \cite{articulo5} emplean este tipo de datos sin etiquetar o con un etiquetado restringido. Algunos estudios, como \cite{articulo4}, eligen crear conjuntos de datos simulados basándose en patrones de consumo habituales, debido a la falta de datos reales etiquetados. En estas situaciones, se introducen de manera artificial diversas formas de fraude para generar escenarios controlados que posibiliten la capacitación de modelos supervisados.
 
-Otra categoría importante corresponde a los conjuntos de datos reales proporcionados por compañías eléctricas. Estos reflejan comportamientos de consumo auténticos, lo que los convierte en una fuente de información muy valiosa para la detección de fraudes. Sin embargo, en muchos casos estos datos no están disponibles públicamente debido a restricciones de privacidad y seguridad. Algunos trabajos analizados como \cite{articulo3} y \cite{articulo5} utilizan este tipo de datos sin etiquetar o con etiquetado limitado, lo que dificulta la comparación de resultados con otros estudios.
-
-Debido a la escasez de datos reales etiquetados, algunos estudios como \cite{articulo4} optan por generar conjuntos de datos simulados a partir de patrones de consumo normales. En estos casos, se introducen artificialmente distintos tipos de fraude para crear escenarios controlados que permitan entrenar modelos supervisados. Este enfoque permite disponer de datos balanceados y bien definidos, aunque puede no reflejar completamente la complejidad de situaciones reales.
-
-Después de analizar todos los grupos de conjuntos de datos existentes utilizados en la detección de fraude eléctrico, se puede observar que, independientemente de su origen, suelen compartir una serie de características comunes. En primer lugar, se trata de datos de series temporales procedentes de contadores inteligentes, donde cada instancia representa el consumo eléctrico en un intervalo de tiempo determinado. Además, es habitual que estos conjuntos presenten un fuerte desbalance entre clases, siendo los casos de fraude mucho menos frecuentes que los consumos normales. Esta característica influye directamente en el rendimiento de los modelos y hace necesario el uso de métricas específicas como el \emph{F1-score} o la estadística Kappa. Por otro lado, la falta de datos públicos ampliamente aceptados dificulta la comparación entre diferentes enfoques, lo que constituye uno de los principales desafíos en este ámbito. En base a estas características, se selecciona un conjunto de datos público, etiquetado y con estructura temporal, que permite aplicar técnicas de aprendizaje supervisado y analizar el comportamiento de los modelos tanto en entornos \emph{offline} como \emph{online}.
+Tras analizar todos los grupos de conjuntos de datos que se utilizan para detectar el fraude eléctrico, es posible notar que, sin importar su procedencia, suelen tener una serie de propiedades comunes. Se trata de datos de series temporales que vienen de contadores inteligentes. En este caso, cada instancia refleja el consumo de electricidad en un espacio temporal específico. Asimismo, es común que estos conjuntos tengan un gran desequilibrio entre clases, con los casos de fraude siendo mucho menos comunes que los consumos normales. Esta particularidad tiene un impacto directo en la efectividad de los modelos y requiere el empleo de métricas concretas, como el estadístico Kappa o la puntuación F1. Por otra parte, la ausencia de datos públicos ampliamente aceptados complica la comparación entre distintos enfoques; esto representa uno de los retos más importantes en este campo. Conforme a estos rasgos, se escoge un conjunto de datos públicos que cuentan con etiquetas y una estructura temporal, lo cual permite la implementación de métodos de aprendizaje supervisado y el análisis del desempeño de los modelos en escenarios\emph{online} y \emph{offline}.
 
 
 \section{Alcance}
 
-El proyecto abarca el estudio, implementación y comparación de métodos de aprendizaje automático aplicados a la detección de fraudes en el consumo eléctrico. Su estructura está dividida en varios apartados. Para empezar,  el análisis del estado del arte, se realiza un estudio de las técnicas empleadas en la detección de fraudes eléctricos en proyectos o artículos de internet. Esto incluye métodos clásicos de aprendizaje supervisado, técnicas de detección de patrones anómalos y enfoques de aprendizaje \emph{online}. Continuando con el análisis de fuentes de datos, se estudian diferentes bases de datos públicas disponibles relacionadas con el consumo eléctrico con etiquetado de usuarios con fraude/no fraude o sin etiquetado. Además, de sus características principales o frecuencia.
+El proyecto se fundamenta en el análisis, la implementación y la comparación de técnicas de aprendizaje automático que se utilizan para detectar fraudes en el consumo de electricidad. Su estructura se divide en diferentes secciones, como el análisis del estado del arte, donde se lleva a cabo un estudio de las metodologías empleadas en proyectos o artículos de internet relacionados con el fraude eléctrico. Incorpora procedimientos tradicionales de aprendizaje supervisado, técnicas para identificar patrones poco comunes y métodos de aprendizaje en línea. Se examinan diversas bases de datos públicas disponibles relacionadas con el uso de electricidad, que están etiquetadas por usuarios con fraude/no fraude o sin etiquetar, como parte del análisis de fuentes de datos.
 
-Después, el estudio e implementación de métodos, se seleccionan e implementan distintas técnicas de aprendizaje automático, estas se diferencian en \emph{offline} o \emph{online}. La idea, en un principio, era de 10 técnicas en total, 5 para cada opción. Finalmente, se implementó una \emph{offline} más que es esencial para este trabajo, debido a su mejor rendimiento en comparación al resto. Y la evaluación y comparación de métodos, se realiza una comparativa entre los enfoques \emph{offline} y \emph{online} analizando, la capacidad de detección de fraude, la robustez ante datos desbalanceados, la adaptabilidad a cambios en el patrón de consumo y el coste computacional. Destacar que, el objetivo es determinar qué tipo de técnica resulta más adecuada según el escenario, histórico o en tiempo real.
+En el estudio e implementación de métodos se seleccionan e implementan distintas técnicas de aprendizaje automático que se diferencian en \emph{offline} o \emph{online}. La idea, en un principio, era de 10 técnicas en total, 5 para cada opción. Finalmente, se implementó una \emph{offline} más que es esencial para este trabajo, debido a su mejor rendimiento en comparación al resto. La evaluación y comparación de métodos que realiza una comparativa entre los enfoques \emph{offline} y \emph{online} analizando, la capacidad de detección de fraude, la robustez ante datos desbalanceados, la adaptabilidad a cambios en el patrón de consumo y el coste computacional. El objetivo es determinar qué tipo de técnica resulta más adecuada según el escenario, histórico o en tiempo real.
 
 A continuación, el diseño e implementación del prototipo, se desarrolla un entorno web que a través de los datos recogidos históricamente(\emph{offline}) o en tiempo real(\emph{online}) podrá simular un escenario real de detección de fraude eléctrico. El sistema permite simular consumo electrico, aplicar los métodos entrenados, mostrar resultados de la mejor técnica para \emph{offline} y \emph{online} en base a rendimiento, y comparar visualmente los enfoques \emph{online} y \emph{offline}. Este prototipo facilitará la escalabilidad y la incorporación futura de nuevos métodos. Para finalizar, se presentan las conclusiones obtenidas a partir del estudio comparativo, identificando fortalezas y debilidades de cada enfoque, y proponiendo posibles mejoras.
 
 
 \section{Objetivo}
 
-El principal objetivo es diseñar e implementar un sistema de detección de fraude en el consumo eléctrico de un determinado conjunto de datos basado en técnicas de aprendizaje automático, permitiendo comparar el rendimiento de modelos de aprendizaje \emph{offline} y modelos de aprendizaje \emph{online}. Para alcanzar este objetivo general, se plantean los siguientes objetivos específicos: implementación de 6 técnicas representativas de aprendizaje \emph{offline}, implementación de 5 técnicas representativas de aprendizaje \emph{online}, evaluación de ambos grupos de modelos utilizando métricas adecuadas, determinación de la técnica con mejor rendimiento dentro de cada categoría, \emph{offline} y \emph{online}, e integración de los modelos seleccionados en un prototipo software que permita la visualización de los resultados y métricas de forma comparativa. El sistema desarrollado debe de permitir analizar el comportamiento de los modelos en un entorno controlado, facilitando la comparación objetiva entre modelos \emph{online} y \emph{offline}.
+El propósito principal es diseñar e implementar un sistema de detección de fraude en el consumo eléctrico que emplee métodos de aprendizaje automático, aplicado a un conjunto particular de datos. Que permite comparar los modelos de aprendizaje \emph{offline} con los modelos de aprendizaje \emph{online}. Los siguientes objetivos específicos se sugieren para alcanzar esta meta general: implementar seis métodos relevantes de aprendizaje \emph{offline}; aplicar cinco métodos importantes de aprendizaje \emph{online}; analizar ambos grupos de modelos con métricas adecuadas; determinar la técnica más eficaz en cada categoría y añadir los modelos seleccionados a un prototipo de software que permita comparar visualmente los resultados y las métricas. En el sistema desarrollado debe poder analizar el comportamiento de los modelos en un entorno controlado, facilitando la comparación objetiva entre modelos \emph{online} y \emph{offline}.
+
 
 \section{Glosario de Términos}
 
 \begin{itemize}
-\item \emph{Machine Learning} (Aprendizaje Automático): Disciplina de la inteligencia artificial que permite a los sistemas aprender patrones a partir de datos y realizar predicciones o clasificaciones sin estar explícitamente programados para cada tarea concreta.
+\item \emph{Machine Learning} (Aprendizaje Automático): Campo de la inteligencia artificial que permite a los sistemas aprender patrones a partir de datos y realizar predicciones o clasificaciones sin estar programados para cada tarea concreta.
 
 \item \emph{Dataset} (Conjunto de datos): Colección estructurada de datos utilizada para el entrenamiento, validación y evaluación de modelos de aprendizaje automático.
 
@@ -352,7 +330,7 @@ El principal objetivo es diseñar e implementar un sistema de detección de frau
 
 \item Clasificación Supervisada: Técnica de aprendizaje automático en la que el modelo se entrena utilizando datos etiquetados para predecir la clase de nuevas instancias.
 
-\item Métodos Ensemble: Técnica avanzada de aprendizaje automático que combina las predicciones de múltiples modelos individuales para crear un único modelo final más sólido, preciso y estable.
+\item Métodos Ensamble: Técnica avanzada de aprendizaje automático que combina las predicciones de múltiples modelos individuales para crear un único modelo final más sólido, preciso y estable.
 
 \item Modelo baseline: Modelo de referencia simple y rápido de construir para establecer un punto de partida, de forma que sirva para evaluar el rendimiento de modelos más complejos
 
@@ -385,18 +363,14 @@ En esta sección se describen todos los aspectos relacionados a la gestión del 
 
 \section{Metodología de desarrollo}
 
-El desarrollo del proyecto se lleva a cabo siguiendo una metodología iterativa e incremental, adecuada para proyectos que combinan investigación en aprendizaje automático con el desarrollo de un entorno web. Entonces, el desarrollo se ha dividido en dos grandes bloques: Por un lado, la construcción del sistema, incluyendo la implementación de seis técnicas de aprendizaje \emph{offline} y cinco técnicas de aprendizaje \emph{online}, así como el desarrollo del backend web encargado de integrar dichos modelos. Por el otro lado, se evaluaron y ejecutaron los once modelos implementados a través de métricas adecuadas al problema de detección de fraude. Después de esta evaluación, se seleccionaron los modelos con mejor rendimiento dentro de cada categoría. Aunque el sistema permite la ejecución de las once técnicas implementadas, únicamente los modelos con mejor rendimiento por categoría son presentados en el entorno web como referencia principal para el usuario.
-
-El proyecto se divide en las siguientes fases: Análisis del problema y revisión del estado del arte, Selección y estudio del conjunto de datos, Estudio y selección de técnicas de aprendizaje automático, Diseño de la arquitectura del sistema web, Implementación de los modelos \emph{offline}, Implementación de los modelos \emph{online}, Evaluación y comparación de resultados, Selección del mejor modelo por categoría, Desarrollo del entorno web y  por último, las Pruebas del sistema. Esta estructuración permite mantener una planificación organizada propia de un modelo estructurado, incorporando al mismo tiempo iteraciones en la fase experimental para comparar y validar los modelos implementados.
+La metodología iterativa e incremental se utiliza para ejecutar el proyecto, lo cual es apropiado para proyectos que a la vez desarrollan un entorno web y realizan investigación en aprendizaje automático. El desarrollo se ha dividido en dos bloques principales: Por un lado, el desarrollo del sistema, que abarca la aplicación de cinco métodos de aprendizaje \emph{online} y seis procedimientos de aprendizaje \emph{offline}, además del desarrollo del \emph{backend web} que se ocupa de integrar estos modelos. Por otro lado, se examinaron y llevaron a cabo los once modelos que se implementaron utilizando métricas pertinentes al problema de detección de fraude. Tras esta evaluación, se eligieron los modelos de cada categoría que presentaron el mejor rendimiento. El sistema admite la ejecución de las once técnicas puestas en práctica, pero solamente se muestran en el entorno web los modelos con un rendimiento superior por categoría como referencia principal para el usuario. El proyecto consta de las fases que se indican a continuación: Evaluación del problema y análisis del estado actual, elección y estudio del conjunto de datos, selección e indagación de métodos de aprendizaje automático, diseño de la arquitectura del sistema web, implementación de los modelos \emph{offline}, implementación de los modelos \emph{online}, comparación y evaluación de resultados, determinación del modelo más adecuado por categoría, creación del entorno web y finalmente las pruebas del sistema. Esta organización ayuda a la conservación de una planificación ordenada, propia de un modelo estructurado, mientras se incluyen iteraciones durante la etapa experimental para cotejar y validar los modelos que se han implementado.
 
 
 \section{Planificación del proyecto}
 
-Dada la metodología elegida y el carácter mixto del proyecto que combina experimentación en aprendizaje automático con el desarrollo de un entorno web, la planificación se compone de varias fases secuenciales con iteraciones. La primera, análisis del problema, se realiza el estudio del problema de detección de fraude eléctrico, se revisan técnicas actuales en el estado del arte y se analiza el conjunto de datos seleccionado. Duración estimada 4 semanas, duración real 3 semanas. Una vez terminado el análisis, se lleva a cabo el estudio y selección de técnicas de aprendizaje automático, se analizan diferentes algoritmos de clasificación supervisada, tanto \emph{offline} como \emph{online}, seleccionando técnicas de cada categoría en función de su adecuación al problema y su aplicabilidad al conjunto de datos seleccionado. Duración estimada 1 semana, duración real 1 semana.
+La planificación consta de varias etapas secuenciales y con iteraciones, debido a la metodología y el carácter mixto del proyecto, que integra la experimentación en aprendizaje automático con la creación de un entorno web. El análisis del problema incluye el estudio de la detección de fraude eléctrico, la revisión de técnicas actuales en el estado del arte y el examen del conjunto de datos elegido. La duración verdadera fue de tres semanas, mientras que la estimada era de cuatro. Se examinan distintos algoritmos de clasificación supervisada, incluyendo tanto los \emph{offline} como los \emph{online}, después de que el análisis, la investigación y la elección de técnicas de aprendizaje automático han concluido. Se eligen métodos de cada categoría según la problemática y la idoneidad para el conjunto de datos escogido. La duración estimada es de una semana, y la durabilidad concreta también es de una semana.
 
-A continuación, se llevan a cabo las implementaciones de los modelos, implementación de modelos offline, se implementan cinco técnicas de aprendizaje \emph{offline} utilizando librerías especializadas y realizando ajustes de parámetros. Duración estimada 2 semanas, duración real 3 debido a problemas en la optimización de algún modelo. Implementación de modelos online, se implementan cinco técnicas de aprendizaje \emph{online} utilizando librerías especializadas y realizando ajustes de parámetros. Duración estimada 2 semanas, duración real: 2 semanas. Después de las implementaciones de los modelos, es el turno de la evaluación comparativa de modelos, se diseña un protocolo común de evaluación utilizando métricas adecuadas para detección de fraude. Se ejecutan los modelos con las mismas condiciones y se analizan los resultados. Duración estimada 2 semanas, duración real 2 semanas.
-
-Además, del diseño e implementación del entorno web, se desarrolla la arquitectura de la web, incluyendo backend, integración de modelos y visualización de resultados. Duración estimada 5 semanas. Por último,  las pruebas y validación del sistema, se realizan pruebas funcionales y no funcionales para garantizar el correcto funcionamiento del sistema y la integración entre componentes. Duración estimada 1 semana.
+La implementación de los modelos se lleva a cabo incluyendo la aplicación de modelos \emph{offline}. Se emplean cinco métodos de aprendizaje \emph{offline}con el uso de bibliotecas especializadas y mediante la modificación de parámetros. La duración calculada es de dos semanas, pero la verdadera fue de tres a causa de dificultades en la optimización de alguno de los modelos. Para poner en práctica modelos \emph{online}, se emplean cinco métodos de aprendizaje \emph{online} mediante el uso de bibliotecas especializadas y la realización de ajustes a los parámetros. La duración real fue de dos semanas, al igual que la duración estimada. Luego de implementar los modelos, se procede a la evaluación comparativa de los mismos, para lo cual se elabora un protocolo estandarizado que emplea métricas idóneas para detectar fraudes. Se ponen en práctica los modelos bajo las mismas condiciones y se examinan los resultados. La duración real fue de dos semanas, al igual que la duración estimada. Además, del diseño e implementación del entorno web, se desarrolla la arquitectura de la web, incluyendo \emph{backend}, integración de modelos y visualización de resultados. La duración estimada y real son de cinco semanas. Por último,  las pruebas y validación del sistema, se realizan pruebas funcionales y no funcionales para garantizar el correcto funcionamiento del sistema y la integración entre componentes. Duración estimada 1 semana.
 
 
 \subsection{Hitos principales}
@@ -467,13 +441,13 @@ La estimación inicial del proyecto se realiza considerando las distintas fases 
 
 \section{Costes}
 
-Para saber el coste total del proyecto se tendrán en cuenta varios factores: el salario del ingeniero informático que desarrolla el sistema web, el coste del consumo eléctrico, el coste del software, el coste de infraestructura y alojamiento y, por último, el coste del material.
+Para determinar el precio total del proyecto, es necesario tomar en cuenta distintos factores, entre ellos el sueldo del ingeniero de informática responsable de diseñar el sistema, los gastos de la electricidad, los costos de la vivienda y la infraestructura, así como los costos de los materiales.
 
-En cuanto al factor humano, según Randstad \cite{randstad}, los datos medios de los salarios de un ingeniero informático junior en España oscilan entre los 22.000~\euro{} y 28.000~\euro{} anuales en el sector privado. Entonces, tomando el mínimo que son 22.000~\euro, ya que no tiene experiencia laboral, y jornada completa de 160 horas mensuales, es decir, 1920 horas anuales. El coste por hora es de aproximadamente 11.46~\euro/hora. Si el proyecto ha requerido aproximadamente 390 horas como se estimó como máximo, el coste del desarrollo será de 4469.40~\euro.
+Respecto al componente humano, Randstad \cite{randstad} indica que los sueldos promedio de un ingeniero junior en informática en España oscilan entre los 22.000~\euro{} y 28.000~\euro{} anuales en el sector privado. Entonces, tomando el mínimo que son 22.000~\euro, ya que no tengo experiencia laboral, y jornada completa de 160 horas mensuales, es decir, 1920 horas anuales. El coste por hora es de aproximadamente 11.46~\euro/hora. Si el proyecto ha requerido aproximadamente 390 horas como se estimó como máximo, el coste del desarrollo será de 4469.40~\euro.
 
-Para calcular el coste del consumo eléctrico hay que tener en cuenta lo siguiente. El coste de la electricidad se calcula tomando en cuenta el consumo medio de 300 W/hora de un ordenador de gama media, durante 5 horas al día, lo que da un total de 1.5 KWh. Con un precio medio de la electricidad de 0.17~\euro/KWh, el coste diario de la jornada de trabajo es de aproximadamente 0.225~\euro/día, y el coste por hora será de 0.051~\euro/hora. El precio puede variar dependiendo el mercado y situaciones externas. Como el proyecto ha requerido aproximadamente 390 horas como se estimó como máximo, el coste del consumo eléctrico será de 19.89~\euro.
+Para determinar el coste del consumo eléctrico, es necesario considerar el costo de la electricidad. Este se obtiene al calcular el consumo promedio de un ordenador de gama media, que es de 300 W/hora durante 5 horas diarias; el resultado es 1.5 KWh. Con un precio medio de la electricidad de 0.17~\euro/KWh, el coste diario de la jornada de trabajo es de aproximadamente 0.225~\euro/día, y el coste por hora será de 0.051~\euro/hora. El precio puede variar dependiendo el mercado y situaciones externas. Como el proyecto ha requerido aproximadamente 390 horas como se estimó como máximo, el coste del consumo eléctrico será de 19.89~\euro.
 
-Para calcular el coste de software hay que tener en cuenta que el software utilizado en el desarrollo del proyecto es de código abierto y gratuito. Por tanto, el coste final del software es de 0~\euro. Además, para el coste de la infraestructura y alojamiento hay que tener en cuenta lo siguiente. Durante el desarrollo el sistema se ha ejecutado en entorno local, sin necesidad de servidores externos de pago.
+Es necesario considerar que el software empleado en la creación del proyecto es de código abierto y no tiene costo para determinar el precio del software. Por lo tanto, el precio final del software es de 0~\euro. Asimismo, es necesario considerar lo siguiente en cuanto al costo de la infraestructura y el alojamiento. El sistema se ha llevado a cabo en un entorno local durante el desarrollo, sin requerir servidores de pago externos.
 
 En caso de despliegue real en producción, sería necesario considerar: Servidor cloud, he tomado la decisión de usar AWS, ya que como alumno de la UCA tengo acceso gratuito y Base de datos en la nube, he usado MySQL que es gratuito y de código abierto. Lo que hace un total de 0~\euro. Al ser un entorno acádemico se puede conseguir gratuito, pero si sale del entorno acádemico podría no serlo. También, como el equipo informático ya estaba disponible antes del desarrollo del proyecto, el coste real del material fue de 0~\euro. Por tanto, el coste total del proyecto sumando todos los costes es de 4489.29~\euro.
 
@@ -542,7 +516,7 @@ Además, debe de tener reproducibilidad, para que que los experimentos realizado
 
 Para desarrollar este proyecto se trabaja con el conjunto de datos llamado Theft Detection Dataset (TDD2022), el cuál se encuentra disponible de manera pública a través de la plataforma Mendeley Data \cite{dataset}. Este, es el mismo mencionado anteriormente y contiene registros de consumo eléctrico obtenidos a partir de redes inteligentes. Además, incluye comportamientos normales y diferentes tipos de fraude eléctrico. Cada registro temporal se encuentra etiquetado con una clase asociada, de esta manera, permite diferenciar entre consumo legítimo y diversas formas de fraudes. Presenta varias características que justifican su elección para el desarrollo del presente trabajo. En primer lugar, destaca su disponibilidad pública, ya que es de los pocos conjuntos de datos que se encuentra disponible para su análisis y descarga de manera pública.  Además, cuenta con un etiquetado explícito de fraude, siendo el único encontrado que tiene una clara diferencia entre clases normales y fraudes, incluyendo una clasificación supervisada clara.  Por otra parte, presenta una adecuada estructura para aprendizaje \emph{online}, ya que además de poder utilizarse para técnicas \emph{offline}, al estar etiquetado por instancia temporal y presentar una estructura secuencial, resulta apropiado para técnicas \emph{online}. 
 
-Finalmente, se trata de un conjunto de datos de uso reciente, empleado en varios estudios actuales sobre detección de fraude eléctrico, como se analizó en la sección del estado del arte, lo que facilita la comparación con trabajos previos. También me gustaría destacar que, aunque este conjunto de datos proporciona un entorno controlado y bien estructurado para evaluación de métodos, su naturaleza parcialmente simulada puede no reflejar la complejidad de escenarios reales de fraude. A pesar de eso, representa una base muy sólida, estandarizada y adecuada para el análisis comparativo planteado en este proyecto y cumplir los objetivos propuestos.
+Se trata de un conjunto de datos de uso reciente, empleado en varios estudios actuales sobre detección de fraude eléctrico, como se analizó en la sección del estado del arte, lo que facilita la comparación con trabajos previos. También me gustaría destacar que, aunque este conjunto de datos proporciona un entorno controlado y bien estructurado para evaluación de métodos, su naturaleza parcialmente simulada puede no reflejar la complejidad de escenarios reales de fraude. A pesar de eso, representa una base muy sólida, estandarizada y adecuada para el análisis comparativo planteado en este proyecto y cumplir los objetivos propuestos.
 
 
 % =========================
@@ -553,16 +527,14 @@ Finalmente, se trata de un conjunto de datos de uso reciente, empleado en varios
 
 \section{Clasificación supervisada para detección de fraude}
 
-La detección de fraude eléctrico a través de métodos de aprendizaje automático puede abordarse de diferentes maneras y formas, tal y como se ha descrito en la sección de estado del arte. Entre ellos, el aprendizaje supervisado destaca por su capacidad para utilizar datos etiquetados y aprender patrones asociados a comportamientos que pueden ser fraudulentos. En este trabajo se opta por la clasificación supervisada, ya que el conjunto de datos seleccionado dispone de etiquetas explícitas que permiten diferenciar entre un consumo normal o fraudulento. Esto facilita la aplicación directa de modelos de clasificación y la evaluación objetiva de su rendimiento mediante métricas. Estas métricas son analizadas y seleccionadas en secciones posteriores. Además, la clasificación supervisada permite enfrentar el problema como una tarea binaria, en la que el modelo debe determinar si un determinado patrón de consumo corresponde a un comportamiento legítimo o fraudulento.
-
-Por otro lado, esta clasificación es ampliamente utilizada en diversos proyectos y trabajos, donde se han aplicado diferentes algoritmos, que se ven en secciones siguientes donde se estudian y analizan estos trabajos, obteniendo resultados satisfactorios en la detección de fraude eléctrico. Por tanto, en este trabajo se emplean distintos modelos de clasificación supervisada, con el objetivo de comparar su rendimiento en la detección de fraude y analizar su comportamiento tanto en entornos \emph{offline} como \emph{online}.
+La detección de fraude eléctrico por medio de procedimientos de aprendizaje automático puede ser tratada de distintas formas, tal como se ha explicado en la sección sobre el estado del arte. El aprendizaje supervisado se distingue por su habilidad de manejar datos etiquetados y de aprender patrones relacionados con conductas que pueden ser fraudulentas. Se elige la clasificación supervisada en este trabajo porque el conjunto de datos seleccionado cuenta con etiquetas explícitas que hacen posible distinguir entre un consumo normal y uno fraudulento. Esto hace más sencillo el uso directo de modelos de clasificación y la evaluación objetiva de su desempeño a través de métricas. Estas métricas son examinadas y elegidas en partes subsiguientes. Además, ayuda a resolver el problema como una tarea binaria, donde el modelo tiene que decidir si un patrón de consumo específico tiene comportamientos normales o de fraude. Se usa mucho en los trabajos y proyectos en los que se usan distintos algoritmos, que se examinan y analizan en las siguientes secciones. En estos trabajos, la detección de fraude eléctrico ha tenido resultados positivos. En este trabajo, por lo tanto, se utilizan diversos modelos de clasificación supervisada con el propósito de comparar su eficacia en la identificación del fraude y examinar su actuación en situaciones \emph{online} y \emph{offline}.
 
 
 \section{Comparación entre métodos \emph{offline} y \emph{online}}
 
-Dentro del aprendizaje automático aplicado a la detección de fraude eléctrico, los modelos pueden clasificarse en función de su forma de aprendizaje en dos grandes categorías: métodos \emph{offline} y métodos \emph{online}. Los métodos \emph{offline} se basan en el uso de conjuntos de datos históricos completos para entrenar el modelo. El entrenamiento se realiza de forma previa utilizando todos los datos disponibles, y posteriormente, el modelo se emplea para realizar predicciones sin actualizarse de manera continua. Esto resulta adecuado cuando los datos son estáticos y representativos del problema, permitiendo obtener modelos estables y con buen rendimiento general. Sin embargo, los métodos \emph{offline} presentan limitaciones en escenarios dinámicos, como es el caso del consumo eléctrico en redes inteligentes, donde los patrones de comportamiento pueden cambiar con el tiempo o en el momento. En estas situaciones, un modelo entrenado previamente puede perder capacidad de predecir de forma correcta si no se actualiza con nueva información.
+Los modelos de aprendizaje automático utilizados se pueden dividir en dos grandes grupos según su forma de aprendizaje: métodos \emph{offline} y métodos \emph{online}. Los primeros se basan en el uso de conjuntos de datos históricos para la formación del modelo. El entrenamiento se lleva a cabo inicialmente con todos los datos existentes, y después se utiliza el modelo para hacer predicciones sin una actualización continua. Esto es apropiado si los datos son representativos y estáticos del problema, lo que permite alcanzar modelos estables con un rendimiento general adecuado. Lo malo, es que tienen restricciones en situaciones dinámicas, como el consumo de electricidad en redes inteligentes, donde los patrones de conducta pueden variar con el tiempo o instantáneamente. En estos casos, un modelo previamente entrenado podría dejar de ser capaz de hacer predicciones adecuadas si no se le incorpora información nueva.
 
-Por otro lado, los métodos de aprendizaje \emph{online} permiten entrenar y actualizar el modelo de manera incremental a medida que llegan nuevos datos. El modelo no se entrena una única vez, sino que aprende continuamente, adaptándose a posibles cambios en los patrones de consumo y en los posibles comportamientos fraudulentos. Esto resulta importante en escenarios donde los datos se generan de forma secuencial, como ocurre con los contadores de luz inteligentes. Una de las principales ventajas del aprendizaje \emph{online} es su capacidad de adaptación a cambios en el tiempo, lo que permite detectar nuevos tipos de fraude sin necesidad de reentrenar el modelo desde cero. No obstante, estos métodos normalmente son más complejos de implementar. Debido a estas diferencias, en este trabajo se plantea una comparación entre modelos \emph{offline} y \emph{online}, con el objetivo de analizar sus capacidades en términos de rendimiento, estabilidad y adaptabilidad. Esta comparación permitirá evaluar qué modelo de aprendizaje automático resulta más adecuado para la detección de fraude en el consumo eléctrico en un entorno realista.
+Por otro lado, los métodos de aprendizaje \emph{online} permiten la actualización y el entrenamiento del modelo de forma gradual conforme se reciben nuevos datos. El modelo no se entrena solo una vez, sino que sigue aprendiendo y se ajusta a eventuales alteraciones en los patrones de consumo y en las conductas potencialmente fraudulentas. Esto es relevante en situaciones donde los datos se producen de manera secuencial, como sucede con los medidores inteligentes de electricidad. Una de las mayores ventajas es su habilidad para ajustarse a las variaciones temporales, lo que facilita la identificación de nuevas formas de fraude sin requerir el reentrenamiento del modelo desde el principio. Sin embargo, estos métodos suelen ser más difíciles de poner en práctica. A causa de estas discrepancias, en este estudio se propone comparar modelos online y offline con el fin de examinar su adaptabilidad, estabilidad y rendimiento. Esta comparación posibilitará determinar qué modelo de aprendizaje automático es más apropiado para identificar el fraude en el consumo de electricidad en un contexto real.
 
 
 \section{Selección y Estudio de Técnicas de Aprendizaje Automático}
@@ -572,12 +544,12 @@ En esta sección se seleccionan y analizan los métodos de aprendizaje automáti
 
 \subsection{Técnicas \emph{offline}}
 
-El problema abordado en este trabajo se plantea como un problema de clasificación supervisada, donde el objetivo es identificar si un determinado patrón de consumo eléctrico corresponde a un comportamiento normal o fraudulento. Se seleccionan diferentes técnicas de aprendizaje automático en modo offline, es decir, modelos que se entrenan previamente utilizando un conjunto de datos histórico completo antes de ser evaluados. Este modo permite analizar en profundidad el rendimiento de distintos algoritmos bajo condiciones controladas. La selección de estos modelos se realiza de una manera minuciosa atendiendo a varios criterios: su uso en la literatura científica en problemas de detección de fraude eléctrico, su capacidad para manejar datos desbalanceados y complejos, y la posibilidad de comparar diferentes paradigmas de aprendizaje dentro de un mismo problema.
+En este trabajo, el problema se presenta como un caso de clasificación supervisada cuyo propósito es determinar si un patrón específico de consumo eléctrico es normal o fraudulento. Se eligen varias metodologías de aprendizaje automático \emph{offline}, o sea, modelos que se entrenan con un conjunto de datos históricos completo antes de ser valorados. Este modo permite analizar en profundidad el rendimiento de distintos algoritmos bajo condiciones controladas. La selección de estos modelos se realiza de una manera minuciosa atendiendo a varios criterios: su uso en la literatura científica en problemas de detección de fraude eléctrico, su capacidad para manejar datos desbalanceados y complejos, y la posibilidad de comparar diferentes paradigmas de aprendizaje dentro de un mismo problema.
 
 
 \subsubsection{Regresión Logística}
 
-La regresión logística es un modelo lineal ampliamente utilizado en problemas de clasificación binaria en trabajos como \cite{articuloBase}. Su funcionamiento se basa en modelar la probabilidad de pertenencia a una clase mediante una función sigmoidea: $f(x) = \frac{1}{1 + e^{-x}}$, este modelo estima la probabilidad de que una instancia pertenezca a la clase positiva (fraude), a partir de una combinación lineal de las variables de entrada. Si se representa esta ecuación de regresión logística, se obtendrá una curva en S como la que se muestra a continuación.
+La regresión logística es un modelo lineal ampliamente utilizado en problemas de clasificación binaria en trabajos como \cite{articuloBase}. Para explicar como funciona este modelo, se tiene que tener en cuenta que se basa en modelar la probabilidad de pertenencia a una clase mediante una función sigmoidea: $f(x) = \frac{1}{1 + e^{-x}}$, este modelo estima la probabilidad de que una instancia pertenezca a la clase positiva, fraude, a partir de una combinación lineal de las variables de entrada. Si se representa esta ecuación de regresión logística, se consigue una curva en S como la que se muestra en la figura a continuación.
 
 \begin{figure}[H]
     \centering
@@ -592,7 +564,7 @@ A pesar de su simplicidad, la regresión logística presenta importantes limitac
 
 \subsubsection{\emph{Random Forest}}
 
-\emph{Random Forest}, bosque aleatorio traducido al español, es un algoritmo de aprendizaje supervisado basado en el uso de múltiples árboles de decisión utilizado en trabajos como \cite{articuloBase}, \cite{articulo2} y \cite{articulo3}, donde en este último se incluye como técnica dentro de la revisión de métodos existentes. Cada árbol se entrena sobre una muestra aleatoria del conjunto de datos y utiliza un subconjunto aleatorio de variables, lo que introduce diversidad en el modelo. Los algoritmos de bosque aleatorio tienen tres hiperparámetros principales, que deben configurarse antes del entrenamiento. Estos incluyen el tamaño del nodo, la cantidad de árboles y la cantidad de características muestreadas. A partir de ahí, el clasificador de bosque aleatorio se utiliza para resolver problemas de regresión o clasificación.
+\emph{Random Forest}, bosque aleatorio traducido al español, es un algoritmo de aprendizaje supervisado, que usa múltiples árboles de decisión utilizado en trabajos como \cite{articuloBase}, \cite{articulo2} y \cite{articulo3}, donde en este último se incluye como técnica dentro de la revisión de los métodos existentes. Cada árbol se entrena sobre una muestra aleatoria del conjunto de datos y utiliza un subconjunto aleatorio de variables, lo que añade diversidad en el modelo. Se componen de tres hiperparámetros principales, que deben configurarse antes del entrenamiento. Son el tamaño del nodo, la cantidad de árboles y la cantidad de características muestreadas. A partir de ahí, el clasificador de bosque aleatorio se utiliza para resolver problemas de regresión o clasificación.
 
 Su algoritmo se compone de una colección de árboles de decisión y cada árbol en el conjunto está compuesto por una muestra de datos extraída de un conjunto de entrenamiento con reemplazo, llamado \emph{bootstrapping}. De esa muestra de entrenamiento, un tercio de ella se reserva como datos de prueba, lo que se conoce como la muestra fuera de bolsa, \emph{oob}. Luego, se inyecta otra instancia de aleatoriedad mediante el embolsado de características, lo que agrega más diversidad al conjunto de datos y reduce la correlación entre los árboles de decisión. Dependiendo del tipo de problema, la determinación de la predicción variará. Para una tarea de regresión, se promediarán los árboles de decisión individuales, y para una tarea de clasificación, el voto mayoritario, es decir, la variable categórica más frecuente, arrojará la clase prevista. Finalmente, la muestra fuera de la bolsa se utiliza para la validación cruzada, finalizando esa predicción.
 
@@ -607,9 +579,7 @@ Este tipo de algoritmos es utilizado en la literatura para la detección de frau
 
 \subsubsection{\emph{Gradient Boosting}}
 
-\emph{Gradient Boosting}, conocido es esnpañol como \emph{boosting} de gradiente, es un método de aprendizaje automático basado en técnicas ensemble que construye el modelo de forma secuencial. A diferencia de \emph{Random Forest}, donde los árboles se entrenan de manera independiente, en este método cada modelo nuevo se entrena para corregir los errores cometidos por los modelos anteriores. El proceso se basa en la minimización de una función de pérdida mediante técnicas de optimización basadas en gradiente, lo que permite ajustar progresivamente el modelo a los datos. A continuación se va a explicar el funcionamiento de su algoritmo.
-
-Para empezar, se utiliza un conjunto de entrenamiento para establecer una base con un modelo base de aprendizaje, a menudo un árbol de decisión, cuyas predicciones iniciales se generan aleatoriamente. Normalmente, el árbol de decisión sólo contiene unos pocos nodos hoja, estos aprendices débiles sirven como un punto de partida óptimo. Esta configuración inicial allana el camino para que se desarrollen iteraciones posteriores. Después de la inicialización, para cada ejemplo de entrenamiento se calcula el error residual restando el valor previsto del valor real. Este paso identifica las áreas en las que es necesario mejorar las predicciones del modelo.
+\emph{Gradient Boosting}, conocido es esnpañol como \emph{boosting} de gradiente, es un método de aprendizaje automático basado en técnicas ensamble que construye el modelo de forma secuencial. En este método cada modelo nuevo se entrena para corregir los errores cometidos por los modelos anteriores. El proceso consta de minimizar una función de pérdida mediante técnicas de optimización basadas en gradiente, lo que permite ajustar progresivamente el modelo a los datos. A continuación se va a explicar el funcionamiento de su algoritmo. Para empezar, se utiliza un conjunto de entrenamiento para establecer una base con un modelo base de aprendizaje, a menudo un árbol de decisión, cuyas predicciones iniciales se generan aleatoriamente. Normalmente, el árbol de decisión sólo contiene unos pocos nodos hoja, estos aprendices débiles sirven como un punto de partida óptimo. Esta configuración inicial allana el camino para que se desarrollen iteraciones posteriores. Después de la inicialización, para cada ejemplo de entrenamiento se calcula el error residual restando el valor previsto del valor real. Este paso identifica las áreas en las que es necesario mejorar las predicciones del modelo.
 
 Después del cálculo residual y antes del entrenamiento de un nuevo modelo, tiene lugar el proceso de regularización. Esta etapa implica reducir la influencia de cada nuevo aprendiz débil integrado en el conjunto. Al calibrar cuidadosamente esta escala, se puede controlar la rapidez con la que avanza el algoritmo de \emph{boosting}, lo que ayuda a prevenir el sobreajuste y a optimizar el rendimiento general. A continuación, se utilizan los errores residuales calculados en el paso anterior como objetivos y se entrena un nuevo modelo o un aprendiz débil para una predicción con precisión. El objetivo de este paso es corregir los errores cometidos por los modelos anteriores, refinando la predicción general. Ahora vienen las actualizaciones del conjunto, el rendimiento del conjunto actualizado, incluido el modelo recién entrenado, se suele evaluar mediante un conjunto de pruebas independiente. Si el rendimiento de este conjunto de datos reservado es satisfactorio, el conjunto se actualiza incorporando el nuevo aprendiz débil; de lo contrario, podría ser necesario realizar ajustes en los hiperparámetros.
 
@@ -636,31 +606,29 @@ K vecinos más cercanos (KNN) es un algoritmo de aprendizaje automático utiliza
 
 Para observar cómo funciona este modelo hay que analizar cómo calcular las métricas de distancia y el valor $k$. Primero se explican las métricas, y luego, el valor $k$. Para empezar, se tiene que determinar qué puntos de datos están más cerca de un punto de consulta determinado. Para ello, será necesario calcular la distancia entre el punto de consulta y los demás puntos de datos. Esas métricas de distancia ayudan a formar límites de decisión, que dividen los puntos de consulta en diferentes regiones. Por lo general, los límites de decisión se visualizan con diagramas de Voronoi. A continuación se van a ver algunas de las medidas de distancia existentes.
 
-La distancia euclídea ($p=2$) es la medida de distancia más comúnmente empleada y está limitada a vectores de valores reales. Empleando la siguiente fórmula, se mide una línea recta entre el punto de consulta y el otro punto que se está midiendo. Su fórmula es
+La distancia euclídea ($p=2$) es la medida de distancia generalmente más usada y está limitada a vectores de valores reales. Empleando la siguiente fórmula, se mide una línea recta entre el punto de consulta y el otro punto que se está midiendo. Su fórmula es
 
 \[d(x,y) = \sqrt{\sum_{i=1}^{n} (y_i - x_i)^2} .\]
 
-Además de la distancia más común usada, existen más distancias importantes que hay que destacar. La distancia de Manhattan ($p=1$) es también otra métrica de distancia popular, que mide el valor absoluto entre dos puntos. Se suele emplear para visualizar cómo se puede navegar de una dirección a otra a través de las calles de la ciudad. Se define como:
+Además, existen más distancias importantes que hay que destacar. La distancia de Manhattan ($p=1$) es también otra métrica de distancia bastante conocida, que mide el valor absoluto entre dos puntos. Se suele utilizar para observar cómo se puede navegar de una dirección a otra a través de las calles de la ciudad. Se define como:
 
 \[d(x,y) = \sum_{i=1}^{m} \lvert x_i - y_i \rvert .\]
 
-Otra distancia conocida es la distancia de Minkowski, esta medida de distancia es la forma generalizada de las métricas de distancia euclidiana y Manhattan. El parámetro $p$, en la fórmula a continuación, permite la creación de otras métricas de distancia. La distancia euclidiana se representa mediante esta fórmula cuando ($p=2$), y la distancia de Manhattan se denota con ($p=1$). Definida como:
+Otra distancia es la de Minkowski, esta medida de distancia es la forma generalizada de las métricas de distancia euclidiana y Manhattan. El parámetro $p$, en la fórmula a continuación, permite la creación de otras métricas de distancia. La distancia euclidiana se representa mediante esta fórmula cuando ($p=2$), y la distancia de Manhattan se denota con ($p=1$). Definida como:
 
 \[d(x,y) = \left( \sum_{i=1}^{n} \lvert x_i - y_i \rvert^p \right)^{\frac{1}{p}} .\]
 
-Para terminar con las distancias, la distancia de Hamming. Esta técnica se emplea normalmente con vectores booleanos o de cadena, identificando los puntos donde los vectores no coinciden. También se conoce como la métrica de superposición.
+Para terminar, la distancia de Hamming. Esta técnica se usa con vectores booleanos o de cadena, identificando los puntos donde los vectores no coinciden. También se conoce como la métrica de superposición.
 \[D_H(x,y) = \sum_{i=1}^{k} \mathbf{1}(x_i \ne y_i) .\]
 
 Ahora se va a mostrar cómo hallar el valor $k$. Este valor en el algoritmo kNN define cuántos vecinos se comprobarán para determinar la clasificación de un punto de consulta específico. Por ejemplo, si $k=1$, la instancia se asignará a la misma clase que su vecino más cercano. Definir dicho valor puede ser un acto de equilibrio, ya que diferentes valores pueden conducir a un sobreajuste o un ajuste insuficiente. Los valores más bajos pueden tener una varianza alta, pero un sesgo bajo, y los valores más grandes pueden conducir a un sesgo alto y una varianza más baja. La elección del valor dependerá en gran medida de los datos de entrada, ya que los datos con más valores atípicos o ruido probablemente funcionarán mejor con valores más altos. En general, se recomienda tener un número impar para $k$ a fin de evitar empates en la clasificación, y las tácticas de validación cruzada pueden ayudarlo a elegir la $k$ óptima para su conjunto de datos.
 
-Para terminar, el comportamiento del algoritmo depende en gran medida de la estructura del espacio de características y de la elección del parámetro $k$, lo que permite analizar cómo influye la proximidad entre patrones de consumo en la detección de fraudes. Este método permite analizar la similitud entre patrones de consumo eléctrico, bajo la hipótesis de que comportamientos similares tienden a pertenecer a la misma clase. No obstante, su rendimiento depende fuertemente de la elección del parámetro y de la escala de las variables, además de presentar limitaciones en términos de eficiencia computacional para grandes conjuntos de datos.
+El comportamiento del algoritmo depende bastante de la estructura del espacio de características y de la elección del parámetro $k$, que permite analizar cómo influye la proximidad entre patrones de consumo en la detección de fraudes. Este método permite analizar la similitud entre patrones de consumo eléctrico, bajo la condición de que comportamientos similares tienden a pertenecer a la misma clase. Pero, su rendimiento depende mucho de la elección del parámetro y de la escala de las variables, además de presentar limitaciones en términos de eficiencia computacional para grandes conjuntos de datos.
 
 
 \subsubsection{Perceptrón Multicapa}
 
-El Perceptrón Multicapa (MLP) es un modelo de aprendizaje supervisado, utilizado en la literatura en trabajos como \cite{articulo3}, que pertenece a las redes neuronales artificiales y está diseñado para aprender relaciones complejas entre variables de entrada y salida. Se trata de una red neuronal \emph{feedforward}, en la que la información fluye en una única dirección desde la entrada hasta la salida, sin ciclos. Sus neuronas suelen utilizar funciones de activación no lineales, lo que permite a la red aprender patrones complejos en los datos. Los MLP son importantes en el aprendizaje automático porque pueden aprender relaciones no lineales en los datos, lo que los convierte en potentes modelos para tareas como la clasificación, la regresión y el reconocimiento de patrones.
-
-Este método destaca por su flexibilidad en la arquitectura y su capacidad para aproximarse a cualquier función en determinadas condiciones, por lo que los convierte en un elemento fundamental en la investigación sobre el aprendizaje profundo y las redes neuronales. Además, está compuesto por tres tipos de capas: una capa de entrada, que recibe las variables del problema; una o varias capas ocultas, encargadas de transformar la información mediante combinaciones lineales y funciones de activación no lineales; y una capa de salida, que proporciona la predicción final del modelo.
+El Perceptrón Multicapa (MLP) es un modelo de aprendizaje supervisado usado en la literatura en trabajos como \cite{articulo3}, que pertenece a las redes neuronales artificiales y está diseñado para aprender relaciones complejas entre variables de entrada y salida. Se trata de una red neuronal donde la información va en una única dirección desde la entrada hasta la salida, sin ciclos. Sus neuronas funcionan a través de funciones de activación no lineales, con lo que permite aprender patrones complejos en los datos. La capacidad para aprender relaciones no lineales en los datos convierte a este método en un modelo potente para tareas como la clasificación, la regresión y el reconocimiento de patrones. Destaca por su capacidad para aproximarse a cualquier función en condiciones determinadas haciendo que se convierta en un elemento importante en la investigación de las redes neuronales. Está compuesto por tres tipos de capas como una capa de entrada, que recibe las variables del problema; una o varias capas ocultas, encargadas de transformar la información mediante combinaciones lineales y funciones de activación no lineales; y una capa de salida, que añade la predicción final del modelo.
 
 \begin{figure}[H]
     \centering
@@ -694,16 +662,16 @@ donde \(L\) es la función de pérdida y \(\theta\) es el conjunto de parámetro
 
 donde \(\theta_t\) son los parámetros del modelo en la iteración \(t\), \(\theta_{t+1}\): son los parámetros actualizados en la siguiente iteración, \(\eta\) es la tasa de aprendizaje, que controla el tamaño de los ajustes y \(\nabla J(\theta_t)\) el gradiente de la función de pérdida en la iteración \(t\).
 
-Este proceso de propagación, cálculo del error y actualización de los parámetros se repite de forma iterativa a lo largo del entrenamiento del modelo. En la práctica, el entrenamiento no se realiza sobre el conjunto completo de datos en cada iteración, sino sobre subconjuntos llamados \emph{mini-batches}, los cuales tienen un tamaño de 1000 datos cada uno. Este ajuste permite mejorar la eficiencia computacional y favorecer la estabilidad del proceso de aprendizaje. Gracias a este proceso, MLP es capaz de ajustar progresivamente sus parámetros para aproximar funciones complejas y modelar relaciones no lineales entre las variables. Esta capacidad lo convierte en un método muy importante para problemas en los que los modelos lineales resultan insuficientes, como es el caso de la detección de fraude en datos de consumo eléctrico.
+Durante el entrenamiento del modelo, se repite de manera iterativa este proceso de difusión, determinación del error y modificación de los parámetros. En la práctica, el entrenamiento no se efectúa en cada iteración con el conjunto de datos entero, sino que se hace con subconjuntos denominados \emph{mini-batches}, los cuales normalmente contienen 1000 datos cada uno. Esta modificación permite que el proceso de aprendizaje sea más estable y que la eficiencia computacional se optimice. MLP puede adecuar de manera gradual sus parámetros para acercarse a funciones complejas y representar relaciones no lineales entre las variables, gracias a este procedimiento. Esta capacidad lo convierte en un método muy importante para problemas en los que los modelos lineales resultan insuficientes, como es el caso de la detección de fraude en datos de consumo eléctrico.
 
 
 \subsubsection{XGBoost}
 
-Conocido como \emph{eXtreme Gradient Boosting} y utilizado en la literatura en trabajos como \cite{articulo3}, donde se incluye como técnica dentro de la revisión de métodos existentes. Es un algoritmo de aprendizaje automático supervisado basado en árboles de decisión que implementa una versión optimizada del método de \emph{gradient boosting}. Su objetivo es construir un modelo predictivo fuerte a partir de la combinación secuencial de múltiples modelos débiles, generalmente árboles de decisión de poca profundidad. A diferencia de otros métodos de ensamble, los modelos no se entrenan de forma independiente, sino que cada árbol nuevo se construye específicamente para corregir los errores cometidos por los anteriores. Es conocido por su velocidad, eficiencia y capacidad de escalar bien con grandes conjuntos de datos. El funcionamiento del algoritmo se basa en un proceso iterativo en el que, en cada paso, se añade un nuevo árbol que intenta aproximar los residuos o errores del modelo actual. Estos residuos representan la diferencia entre los valores reales y las predicciones realizadas hasta ese momento. 
+Se le conoce como \emph{eXtreme Gradient Boosting} y se aplica en la literatura, incluyendo trabajos como \cite{articulo3}, donde se presenta como un método dentro del análisis de las técnicas existentes. Es un algoritmo de aprendizaje automático supervisado que usa árboles de decisión y aplica una versión mejorada del método \emph{gradient boosting}. El propósito es desarrollar un modelo predictivo sólido mediante la combinación secuencial de varios modelos débiles, que normalmente son árboles de decisión poco profundos. Los modelos no se entrenan de manera independiente; en su lugar, cada nuevo árbol se crea particularmente para rectificar los fallos que cometieron los árboles anteriores. Es reconocido por su rapidez, eficacia y habilidad para escalar eficientemente con conjuntos de datos extensos. El algoritmo opera a través de un proceso iterativo, donde en cada paso se agrega un árbol nuevo que busca acercarse a los residuos o errores del modelo vigente. Estos desechos son la diferencia entre los valores reales y las predicciones hechas hasta ese instante.
 
-El proceso de aplicación del algoritmo desde la práctica comienza con la preparación de los datos. En primer lugar, es necesario dividir el conjunto de datos en dos subconjuntos: uno de entrenamiento, utilizado para construir el modelo, y otro de prueba, destinado a evaluar su rendimiento. Posteriormente, los datos se transforman al formato DMatrix, que es la estructura interna optimizada de XGBoost. Este formato está diseñado para mejorar la eficiencia tanto en el uso de memoria como en la velocidad de entrenamiento, que resulta imprescindible en problemas con grandes volúmenes de datos. Una vez preparados los datos, se procede a la generación del modelo. Para ello, se instancia el algoritmo y se selecciona una función objetivo adecuada en función del tipo de problema. A continuación, el modelo se entrena utilizando el conjunto de entrenamiento y se generan predicciones sobre el conjunto de prueba. La evaluación del modelo se realiza comparando las predicciones con los valores reales mediante métricas como la exactitud, la precisión, la sensibilidad (recall) o la puntuación F1 (F1-score). Además, el uso de la matriz de confusión permite analizar con mayor detalle los aciertos y errores del modelo.
+La preparación de los datos es el primer paso para poder explicar el algoritmo. Para ello es imprescindible dividir el conjunto de datos en dos grupos menores, uno para entrenar el modelo y otro para comprobar su desempeño. Después, los datos se convierten en el formato \emph{DMatrix}, que es la estructura interna de XGBoost optimizada. Este formato se ha creado con el objetivo de optimizar la velocidad de entrenamiento y el uso de memoria, lo cual es esencial en casos que involucran grandes cantidades de datos. Una vez los datos han sido preparados, se inicia la creación del modelo. Activando el algoritmo y escogiendo una función objetivo apropiada según la clase de problema. El modelo se entrena utilizando el conjunto de entrenamiento y se crean predicciones sobre el conjunto de prueba. La evaluación del modelo se lleva a cabo mediante la comparación de las predicciones con los valores reales, utilizando para ello métricas como la sensibilidad (\emph{recall}), la precisión, la exactitud o la puntuación F1. El empleo de la matriz de confusión permite el análisis más detallado de los fallos y aciertos del modelo.
 
-Para mejorar el rendimiento del modelo, es habitual realizar un proceso de ajuste de hiperparámetros. Este proceso consiste en encontrar la combinación óptima de parámetros que maximicen la capacidad predictiva del modelo. Técnicas como la búsqueda en cuadrícula y la validación cruzada permiten explorar diferentes configuraciones de manera sistemática. Este paso es especialmente importante, ya que el rendimiento depende en gran medida de una adecuada selección de hiperparámetros. Entre los hiperparámetros más relevantes destaca la tasa de aprendizaje, que controla la contribución de cada árbol al modelo final. Valores bajos de este parámetro hacen que el aprendizaje sea más lento pero más robusto, reduciendo el riesgo de sobreajuste, mientras que valores altos aceleran el aprendizaje a costa de una posible pérdida de generalización. 
+El proceso de ajuste de hiperparámetros es algo común para optimizar el desempeño del modelo. Este proceso implica hallar la combinación ideal de parámetros para maximizar el potencial predictivo del modelo. La validación cruzada y la búsqueda en cuadrícula son métodos que posibilitan indagar distintas configuraciones de forma sistemática. Uno de los hiperparámetros más importantes es la tasa de aprendizaje, que regula cuánto aporta cada árbol al modelo final. Si este parámetro tiene un valor bajo, el aprendizaje es más lento pero más sólido, lo cual disminuye la probabilidad de sobreajuste. Si el parámetro tiene un valor alto, el aprendizaje se acelera a espera de una posible pérdida de generalización.
 
 \begin{figure}[H]
     \centering
@@ -711,18 +679,14 @@ Para mejorar el rendimiento del modelo, es habitual realizar un proceso de ajust
     \caption{Funcionamiento XGBoost.}
 \end{figure}
 
-Una de sus características más importantes es la incorporación de mecanismos de regularización que ayudan a evitar el sobreajuste. Estos mecanismos penalizan la complejidad del modelo, limitando el crecimiento excesivo de los árboles y favoreciendo soluciones más generalizables. Además, el algoritmo incluye técnicas avanzadas como la poda de árboles, el manejo automático de valores faltantes y la selección eficiente de características durante el proceso de entrenamiento.
-
-En cuanto al rendimiento, está diseñado para ser altamente eficiente y escalable. Permite la paralelización durante la construcción de los árboles, lo que reduce significativamente los tiempos de entrenamiento en comparación con otros métodos de boosting. También, optimiza el uso de memoria y es capaz de trabajar con grandes volúmenes de datos, lo que lo hace especialmente adecuado para aplicaciones en entornos reales y problemas de gran escala. Otra ventaja a destacar, es su flexibilidad, ya que permite utilizar diferentes funciones de pérdida dependiendo del problema. Esto lo convierte en una herramienta versátil dentro del ámbito del aprendizaje automático. Además, su capacidad para capturar relaciones no lineales y manejar interacciones complejas entre variables lo hace especialmente efectivo en problemas con datos estructurados o tabulares.
+La implementación de mecanismos para la regularización, que contribuyen a prevenir el sobreajuste, es una de sus características más importante. Estos procedimientos castigan la complejidad del modelo, lo que restringe el crecimiento desmedido de los árboles y promueve soluciones más universales. Sobre el rendimiento, su diseño permite que sea escalable y de alta eficiencia. Facilita la paralelización en el momento de construir los árboles, lo que disminuye notablemente los tiempos de entrenamiento en comparación con otros métodos de \emph{boosting}. Además, es capaz de manejar amplios volúmenes de datos y optimiza la utilización de memoria, lo cual lo hace muy bueno para implementar aplicaciones en situaciones reales y para resolver problemas a gran escala. Su flexibilidad es otro aspecto que merece ser destacado, pues ayuda al uso de distintas funciones de pérdida según el problema. También, su habilidad para captar conexiones no lineales y gestionar interacciones complejas entre variables lo vuelven particularmente eficaz en situaciones con datos tabulares o estructurados.
 
 Sin embargo, este método también presenta ciertas limitaciones. Su correcto funcionamiento depende en gran medida del ajuste de hiperparámetros, lo que puede requerir un proceso de optimización complejo. Además, sigue siendo menos transparente que modelos más simples. Por último, su complejidad computacional, aunque optimizada, puede ser elevada en comparación con algoritmos más básicos. Para terminar, XGBoost representa una evolución avanzada del \emph{gradient boosting} que combina precisión, eficiencia y robustez. Gracias a sus mejoras en optimización, regularización y escalabilidad, se convierte en uno de los algoritmos más utilizados en el ámbito del aprendizaje automático, especialmente en problemas donde se requiere un alto rendimiento predictivo.
 
 
 \subsection{Técnicas \emph{online}}
 
-A diferencia de los modelos \emph{offline}, los algoritmos de aprendizaje automático \emph{online} permiten actualizar sus parámetros de manera incremental a medida que se reciben nuevas instancias de datos, sin necesidad de reentrenar el modelo completo desde cero. Esto resulta especialmente beneficioso sobre todo cuando los datos llegan en forma de flujo continuo, como ocurre en sistemas reales de monitorización de consumo eléctrico. En este tipo de escenarios, los modelos deben ser capaces de adaptarse a cambios en los patrones de consumo, conocido como \emph{concept drift} o deriva de concepto, donde la distribución de los datos evoluciona con el tiempo. Por ello, el aprendizaje \emph{online} constituye una herramienta clave en la detección de fraude eléctrico en tiempo real.
-
-La selección de técnicas \emph{online} se realiza en base a su presencia en la literatura científica sobre la detección de fraude eléctrico en flujos de datos. En este proyecto se seleccionan algoritmos representativos de distintos modos, incluyendo un modelo baseline que permita establecer un punto de referencia.
+Los algoritmos de aprendizaje automático \emph{online} permiten la actualización paulatina de sus parámetros conforme se van recibiendo nuevas instancias de datos, sin requerir que el modelo entero sea reentrenado desde el principio. Es especialmente bueno, cuando los datos fluyen de manera continua, como en sistemas reales que monitorean el consumo eléctrico. En estas situaciones, los modelos tienen que ser capaces de ajustarse a las alteraciones en los patrones de consumo; este fenómeno se llama \emph{concept drift} o deriva de concepto. En él, la distribución de los datos cambia con el tiempo. Por eso, la detección de fraude eléctrico en tiempo real es considerada como esencial para el aprendizaje online. La selección de técnicas \emph{online} se realiza en base a su presencia en la literatura científica sobre la detección de fraude eléctrico en flujos de datos. En este proyecto se seleccionan algoritmos representativos de distintos modos, incluyendo un modelo \emph{baseline} que permita establecer un punto de referencia.
 
 
 \subsubsection{Perceptrón}
@@ -1253,36 +1217,36 @@ Para definir los requisitos del sistema del proyecto, se ha realizado un anális
 
 \section{Situación actual}
 
-El fraude en el consumo eléctrico representa un gran problema para las compañías energéticas, ya que provoca grandes pérdidas económicas y puede afectar a la estabilidad de la red eléctrica. Actualmente, con el desarrollo de los sistemas de medición inteligente, se dispone de grandes cantidades de datos sobre el consumo energético de los usuarios. Sin embargo, analizar manualmente estos datos para identificar patrones anómalos resulta una tarea difícil. Por este motivo, el uso de técnicas de aprendizaje automático se presenta como una alternativa eficaz para detectar patrones de comportamiento anómalos que puedan indicar fraude en el consumo eléctrico.
+El fraude del consumo eléctrico es un problema importante para las compañías energéticas, porque provoca pérdidas económicas y puede afectar a la estabilidad de la red eléctrica. Gracias a los sistemas de medición inteligentes, existen cantidades grandes de datos del consumo energético de los usuarios. Sin embargo, analizar manualmente estos datos para identificar comportamientos que no son normales resulta una tarea difícil. El uso de técnicas de aprendizaje automático son una alternativa eficaz para detectar patrones de comportamiento que puedan indicar fraude.
 
 
 \section{Entorno Tecnológico}
 
-El sistema desarrollado se basa en un entorno web implementado en Python, que permite ejecutar distintos modelos de aprendizaje automático y visualizar los resultados obtenidos de forma clara e interactiva. El entorno tecnológico necesario para el uso del sistema incluye: Un ordenador con acceso a Internet, un navegador web moderno (como Google Chrome, Mozilla Firefox o Microsoft Edge) y un servidor donde se ejecute el entorno web y los modelos de aprendizaje automático. El sistema no requiere hardware específico por parte del usuario, ya que los modelos de aprendizaje automático se ejecutan en el servidor y los usuarios interactúan con el sistema a través de la interfaz web.
+El sistema se basa en un entorno web implementado en Python, que permite ejecutar modelos de aprendizaje automático y ver los resultados obtenidos de forma clara. El entorno tecnológico necesario para el uso del sistema incluye un ordenador con acceso a Internet, un navegador web moderno y, un servidor donde se ejecute el entorno web y los modelos de aprendizaje automático. Para que el sistema funcione no se necesita un \emph{hardware} específico por parte del usuario, ya que los modelos de aprendizaje automático se ejecutan en el servidor y los usuarios interactúan con el sistema a través de la interfaz web.
 
-Las tecnologías utilizadas en el desarrollo del sistema incluyen: Python como lenguaje principal de programación, Scikit-learn para la implementación de los modelos de aprendizaje automático, Pandas y NumPy para el procesamiento y análisis de los datos, FastApi como framework web en Python utilizado para la creación del entorno web, HTML, CSS y JavaScript, para el desarrollo de la interfaz de usuario. Este conjunto de tecnologías permite desarrollar una solución flexible y fácilmente extensible, facilitando la experimentación con distintos modelos de detección de fraude en el consumo eléctrico.
+Las tecnologías utilizadas en el desarrollo del sistema incluyen: Python como lenguaje principal de programación, Scikit-learn para la implementación de los modelos de aprendizaje automático, Pandas y NumPy para el procesamiento y análisis de los datos y FastApi como framework web en Python utilizado para la creación del entorno web. Este conjunto de tecnologías permite desarrollar una solución flexible y fácilmente extensible, facilitando la experimentación con distintos modelos de detección de fraude en el consumo eléctrico.
 
 
 \section{Fortalezas y Debilidades}
 
-La principal fortaleza del sistema es su capacidad para analizar grandes flujos de datos de consumo eléctrico y detectar posibles patrones de fraude utilizando técnicas de aprendizaje automático. Además, el sistema permite comparar distintos modelos de clasificación y visualizar sus métricas de rendimiento, lo que facilita la evaluación de qué algoritmos resultan más eficaces para el problema. Otra ventaja importante es la existencia de un entorno web que centraliza la ejecución de los modelos y la visualización de resultados, permitiendo a los usuarios analizar la información de manera intuitiva.
+La habilidad para examinar grandes volúmenes de datos sobre el consumo eléctrico y descubrir posibles patrones de fraude, empleando métodos de aprendizaje automático, es el principal punto fuerte del sistema. El sistema posibilita, además, el análisis comparativo de varios modelos de clasificación y la visualización de sus métricas de rendimiento, lo que simplifica la evaluación sobre cuáles algoritmos son más efectivos para resolver el problema. La presencia de un entorno en la web que centraliza la implementación de los modelos y la visualización de resultados, lo que posibilita a los usuarios llevar a cabo un análisis intuitivo de la información, es otra ventaja relevante.
 
-Sin embargo, el sistema también presenta algunas limitaciones. En primer lugar, la calidad de los resultados depende directamente de la calidad y representatividad de los datos utilizados para el entrenamiento de los modelos. Además, los modelos de aprendizaje automático pueden generar falsos positivos o falsos negativos, lo que implica que el sistema debe utilizarse como una herramienta de apoyo al análisis y no como un sistema de decisión completamente definitivo. Por último, la implementación inicial del sistema incluye un número limitado de modelos, por lo que será necesario seguir investigando y probando nuevas técnicas para mejorar la precisión del sistema.
+No obstante, el sistema también tiene ciertas limitaciones. La calidad y la representatividad de los datos empleados para entrenar los modelos son el primer elemento que define lo buenos que serán los resultados. Asimismo, los modelos de aprendizaje automático tienen la capacidad de producir falsos negativos o falsos positivos. Esto significa que el sistema debe ser utilizado como una herramienta adicional al análisis y no como un mecanismo de decisión totalmente determinante. Por último, el primer despliegue del sistema incorpora una cantidad restringida de modelos. Por lo tanto, será imprescindible continuar con la investigación y la prueba de procedimientos innovadores para aumentar su exactitud.
 
 
 \section{Necesidades de Negocio}
 
-El objetivo principal del sistema es proporcionar una herramienta que permita analizar datos de consumo energético y detectar posibles casos de fraude eléctrico de forma automatizada. Las empresas energéticas necesitan identificar rápidamente comportamientos de consumo anómalos para poder realizar inspecciones o investigaciones más detalladas.
+El propósito fundamental del sistema es ofrecer un instrumento que facilite el análisis de datos sobre consumo de energía y la identificación automática de potenciales fraudes eléctricos. Para poder llevar a cabo inspecciones o investigaciones más exhaustivas, las compañías energéticas requieren detectar de manera rápida comportamientos anómalos en el consumo.
 
 
 \subsection{Objetivos de Negocio}
 
-El sistema desarrollado busca facilitar el proceso de negocio mediante el uso de modelos de aprendizaje automático que permitan clasificar los registros de consumo como normales o fraudulentos. Además, el sistema debe permitir visualizar los resultados obtenidos y comparar el rendimiento de distintos modelos de clasificación. Todo esto será verá reflejado en una interfaz web que facilite la visualización de resultados y métricas de evaluación. El sistema permite analizar los datos de forma más eficiente que los métodos tradicionales basados únicamente en inspecciones manuales.
+El sistema creado tiene como objetivo simplificar el proceso de negocio a través del empleo de modelos de aprendizaje automático que posibiliten la categorización de los registros de consumo en normales o fraudulentos. El sistema también tiene que posibilitar la comparación del desempeño de diferentes modelos de clasificación y la visualización de los resultados logrados. Todo esto se verá reflejado en una interfaz web que haga más fácil ver los resultados y las métricas de evaluación. El sistema posibilita un análisis de los datos más eficaz que el de las técnicas tradicionales que solo se fundamentan en inspecciones manuales.
 
 
 \subsection{Procesos de Negocio}
 
-El proceso de funcionamiento del sistema se estructura en varias etapas. Para empezar, la carga del conjunto de datos de consumo eléctrico, que contiene información sobre el uso de electricidad. Segundo, el preprocesamiento de los datos, incluyendo la limpieza de los registros, la transformación de variables categóricas y la preparación de los datos para su uso en modelos. Tercero, el entrenamiento de modelos de clasificación, que analizan los patrones de consumo eléctrico y aprenden a distinguir entre comportamientos normales y fraudulentos. Cuarto, la evaluación de los modelos, utilizando distintas métricas como accuracy, precision, recall, F1-score, matriz de confusión y Cohen's Kappa. Para terminar, la visualización de resultados en el entorno web, donde los usuarios pueden consultar las métricas de rendimiento y comparar los distintos modelos. Este proceso permite experimentar con diferentes algoritmos y seleccionar aquellos que ofrecen mejores resultados para la detección de fraude eléctrico.
+El sistema funciona en distintas fases. Primero, se carga el conjunto de datos que contiene información sobre el consumo eléctrico. En segundo lugar, el preprocesamiento de la información, que abarca la depuración de los registros, la conversión de variables categóricas y el acondicionamiento de los datos para su aplicación en modelos. Tercero: el entrenamiento de modelos de clasificación, que estudian los patrones en el consumo eléctrico y aprenden a diferenciar entre comportamientos fraudulentos y normales. Cuarto, la valoración de los modelos, empleando diferentes métricas como precisión, exactitud, Kappa de Cohen, matriz de confusión, F1-score y recall. Finalmente, la visualización de resultados en el ambiente web, donde los usuarios tienen la posibilidad de verificar las métricas del rendimiento y contrastar las diferentes categorías de los modelos. Además, se seleccionan los que ofrecen mejores resultados de cada categoría.
 
 
 \section{Catálogo de Requisitos del Sistema}
@@ -1384,14 +1348,13 @@ RI6 & Protección de datos. & Los datos de los usuarios del sistema se almacenar
 
 \section{Objetivo del prototipo software}
 
-Después de realizar la fase experimental, en la que se implementan y evalúan distintos modelos de aprendizaje automático para la detección de fraude eléctrico, se plantea el desarrollo de un prototipo software que permita aplicar los resultados obtenidos en un entorno funcional. El objetivo principal del prototipo es facilitar que un operador de una empresa eléctrica pueda importar curvas de consumo y obtener una clasificación automática de cada registro como consumo normal o posible fraude, utilizando para ello los modelos previamente entrenados que han mostrado mejor rendimiento durante la comparativa experimental. Además de esta funcionalidad principal, el prototipo también permite la comparación objetiva entre ambas categorías y visualizar recursos gráficos como las curvas ROC o la importancia de las variables en la predicción. 
+Se propone el diseño de un prototipo de software que haga posible utilizar los resultados obtenidos en un ambiente funcional, tras llevar a cabo la etapa experimental, donde se ponen en práctica y analizan diversos modelos de aprendizaje automático para identificar el fraude eléctrico. El propósito fundamental del prototipo es ayudar a un operador de una compañía eléctrica a importar las curvas de consumo y clasificar automáticamente cada registro como posible fraude o consumo normal; para ello, se emplean los modelos que ya fueron entrenados y que han demostrado un mejor desempeño en la comparación experimental. El prototipo, además de su función principal, ofrece la posibilidad de comparar ambas categorías de manera objetiva y ver recursos gráficos como las curvas ROC o el valor que tienen las variables en la predicción. 
 
-El sistema no reentrena los modelos en tiempo real, sino que utiliza modelos previamente entrenados y almacenados. Esta decisión permite reducir el coste computacional, mejorar el tiempo de respuesta del prototipo y separar claramente la fase experimental de la fase de uso operativo. Así, el entrenamiento y evaluación de los modelos se realiza previamente mediante scripts experimentales, mientras que la aplicación se centra en la consulta de resultados y en la generación de predicciones sobre nuevos datos importados.
-
+El sistema emplea modelos que ya fueron entrenados y guardados, en lugar de reentrenarlos en tiempo real. Esta decisión posibilita disminuir el costo computacional, mejorar la velocidad de respuesta del prototipo y distinguir con claridad entre la fase experimental y la fase operativa. Por lo tanto, los modelos se entrenan y evalúan antes a través de scripts experimentales, mientras que la aplicación se enfoca en consultar resultados y crear predicciones basadas en datos nuevos importados.
 
 \section{Modelo conceptual del sistema}
 
-El modelo conceptual del sistema se diseña teniendo en cuenta tanto la fase experimental como la fase operativa del prototipo. La entidad \emph{ModeloPredictivo} representa los modelos entrenados y evaluados, diferenciados mediante la entidad \emph{CategoriaModelo} en modelos \emph{offline} y \emph{online}. Cada modelo dispone de un resultado de evaluación asociado, curvas ROC y, en aquellos casos en los que el algoritmo lo permite, información sobre la importancia de las variables. Por otro lado, la entidad \emph{ArchivoConsumo} representa el fichero CSV importado por el operador, compuesto por una o varias \emph{CurvaConsumo}. Cada curva puede ser evaluada por uno de los modelos entrenados, generando una entidad \emph{Prediccion}, que almacena el resultado obtenido, la probabilidad de fraude y la fecha en la que se realizó la clasificación.
+El modelo conceptual del sistema se desarrolla considerando las etapas operativa y experimental del prototipo. La entidad \emph{ModeloPredictivo} es un reflejo de los modelos que han sido entrenados y analizados, los cuales se dividen en modelos \emph{online} y \emph{offline} a través de la entidad \emph{CategoriaModelo}. Cada modelo cuenta con un resultado de evaluación vinculado, curvas ROC y detalles acerca de la relevancia de las variables en los casos en que el algoritmo lo permite. En cambio, la entidad \emph{ArchivoConsumo} contiene el archivo CSV que el operador ha importado, que consta de una o varias \emph{CurvaConsumo}. Cada curva puede ser analizada por uno de los modelos entrenados, creando una entidad llamada \emph{Predicción}, que guarda la fecha en la que se realiza la clasificación. Además, hay que destacar la clase Usuario que es el operador que realiza una predicción importando archivos de consumo.
 
 \begin{figure}[H]
 \centering
@@ -1402,11 +1365,11 @@ El modelo conceptual del sistema se diseña teniendo en cuenta tanto la fase exp
 
 \section{Actores del sistema}
 
-Se identifican dos actores principales: el operador de la empresa eléctrica y el administrador del sistema. El primero representa al usuario funcional de la aplicación, mientras que el segundo se encarga de las tareas técnicas necesarias para su puesta en marcha y mantenimiento.
+Los dos actores son el administrador del sistema y el operador de la compañía eléctrica. El primero representa al usuario funcional de la aplicación y el segundo se ocupa de las tareas técnicas requeridas para su implementación y mantenimiento.
 
-El operador de la empresa eléctrica es el actor principal del sistema. Representa al usuario encargado de utilizar la aplicación para importar curvas de consumo eléctrico y obtener una predicción sobre cada una de ellas, indicando si el consumo corresponde a un comportamiento normal o a un posible caso de fraude. Su interacción con el sistema se centra en la fase operativa, es decir, en aplicar los modelos seleccionados a nuevos datos de consumo. Entre sus funciones principales se encuentran: realizar la clasificación de las curvas de consumo de un archivo importado, indicando si cada una corresponde a consumo normal o posible fraude, junto con la probabilidad asociada a la predicción, consultar información complementaria sobre los modelos utilizados, como métricas de evaluación o curvas ROC, consultar los datos anteriores e iniciar sesión en el sistema.
+El actor principal del sistema es el operador de la compañía eléctrica. Es el usuario que tiene la responsabilidad de manejar la aplicación con el fin de importar curvas de consumo eléctrico y conseguir una predicción para cada una, señalando si el uso está dentro de lo habitual o si podría haber un caso potencial de fraude. Su interacción con el sistema se enfoca en la fase operativa, o sea, en implementar los modelos escogidos a datos de consumo recientes. Entre sus principales responsabilidades están: llevar a cabo la clasificación de las curvas de consumo de un archivo importado, señalando si cada una es normal o indica posible fraude, así como la probabilidad vinculada a la predicción; revisar información adicional sobre los modelos que se emplean, como métricas de evaluación o curvas ROC, consultar el último resultado de predicción e iniciar sesión en el sistema.
 
-El administrador del sistema es el actor encargado de gestionar los aspectos técnicos del prototipo. Su función principal es garantizar que la aplicación esté disponible, correctamente configurada y preparada para realizar predicciones utilizando los modelos previamente entrenados. En el contexto de este proyecto, el administrador coincide con el propio desarrollador del sistema, aunque conceptualmente se diferencia del operador por el tipo de tareas que realiza. Entre sus funciones principales se encuentran: gestionar los modelos entrenados y los resultados experimentales y, gestionar los usuarios del sistema.
+El administrador del sistema es el actor encargado de gestionar los aspectos técnicos del prototipo. Su tarea principal es asegurar que el sistema esté listo para hacer predicciones con los modelos previamente entrenados, así como también que esté disponible y bien configurado. Dentro del marco de este proyecto, el administrador es el mismo que el creador del sistema; sin embargo, se distingue del operador debido a la clase de tareas que lleva a cabo. Entre las tareas fundamentales que realiza, están la gestión de los usuarios del sistema y la administración de los modelos entrenados y los resultados obtenidos durante las pruebas.
 
 
 \section{Casos de Uso}
@@ -1427,56 +1390,65 @@ En esta sección se definen los principales casos de uso del sistema a partir de
 \caption{Diagrama de Casos de Uso del Administrador del sistema.}
 \end{figure}
 
-En el diagrama se observa que el operador debe iniciar sesión para acceder al sistema. La funcionalidad principal es la realización de una predicción de fraude, que incluye la importación de un archivo CSV con curvas de consumo eléctrico. Una vez realizada la predicción, el operador puede consultar el último resultado generado y, de forma opcional, acceder a datos complementarios que ayuden a interpretar la decisión del modelo, como métricas, curvas ROC o importancia de variables.
+El diagrama muestra que el operador tiene que iniciar sesión para entrar al sistema. Su función principal es la elaboración de una predicción de fraude, lo que conlleva importar un archivo CSV que contenga curvas de consumo de electricidad. Este tiene dos opciones dependiendo si quiere una predicción histórica de los datos o en tiempo real para ir actualizando datos. Después de hacer la predicción, el operador tiene la posibilidad de revisar el resultado más reciente que se obtuvo y, si lo desea, entrar a datos adicionales que faciliten comprender la decisión del modelo, como métricas, curvas ROC o relevancia de variables.
 
-En el caso del administrador, se identifican dos casos de uso principales orientados al mantenimiento del sistema. El primero consiste en la gestión de modelos y resultados, permitiendo incorporar nuevos modelos entrenados, actualizar los modelos existentes o modificar los ficheros de resultados experimentales, métricas y recursos gráficos asociados. El segundo caso de uso corresponde a la gestión de usuarios, mediante la cual el administrador puede crear, modificar o eliminar usuarios y gestionar sus permisos de acceso. Estos casos de uso no forman parte del flujo principal del sistema, sino que representan tareas de configuración y mantenimiento necesarias para garantizar el correcto funcionamiento.
+Para el administrador, se han identificado dos principales casos de uso que tienen como objetivo la conservación del sistema. El primero implica la administración de modelos y resultados, lo que posibilita añadir nuevos modelos entrenados, actualizar los existentes o cambiar los archivos de resultados experimentales, métricas y recursos gráficos relacionados. El segundo caso de uso tiene que ver con la administración de usuarios, a través de la cual el administrador tiene la capacidad de crear, modificar o borrar usuarios y manejar sus permisos para acceder. Estos casos de uso, que son tareas de mantenimiento y configuración esenciales para asegurar un funcionamiento adecuado, no se incluyen en el flujo principal del sistema.
 
 
-\subsection{Descripción de escenarios}
+\subsection{Descripción de escenarios del operador}
 
-A continuación, se va a desarrollar la descripción de los escenarios de casos de uso del operador. Para todos los casos de uso asociados al operador se considera como precondición que el usuario ha iniciado sesión correctamente en el sistema. Por tanto, el caso de uso \emph{Iniciar sesión} no se repite en la descripción de cada escenario, aunque se entiende como requisito previo para acceder a las funcionalidades del sistema.
+A continuación, se desarrolla la descripción de los escenarios de casos de uso del operador. Para todos los casos de uso asociados al operador se considera como precondición que el usuario ha iniciado sesión correctamente en el sistema. Por tanto, el caso de uso \emph{Iniciar sesión} no se repite en la descripción de cada escenario, aunque se entiende como requisito previo para acceder a las funcionalidades del sistema.
 
-\medskip
+\subsubsection{Realizar predicción de fraude histórica}
 
-\noindent Primer Caso de Uso: Realizar predicción de fraude.
+\noindent Primer Caso de Uso: Realizar predicción de fraude histórica.
 
 \begin{itemize}[leftmargin=1.5cm]
-    \item Escenario principal (éxito): Realizar predicción de fraude.
-    \item Escenario alternativo (error): Los modelos entrenados necesarios para realizar la predicción no están disponible.
+    \item Escenario principal (éxito): Realizar predicción de fraude histórica.
+    \item Escenario alternativo (error): Error en la introducción de los parámetros de la predicción.
+    \item Escenario alternativo (error): El modelo entrenado necesario para realizar la predicción no está disponible.
     \item Escenario alternativo (error): Error durante el preprocesamiento de los datos.
-    \item Escenario alternativo (error): El flujo online no puede simularse correctamente.
     \item Escenario alternativo (excepción): El operador cancela la predicción.
 \end{itemize}
 
 \medskip
 
-\noindent Escenario principal (éxito): Realizar predicción de fraude.
+\noindent Escenario principal (éxito): Realizar predicción de fraude histórica.
 
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El operador selecciona la opción realizar predicción de fraude.
+    \item El operador selecciona la opción realizar predicción de fraude histórica.
+    \item El operador elige los parámetros que tendrán la predicción. Estos son el límite de registros y el límite de predicciones individuales mostradas en la respuesta.
     \item Se incluye el caso de uso \emph{Importar archivo de curvas de consumo}.
-    \item El sistema solicita solicita confirmación para realizar la predicción de esos datos importados.
+    \item Opcionalmente, se extiende el caso de uso \emph{Consultar datos complementarios}.
     \item El operador confirma la predicción de fraude del archivo importado.
+    \item El sistema comprueba que los parámetros de la predicción son valores correctos.
     \item El sistema carga los modelos entrenados seleccionados para realizar la predicción.
     \item El sistema aplica el preprocesamiento necesario a las curvas de consumo importadas.
-    \item El sistema realiza la predicción sobre las curvas de consumo. En el caso del modelo \emph{offline}, la predicción se realiza sobre el conjunto completo de datos, mientras que en el modelo \emph{online} las curvas se procesan de forma secuencial simulando un flujo de datos.
+    \item El sistema realiza la predicción sobre las curvas de consumo. En este caso del modelo \emph{offline}, la predicción se realiza sobre el conjunto completo de datos.
     \item El sistema muestra por pantalla el resultado de cada curva, indicando si corresponde a consumo normal o posible fraude.
     \item El sistema muestra la probabilidad asociada a la predicción de fraude cuando esté disponible.
-    \item Opcionalmente, se extiende el caso de uso \emph{Consultar datos complementarios}.
 \end{enumerate}
 \medskip
 
 \noindent Extensiones:
 
-5a. Modelo entrenado no disponible.
+6a. Error en la introducción de los parámetros de la predicción.
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El sistema detecta que algún modelo no existe o no está disponible en la ruta configurada.
+    \item El sistema detecta que existe un error en algún parámetro de la predicción que el operador introdujo.
+    \item El sistema muestra un mensaje de error indicando el error de ese parámetro en cuestión y no se realiza la predicción.
+\end{enumerate}
+
+\medskip
+
+7a. Modelo entrenado no disponible.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema detecta que el modelo \emph{offline} no existe o no está disponible en la ruta configurada.
     \item El sistema muestra un mensaje de error indicando que no es posible realizar la predicción y no se realiza la predicción.
 \end{enumerate}
 
 \medskip
 
-6a. Error durante el preprocesamiento de los datos.
+8a. Error durante el preprocesamiento de los datos.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El sistema detecta que faltan columnas necesarias o que existen valores no válidos.
     \item El sistema muestra un mensaje de error indicando que los datos importados no son compatibles con el modelo y no se realiza la predicción.
@@ -1484,13 +1456,7 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-7a. Error durante la simulación del flujo online.
-\begin{enumerate}[leftmargin=1.5cm]
-    \item El sistema detecta un error durante la generación de predicciones online.
-    \item El sistema muestra un mensaje de error indicando que no ha sido posible completar la simulación del flujo online.
-\end{enumerate}
-
-1a-3a. Cancelar realizar predicción de fraude.
+1a-4a. Cancelar realizar predicción de fraude histórica.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El operador selecciona cancelar la predicción antes de confirmar.
     \item El sistema cancela la predicción.
@@ -1498,7 +1464,81 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Segundo Caso de Uso: Importar archivo de curvas de consumo.
+\subsubsection{Realizar predicción de fraude en tiempo real}
+
+\noindent Segundo Caso de Uso: Realizar predicción de fraude en tiempo real.
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item Escenario principal (éxito): Realizar predicción de fraude en tiempo real.
+    \item Escenario alternativo (error): Error en la introducción de los parámetros de la predicción.
+    \item Escenario alternativo (error): El modelo entrenado necesario para realizar la predicción no está disponible.
+    \item Escenario alternativo (error): Error durante el preprocesamiento de los datos.
+    \item Escenario alternativo (error): El flujo online no puede simularse correctamente.
+    \item Escenario alternativo (excepción): El operador cancela la predicción.
+\end{itemize}
+
+\medskip
+
+\noindent Escenario principal (éxito): Realizar predicción de fraude en tiempo real.
+
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona la opción realizar predicción de fraude en tiempo real.
+    \item El operador elige los parámetros que tendrán la predicción. Estos son los intervalos de segundo, el límite de registros y el límite de predicciones individuales mostradas en la respuesta.
+    \item Se incluye el caso de uso \emph{Importar archivo de curvas de consumo}.
+    \item Opcionalmente, se extiende el caso de uso \emph{Consultar datos complementarios}.
+    \item El operador confirma la predicción de fraude del archivo importado.
+    \item El sistema comprueba que los parámetros de la predicción son valores correctos.
+    \item El sistema carga los modelos entrenados seleccionados para realizar la predicción.
+    \item El sistema aplica el preprocesamiento necesario a las curvas de consumo importadas.
+    \item El sistema realiza la predicción sobre las curvas de consumo. En este caso del modelo \emph{online}, las curvas se procesan de forma secuencial simulando un flujo de datos.
+    \item El sistema muestra por pantalla el resultado de cada curva, indicando si corresponde a consumo normal o posible fraude.
+    \item El sistema muestra la probabilidad asociada a la predicción de fraude cuando esté disponible.
+\end{enumerate}
+\medskip
+
+\noindent Extensiones:
+
+6a. Error en la introducción de los parámetros de la predicción.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema detecta que existe un error en algún parámetro de la predicción que el operador introdujo.
+    \item El sistema muestra un mensaje de error indicando el error de ese parámetro en cuestión y no se realiza la predicción.
+\end{enumerate}
+
+\medskip
+
+7a. Modelo entrenado no disponible.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema detecta que el modelo \emph{online} no existe o no está disponible en la ruta configurada.
+    \item El sistema muestra un mensaje de error indicando que no es posible realizar la predicción y no se realiza la predicción.
+\end{enumerate}
+
+\medskip
+
+8a. Error durante el preprocesamiento de los datos.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema detecta que faltan columnas necesarias o que existen valores no válidos.
+    \item El sistema muestra un mensaje de error indicando que los datos importados no son compatibles con el modelo y no se realiza la predicción.
+\end{enumerate}
+
+\medskip
+
+9a. Error durante la simulación del flujo online.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema detecta un error durante la generación de predicciones online.
+    \item El sistema muestra un mensaje de error indicando que no ha sido posible completar la simulación del flujo online.
+\end{enumerate}
+
+1a-4a. Cancelar realizar predicción de fraude.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona cancelar la predicción antes de confirmar.
+    \item El sistema cancela la predicción.
+\end{enumerate}
+
+\medskip
+
+\subsubsection{Importar archivo de curvas de consumo}
+
+\noindent Tercer Caso de Uso: Importar archivo de curvas de consumo.
 
 \begin{itemize}[leftmargin=1.5cm]
     \item Escenario principal (éxito): Importar archivo de curvas de consumo.
@@ -1512,7 +1552,7 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \noindent Escenario principal (éxito): Importar archivo de curvas de consumo.
 
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El operador selecciona la opción de importar datos.
+    \item El operador selecciona la opción de importar archivo.
     \item El sistema muestra el selector de archivos del dispositivo.
     \item El operador selecciona un archivo CSV con curvas de consumo.
     \item El sistema comprueba que el archivo tiene un formato válido.
@@ -1548,7 +1588,9 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Tercer Caso de Uso: Consultar último resultado de predicción.
+\subsubsection{Consultar último resultado de predicción}
+
+\noindent Cuarto Caso de Uso: Consultar último resultado de predicción.
 
 \begin{itemize}[leftmargin=1.5cm]
     \item Escenario principal (éxito):  Consultar último resultado de predicción.
@@ -1562,13 +1604,12 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \noindent Escenario principal (éxito): Consultar último resultado de predicción.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El operador selecciona la opción de mostrar el último resultado de predicción.
-    \item El sistema solicita confirmación para mostrar la última predicción.
-    \item El operador confirma la solicitud.
+    \item Opcionalmente, se extiende el caso de uso \emph{Consultar datos complementarios}.
+    \item El operador confirma la consulta del último resultado.
     \item El sistema comprueba si existe una predicción previa almacenada.
     \item El sistema recupera el último resultado de predicción.
     \item El sistema muestra por pantalla el resultado, de la última predicción, de cada curva, indicando si corresponde a consumo normal o posible fraude.
     \item El sistema muestra la probabilidad asociada a la predicción de fraude cuando esté disponible.
-    \item Opcionalmente, se extiende el caso de uso \emph{Consultar datos complementarios}.
 \end{enumerate}
 
 \medskip
@@ -1599,10 +1640,14 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Cuarto Caso de Uso: Consultar datos complementarios.
+\subsubsection{Consultar datos complementarios}
+
+En este caso de uso no se muestra la gráfica de la curva Roc, se muestran todos los datos complementarios de la predicción actual realizada o de la más reciente que no son gráficas.
+
+\noindent Quinto Caso de Uso: Consultar datos complementarios.
 
 \begin{itemize}[leftmargin=1.5cm]
-    \item Escenario principal (éxito):  Consultar datos complementarios.
+    \item Escenario principal (éxito): Consultar datos complementarios.
     \item Escenario alternativo (error): No existen datos complementarios disponibles de los modelos utilizados.
     \item Escenario alternativo (error): Algún recurso complementario no puede cargarse correctamente.
     \item Escenario alternativo (excepción): El operador cancela la consulta.
@@ -1612,13 +1657,13 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \noindent Escenario principal (éxito): Consultar datos complementarios.
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El operador selecciona la opción de consultar datos complementarios después de realizar una predicción o al mostrar el último resultado.
+    \item El operador selecciona la opción de consultar datos complementarios antes de confirmar la realización de una predicción o de mostrar el último resultado.
     \item El sistema identifica los dos modelos utilizados para generar la predicción.
     \item El sistema comprueba si existen datos complementarios asociados a dichos modelos.
     \item El sistema recupera las métricas de evaluación de los modelos.
     \item El sistema recupera las curvas ROC asociadas a los modelos cuando estén disponible.
     \item El sistema recupera la importancia de variables si los modelos disponen de esta información.
-    \item El sistema muestra por pantalla los datos complementarios disponibles.
+    \item El sistema muestra por pantalla los datos complementarios disponibles al devolver el resultado de una predicción o consulta de un último resultado.
 \end{enumerate}
 
 \medskip
@@ -1649,13 +1694,59 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Quinto Caso de Uso: Iniciar sesión.
+\subsubsection{Visualizar curva ROC}
+
+En este caso de uso solo se muestran los datos complementarios gráficos, es decir, la curva ROC de la última predicción realizada para el modelo selecionado.
+
+\noindent Sexto Caso de Uso: Visualizar curva ROC.
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item Escenario principal (éxito): Visualizar curva ROC.
+    \item Escenario alternativo (error): No se ha realizado ninguna predicción para ese modelo.
+    \item Escenario alternativo (excepción): El operador cancela la visualización.
+\end{itemize}
+
+\medskip
+
+\noindent Escenario principal (éxito): Visualizar curva ROC.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona la opción de visualizar curva ROC despúes de haber realizado una predicción. 
+    \item El sistema muestra un despegable con los dos modelos implementados en el sistema.
+    \item El operador selecciona el modelo.
+    \item El operador confirma la visualización.
+    \item El sistema comprueba que se ha realizado una predicción con ese modelo.
+    \item El sistema devuelve la información de la curva ROC y la opción de descargar la imagen.
+\end{enumerate}
+
+\medskip
+
+\noindent Extensiones:
+
+5a. No se ha realizado ninguna predicción para ese modelo.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema comprueba que no se realizó ninguna predicción con el modelo seleccionado.
+    \item El sistema muestra un mensaje indicando que se realizó predicción con el modelo seleccionado.
+\end{enumerate}
+
+\medskip
+
+1a-3a. Cancelar la visualización de la curva ROC.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona cancelar la visualización.
+    \item El sistema cancela la visualización.
+\end{enumerate}
+
+
+\subsubsection{Iniciar sesión}
+
+\noindent Séptimo Caso de Uso: Iniciar sesión.
 
 \begin{itemize}[leftmargin=1.5cm]
     \item Escenario principal (éxito): El operador inicia sesión correctamente en el sistema.
     \item Escenario alternativo (error): Las credenciales introducidas no son válidas.
-    \item Escenario alternativo (error): El usuario no existe o no tiene permisos de acceso.
+    \item Escenario alternativo (error): El usuario no tiene permisos de acceso al no estar autorizado.
     \item Escenario alternativo (excepción): El operador cancela el inicio de sesión.
+    \item Escenario alternativo (excepción): El operador cancela la autorización.
 \end{itemize}
 
 \medskip
@@ -1663,19 +1754,23 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \noindent Escenario principal (éxito): Iniciar sesión.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El operador accede al sistema.
-    \item El sistema muestra el formulario de autenticación.
+    \item El operador selecciona la opción de iniciar sesión.
+    \item El sistema muestra un formulario con usuario y contraseña.
     \item El operador introduce sus credenciales de acceso.
     \item El operador confirma el inicio de sesión.
-    \item El sistema valida las credenciales introducidas.
-    \item El sistema comprueba que el usuario tiene permisos para acceder a las funcionalidades del operador.
-    \item El sistema permite el acceso al operador.
+    \item El sistema valida las credenciales introducidas y devuelve el token de acceso para verificar la sesión.
+    \item El operador selecciona la opción de Autorizar.
+    \item El sistema muestra un formulario con sola una opción, el token de acceso.
+    \item El operador introduce su token de acceso que fue dado previamente por el sistema.
+    \item El operador confirma la autorización.
+    \item El sistema verifica el token y comprueba que el usuario tiene permisos para acceder a las funcionalidades del operador.
 \end{enumerate}
 
 \medskip
 
 \noindent Extensiones:
 
-5a. Credenciales no válidas.
+6a. Credenciales no válidas.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El sistema comprueba que las credenciales introducidas no son correctas.
     \item El sistema muestra un mensaje de error indicando que el usuario o la contraseña no son válidos.
@@ -1684,8 +1779,9 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-6a. Usuario sin permisos de acceso.
+11a. Usuario no tiene permisos de acceso al no estar autorizado.
 \begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona cualquiera de las funcionalidades del sistema.
     \item El sistema identifica al usuario, pero comprueba que no dispone de permisos suficientes.
     \item El sistema deniega el acceso a las funcionalidades del operador.
     \item El sistema muestra un mensaje indicando que el usuario no tiene permisos para acceder al sistema.
@@ -1693,7 +1789,7 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-1a-3a. Cancelar inicio de sesión.
+1a-5a. Cancelar inicio de sesión.
 \begin{enumerate}[leftmargin=1.5cm]
     \item El operador cancela el proceso antes de confirmar el inicio de sesión.
     \item El sistema cancela la operación.
@@ -1701,11 +1797,77 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Ahora es el turno de los dos casos de uso del administrador, estos se consideran tareas de mantenimiento del sistema. A diferencia de los casos de uso del operador, no forman parte del flujo principal de predicción, sino que permiten preparar, actualizar y supervisar los recursos necesarios para que la aplicación funcione correctamente.
+7a-9a. Cancelar la autorización.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador cancela el proceso de autorizarse en el sistema.
+    \item El sistema cancela la operación.
+\end{enumerate}
 
 \medskip
 
-\noindent Sexto Caso de Uso: Gestionar modelos y resultados.
+\subsubsection{Cerrar sesión}
+
+\noindent Octavo Caso de Uso: Cerrar sesión.
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item Escenario principal (éxito): El operador cierra sesión correctamente en el sistema.
+    \item Escenario alternativo (error): Error al cerrar sesión.
+    \item Escenario alternativo (excepción): El operador cancela el cierre de sesión.
+    \item Escenario alternativo (excepción): El operador cancela la finalización de la autorización.
+\end{itemize}
+
+\medskip
+
+\noindent Escenario principal (éxito): Cerrar sesión.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona la opción de cerrar sesión.
+    \item El operador confirma el cierre de sesión.
+    \item El sistema verifica el cierre de sesión y devuelve el mensaje de éxito por la pantalla.
+    \item El operador selecciona la opción de Autorizar.
+    \item El sistema muestra dos opciones dentro de Autorizar, finalizar autorización o cerrar.
+    \item El operador selecciona finalizar la autorización.
+    \item El sistema verifica la finalización de la autorización.
+\end{enumerate}
+
+\medskip
+
+\noindent Extensiones:
+
+3a. Error al cerrar sesión.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El sistema comprueba que ocurrió un error al cerrar la sesión del operador.
+    \item El sistema muestra un mensaje de error indicando que no fue posible cerrar su sesión.
+\end{enumerate}
+
+\medskip
+
+1a-2a. Cancelar cierre de sesión.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador cancela el proceso antes de confirmar el inicio de sesión.
+    \item El sistema cancela la operación.
+    \item El operador no podrá acceder a ninguna funcionalidad del sistema hasta volver a iniciar sesión.
+\end{enumerate}
+
+\medskip
+
+5a. Cancelar finalizar autorización.
+\begin{enumerate}[leftmargin=1.5cm]
+    \item El operador cancela el proceso de finalizar su autorización en el sistema.
+    \item El sistema cancela la operación.
+    \item El operador no podrá acceder a ninguna funcionalidad del sistema hasta volver a iniciar sesión.
+\end{enumerate}
+
+\medskip
+
+\subsection{Descripción de escenarios del administrador}
+
+Ahora es el turno de los dos casos de uso del administrador, estos se consideran tareas de mantenimiento del sistema. A diferencia de los casos de uso del operador, no forman parte del flujo principal de predicción, sino que permiten preparar, actualizar y supervisar los recursos necesarios para que la aplicación funcione correctamente.
+
+\medskip
+
+\subsubsection{Gestionar modelos y resultados}
+
+\noindent Noveno Caso de Uso: Gestionar modelos y resultados.
 
 \begin{itemize}[leftmargin=1.5cm]
     \item Escenario principal (éxito): El administrador actualiza correctamente los modelos entrenados o los resultados experimentales.
@@ -1715,7 +1877,6 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \medskip
 
 \noindent Escenario principal (éxito): Gestionar modelos y resultados.
-
 \begin{enumerate}[leftmargin=1.5cm]
     \item El administrador accede a los recursos internos del sistema.
     \item El administrador sustituye o añade modelos entrenados, métricas, curvas ROC o información de importancia de variables.
@@ -1736,7 +1897,9 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 
 \medskip
 
-\noindent Séptimo Caso de Uso: Gestionar usuarios.
+\subsubsection{Gestionar usuarios}
+
+\noindent Décimo Caso de Uso: Gestionar usuarios.
 
 \begin{itemize}[leftmargin=1.5cm]
     \item Escenario principal (éxito): El administrador gestiona correctamente los usuarios del sistema.
@@ -1746,7 +1909,6 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \medskip
 
 \noindent Escenario principal (éxito): Gestionar usuarios.
-
 \begin{enumerate}[leftmargin=1.5cm]
     \item El administrador accede al sistema de gestión de usuarios.
     \item El administrador crea, modifica o elimina un usuario.
@@ -1772,26 +1934,179 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 % =========================
 \chapter{Diseño del Sistema}
 
-
-\section{Arquitectura general del Sistema}
-
-
-\subsection{Arquitectura física}
+En este capítulo se describe el diseño del sistema software desarrollado. El objetivo es dejar claro la organización general de la solución, sus componentes principales, las responsabilidades de cada parte y la forma en la que interactúan entre sí para permitir la detección de posibles fraudes. El sistema se basa en un prototipo para ser utilizado por un operador de una distribuidora eléctrica.
 
 
-\subsection{Arquitectura lógica}
+\section{Arquitectura del Sistema}
+
+La arquitectura del sistema se diseña separando la fase experimental de la fase operativa. La fase experimental se encarga del entrenamiento y evaluación de los modelos de aprendizaje automático, mientras que la fase operativa permite utilizar los modelos dentro de una \emph{API REST} para realizar predicciones. La arquitectura del sistema se compone de varios elementos. Empezando por el cliente, este representa el punto de acceso al sistema. El operador interactúa con la API mediante un navegador web o cliente HTTP, pudiendo iniciar sesión, importar archivos CSV, ejecutar predicciones y consultar resultados.
+
+El componente principal y núcleo del sistema es la \emph{API REST}. Esta, recibe las peticiones del cliente, valida la autenticación, ejecuta las predicciones y devuelve las respuestas correspondientes. Además, se encarga del correcto funcionamiento de la predicción histórica, la predicción en tiempo real, la consulta de resultados y la visualización de curvas ROC. La base de datos MySQL almacena la información relativa a los usuarios del sistema, incluyendo credenciales cifradas, roles y estado de activación. La API consulta esta base de datos durante el proceso de inicio de sesión para validar el acceso al sistema.
+
+Analizando más en profundidad, existen varios elementos más como los servicios de predicción que agrupan la lógica encargada de cargar los modelos entrenados, preprocesar los datos importados y ejecutar las predicciones. Dentro de este bloque se distinguen dos flujos: la predicción histórica, basada en \emph{XGBoost}, y la predicción en tiempo real, basada en \emph{Adaptive Random Forest}. La cola interna,dentro del flujo online, permite simular la llegada progresiva de datos en tiempo real. Un productor introduce las curvas de consumo en la cola cada cierto intervalo de tiempo, mientras que un consumidor las extrae y las clasifica mediante el modelo online. Y termina con el sistema de ficheros que almacena los modelos entrenados, columnas esperadas, escaladores, métricas experimentales, curvas ROC, importancia de variables y resultados de predicción generados por el sistema. La Figura~\ref{fig:arquitectura_sistema} muestra el esquema general de la arquitectura del sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/arquitectura_sistema.png}
+\caption{Arquitectura del sistema.}
+\label{fig:arquitectura_sistema}
+\end{figure}
+
+
+\section{Diseño de la base de datos}
+
+Se crea una base de datos donde se guarda toda la información de los usuarios para controlar su acceso en el sistema. Esta información se almacena en una base de datos relacional, a diferencia de otras partes del proyecto como modelos entrenados, métricas experimentales o resultados de predicción que se guardan en el sistema de ficheros. Esto permite separar la gestión de usuarios del código de nuestra aplicación y evita tener credenciales escritas en los ficheros del proyecto. De este modo el sistema queda más seguro, manejable y preparado para futuras ampliaciones.
+
+La base de datos solo dispone de una tabla, la cual se llama \emph{usuarios}. Esta guarda la información que precisa el sistema para autenticar a los usuarios y controlar sus permisos de acceso. Además, no se almacenan las predicciones generadas por los modelos en la base de datos, ya que estas se guardan en ficheros JSON separados por usuario y tipo de predicción. Esto resulta suficiente para el alcance actual del sistema y evita sobrecargar la base de datos con grandes volúmenes de predicciones individuales. Esta estructura en el diseño permite una futura ampliación en la que los resultados puedan almacenarse también en tablas relacionales, permitiendo consultas históricas, auditoría y análisis más avanzados. En la Figura~\ref{fig:diseno_bd} se muestra el diseño de la base de datos utilizada por el sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{imagenes/diseno_bd.png}
+\caption{Diseño de la Base de Datos.}
+\label{fig:diseno_bd}
+\end{figure}
+
+
+\subsection{Tabla usuarios}
+
+Esta tabla está formada por varios elementos como un identificador único, un nombre de usuario, una contraseña almacenada mediante hash, un rol dentro del sistema, un estado de activación y una fecha de creación. El uso de contraseñas cifradas mediante hash evita tener contraseñas en texto plano, así se consigue reducir los casos de accesos no autorizados. El campo de estado permite desactivar usuarios sin necesidad de eliminarlos físicamente, conservando así la integridad de la información. En la Figura~\ref{fig:tabla_usuarios} se muestran sus atributos junto con detalles como el tipo de dato.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/tabla_usuarios.png}
+\caption{Diseño de la tabla de usuarios.}
+\label{fig:tabla_usuarios}
+\end{figure}
+
+
+\section{Diseño del almacenamiento de ficheros}
+
+El sistema guarda en disco los recursos creados durante la fase experimental y los resultados producidos durante el uso de la aplicación. Con esta división se reserva la base de datos para información relacionada a los usuarios, mientras que el sistema de ficheros se utiliza para almacenar recursos más pesados o generados externamente, como modelos entrenados, gráficas, métricas y resultados de predicción. Esta decisión se debe a que algunos elementos del sistema no encajan de forma natural en una tabla relacional. Los modelos entrenados, los escaladores, las listas de columnas esperadas, las curvas ROC, los ficheros de métricas y la importancia de variables son recursos producidos durante la fase experimental y posteriormente reutilizados por la aplicación. Se almacenan como ficheros dentro de la estructura del proyecto, permitiendo que la \emph{API} los cargue cuando sean necesarios sin repetir el entrenamiento de los modelos.
+
+La carpeta \emph{models/} se utiliza para guardar los recursos necesarios para realizar las predicciones. En ella se encuentran los modelos entrenados, las columnas esperadas por cada modelo y, en el caso del modelo online, el escalador utilizado durante la fase experimental. Estos garantizan que los datos importados por el operador se procesen con la misma estructura y condiciones que los datos utilizados durante el entrenamiento. Por otro lado, la carpeta \emph{results/} almacena los resultados experimentales y los recursos complementarios asociados a los modelos. En esta carpeta se encuentran las métricas de evaluación, las curvas ROC, la importancia de variables de \emph{XGBoost} y los resultados. De esta forma, la aplicación puede mostrar información complementaria sin recalcularla en cada consulta. Los resultados de las predicciones se guardan separados por usuario y por tipo de predicción. Así se evita que los resultados de distintos operadores se mezclen y permite distinguir entre la última predicción histórica y la última predicción en tiempo real.
+
+Los archivos en el entorno local se guardan directamente en el sistema de ficheros del ordenador donde la aplicación está funcionando. Estos pueden estar en el disco persistente vinculado al servidor, como un volumen \emph{EBS}, por ejemplo, cuando se despliega en un servidor sobre una instancia de \emph{AWS EC2}. Así, los modelos, resultados y recursos adicionales continúan accesibles incluso si se vuelve a iniciar la aplicación. El almacenamiento de los ficheros podría trasladarse a un servicio externo como \emph{Amazon S3} para una versión más segura con requerimientos más altos de mantenimiento, disponibilidad y escalabilidad. Esto posibilita la separación de los archivos de la instancia de ejecución, el mejoramiento de la persistencia y la administración más sólida de los recursos que produce el sistema, así como también hacer copias de seguridad más fácilmente.
 
 
 \section{Diseño de la API REST}
 
-
-\subsection{Capa de negocio (backend)}
-
-
-\subsection{Capa de almacenamiento de resultados}
+En esta sección se puede visualizar el diseño del sistema, tanto en su versión inicial como estaba planeado el sistema, como en su versión final ya implementado y funcional.
 
 
-\subsection{Estructura de directorios del proyecto}
+\subsection{Bocetos iniciales}
+
+Antes de realizar la implementación y diseño final del sistema se realiza unos bocetos iniciales para plasmar la idea inicial del sistema. Estos bocetos están realizados a través de un software especializado llamado \emph{balsamiq} y muestran cada una de las ventanas y funcionalidades del sistema. En la Figura~\ref{fig:main_boceto} se puede ver la ventana principal del sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/main_boceto.png}
+\caption{Boceto de la ventana principal del sistema.}
+\label{fig:main_boceto}
+\end{figure}
+
+
+\subsubsection{Ventanas de autenticación}
+
+Se muestran las ventanas que pertenecen a los casos de uso de Iniciar sesión y Cerrar sesión, relacionados con la autenticación en el sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/iniciarSesion_boceto.png}
+\caption{Boceto de la ventana de iniciar sesión.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/iniciarSesionExito_boceto.png}
+\caption{Boceto de la ventana de iniciar sesión con éxito.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/iniciarSesionError_boceto.png}
+\caption{Boceto de la ventana de error al iniciar sesión.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/cerrarSesion_boceto.png}
+\caption{Boceto de la ventana de cerrar sesión.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/cerrarSesionExito_boceto.png}
+\caption{Boceto de la ventana de cerrar sesión con éxito.}
+\end{figure}
+
+
+\subsubsection{Ventanas de predicción}
+Se muestran las ventanas que pertenecen a los casos de uso de predecir fraude ya sea \emph{offline} o \emph{online} junto a posibles errores.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOffline_boceto.png}
+\caption{Boceto de la ventana principal de predecir fraude \emph{offline}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOfflineExito_boceto.png}
+\caption{Boceto de la ventana de predecir fraude \emph{offline} con éxito.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOfflineError_boceto.png}
+\caption{Boceto de la ventana de error al predecir fraude \emph{offline}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOnline_boceto.png}
+\caption{Boceto de la ventana principal de predecir fraude \emph{online}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOnlineExito_boceto.png}
+\caption{Boceto de la ventana de predecir fraude \emph{online} con éxito.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/fraudeOnlineError_boceto.png}
+\caption{Boceto de la ventana de error al predecir fraude \emph{online}.}
+\end{figure}
+
+
+\subsubsection{Ventanas de consulta}
+
+Se muestran las ventanas del caso de uso de consultar último resultado de predicción junto a sus posibles errores.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/ultimaPrediccion_boceto.png}
+\caption{Boceto de la ventana principal de consultar último resultado de predicción.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/ultimaPrediccionExito_boceto.png}
+\caption{Boceto de la ventana de consultar último resultado de predicción con éxito.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/ultimaPrediccionError_boceto.png}
+\caption{Boceto de la ventana de error al consultar último resultado de predicción.}
+\end{figure}
+
+
+\subsection{Diseño final}
+\subsubsection{Endpoints de autenticación}
+\subsubsection{Endpoints de predicción}
+\subsubsection{Endpoints de consulta}
 
 
 % =========================
@@ -1799,20 +2114,34 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 % =========================
 \chapter{Construcción del Sistema}
 
+Este capítulo se ocupa de los elementos relacionados con la construcción del sistema de software creado. Se detalla el entorno de desarrollo que se usó, las tecnologías que se aplicaron, las resoluciones tomadas durante la creación del prototipo y la implementación a nivel de código. La aplicación \emph{back-end} ha sido creada a partir de una \emph{API REST}, la cual tiene la responsabilidad de autenticar a los usuarios, recibir archivos CSV con las curvas de consumo eléctrico, implementar los modelos predictivos escogidos en el periodo experimental y retornar los resultados al operador.
+
 
 \section{Entorno de desarrollo}
 
+El desarrollo se realiza con un equipo con \emph{Windows} junto con \emph{Python} como el lenguaje de programación principal. Esta opción es apropiada para el proyecto porque posibilita la incorporación de los modelos de aprendizaje automático que se han conseguido en la fase experimental junto con la lógica del sistema, todo dentro del mismo entorno. Se crea un entorno virtual a través de \emph{venv} para juntar las dependencias del proyecto. Las bibliotecas necesarias para la aplicación se mantienen separadas de otras instalaciones de \emph{Python} que se encuentran en el equipo, con lo cual se previenen conflictos entre versiones y se simplifica la replicación del entorno en otros equipos o en un futuro despliegue. Se ha elegido \emph{Visual Studio Code} como el entorno de desarrollo integrado, que se emplea para la edición del código fuente, la estructuración del proyecto y la ejecución de comandos en la terminal integrada. 
+
+Para manejar e instalar las dependencias, se emplea \emph{pip}, este programa genera el archivo requirements.txt, que compila las librerías necesarias para que el sistema funcione. Durante la fase de desarrollo, la aplicación se ejecuta con \emph{Uvicorn}, un servidor \emph{ASGI} que es compatible con \emph{FastAPI}. \emph{XAMPP, phpMyAdmin} y \emph{MySQL} se utilizan para gestionar la base de datos. Esto permite crear y gestionar una base de datos de los usuarios del sistema, donde se encuentran los roles, el estado de activación y la información de autenticación. Finalmente, se utiliza \emph{Git} para controlar las versiones, lo que permite llevar un registro del progreso del código fuente y supervisar los cambios realizados durante la construcción del sistema.
+
 
 \section{Tecnologías utilizadas}
+
+Para construir el sistema se emplean diversas tecnologías en las que cada una se encarga de una tarea distinta. Se emplea \emph{FastAPI} como base fundamental para crear la \emph{API REST}. Esta aporta que los \emph{endpoints} funcionen y hagan su tarea correctamente, la validación de los parámetros de entrada y la creación automática de una documentación del sistema que es interactiva. Garcias a esto el operador puede comprobar las funcionalidades disponibles a través de una interfaz a la que se accede por medio del navegador. La aplicación desarrollada con \emph{FastAPI} se ejecuta usando el servidor \emph{ASGI} llamado \emph{Uvicorn}. Este servidor permite atender las peticiones HTTP recibidas por la API y ejecutar los endpoints definidos en el sistema.
+
+Para la lectura, manipulación y preprocesamiento de los archivos CSV importados por el operador se utiliza\emph{Pandas}. Esta se encarga de cargar las curvas de consumo, eliminar columnas innecesarias, adaptar las variables al formato requerido por los modelos y preparar los datos antes de realizar la predicción. Para la predicción sobre consumo histórico se ha utilizado el modelo \emph{XGBoost}, implementado mediante la biblioteca \emph{xgboost} de \emph{Python}. Este se selecciona como mejor técnica \emph{offline} durante la fase experimental y se integra en el sistema para clasificar archivos completos de curvas de consumo. Para la predicción en tiempo real se ha utilizado el modelo \emph{Adaptive Random Forest}, implementado mediante la biblioteca \emph{River}, orientada al aprendizaje automático online. Este modelo permite clasificar los registros de forma secuencial dentro de la simulación de flujo en tiempo real. También, se utiliza \emph{Scikit-learn} como biblioteca auxiliar en determinados procesos asociados a los modelos, especialmente en el escalado de datos necesario para mantener la coherencia entre la fase experimental y la fase operativa del sistema.
+
+Se emplea \emph{MySQL} como sistema gestor de base de datos para administrar usuarios. Se guardan los datos necesarios para la autenticación. La \emph{API} y la base de datos se comunican mediante \emph{PyMySQL}, lo que permite realizar consultas a través del código Python. Para una buena seguridad en las contraseñas se emplea \emph{hash} mediante el algoritmo \emph{bcrypt} y la biblioteca \emph{Passlib}. Estos ayudan a la verificación de las contraseñas que el usuario ingresa, al compararlas con el hash guardado en la base de datos. Así, se evita almacenar las contraseñas como texto plano.
+
+Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recursos generados previamente durante la fase experimental, como modelos entrenados, listas de columnas esperadas y escaladores. Esto hace que la aplicación utilice los modelos ya entrenados sin necesidad de repetir el proceso de entrenamiento durante el uso del sistema. El uso de todas estas tecnologías permite construir un sistema modular, capaz de integrar modelos de aprendizaje automático previamente entrenados dentro de una \emph{API REST} protegida mediante autenticación y preparada para realizar predicciones sobre nuevas curvas de consumo eléctrico.
 
 
 \section{Implementación de la API REST}
 
 
-\section{Implementación de endpoints}
+\subsection{Implementación de endpoints}
 
 
-\section{Integración de resultados experimentales}
+\subsection{Integración de resultados experimentales}
 
 
 \section{Documentación interactiva con Swagger UI}
@@ -1889,10 +2218,10 @@ A continuación, se va a desarrollar la descripción de los escenarios de casos 
 \chapter{Manual de usuario}
 
 
-\section{Puesta en marcha del sistema}
+\section{Introducción}
 
 
-\section{Uso de Swagger UI}
+\section{Uso del sistema}
 
 
 \subsection{Consulta de modelos offline}

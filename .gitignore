@@ -45,6 +45,9 @@ data/
 results/*.csv
 results/*.json
 
+# Predicciones de usuarios
+results/predicciones_usuarios/
+
 # Archivos auxiliares LaTeX
 *.aux
 *.log
@@ -56,6 +59,10 @@ results/*.json
 *.fdb_latexmk
 *.synctex.gz
 *.lol
+
+# Modelos serializados
+models/*.pkl
+results/*.pkl
 
 # Ignorar todos los PDF...
 *.pdf

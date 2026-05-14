@@ -45,8 +45,16 @@ class TipoPrediccion(str, Enum):
     description="Permite al operador iniciar sesión en el sistema."
 )
 def iniciar_sesion(
-    usuario: str = Form(...),
-    password: str = Form(...)
+    usuario: str = Form(
+        ...,
+        example="usuario",
+        description="Nombre de usuario del operador."
+    ),
+    password: str = Form(
+        ...,
+        example="********",
+        description="Contraseña asociada al usuario."
+    )
 ):
     return autenticar_usuario(
         nombre_usuario=usuario,
