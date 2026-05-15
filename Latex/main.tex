@@ -196,9 +196,27 @@ El proyecto lleva a cabo una comparación de varias técnicas para identificar f
 
 \section{Motivación}
 
-El fraude dentro del consumo eléctrico es uno de los problemas principales para las empresas de energía eléctrica en todo el mundo, ya que suponen pérdidas enormes económicas afectando a la estabilidad y sostenibilidad de las redes eléctricas. Existen dos tipos de conexiones irregulares al suministro eléctrico, los enganches directos sin contrato de suministro y las manipulaciones que afectan tanto al contador como a la instalación. En el ámbito nacional, según la empresa Endesa \cite{endesa}, casi el 60 por ciento de estos fraudes de electricidad se realizan a través de un enganche ilegal de luz conectado directamente a la red de baja tensión o de alumbrado. Además, las manipulaciones del contador son casos en los que se tiene un contrato en vigor y se manipula la instalación o el contador para que no registre todo lo que se está consumiendo. Se han detectado en España en los últimos 5 años más de 300.000 casos de fraude, y en los primeros meses de 2025, se detectaron 60.525 fraudes; prácticamente 200 casos diarios.
+La digitalización de las redes eléctricas y las infraestructuras de medición inteligente han ido progresivamente transformando la gestión y recopilación de la información del consumo energético. Destacan los contadores inteligentes y las redes eléctricas inteligentes, \emph{smart grids}, que permiten generar grandes cantidades de datos de consumo de forma continua, detallada y prácticamente en tiempo real. Proporcionando una oportunidad muy importante para la aplicación de técnicas de aprendizaje automático capaces de analizar automáticamente patrones de comportamiento y detectar anomalías relacionadas a posibles fraudes eléctricos.
 
-Para detectar estos fraudes se utilizan técnicas de aprendizaje supervisado en modo \emph{offline}, donde los modelos se entrenan con conjuntos de datos históricos completos. Sin embargo, con la implementación de redes inteligentes y la digitalización de los sistemas de medición a través de contadores inteligentes abren la puerta a la aplicación de técnicas \emph{onlines} de aprendizaje automático para detectar patrones anómalos relacionados con el fraude. Por ello, es interesante comparar la diferencia de rendimiento entre técnicas \emph{offlines}, más clásicas, y técnicas \emph{online}, más modernas. Así, se podrá analizar sus capacidades de detección, adaptabilidad y viabilidad en escenarios reales. Además, de desarrollar un prototipo funcional que simule un entorno web operativo que permita evaluar la práctica de estas técnicas más allá del análisis teórico.
+Como el fraude en el consumo de electricidad genera grandes pérdidas económicas y tiene un impacto negativo en la red eléctrica, es uno de los problemas más importantes para las empresas distribuidoras de energía. Las prácticas fraudulentas más comunes incluyen las conexiones ilegales a la red y las manipulaciones de contadores o instalaciones eléctricas para disminuir el consumo registrado de manera artificial. En España, de acuerdo con información divulgada por Endesa \cite{endesa}, se han identificado en los últimos años centenares de miles de casos de fraude eléctrico, lo que demuestra la urgencia de crear sistemas automáticos que sean más eficaces para su detección.
+
+Tradicionalmente, se emplean métodos de aprendizaje supervisado en modo \emph{offline} para detectar fraude eléctrico. Los modelos son entrenados con conjuntos de datos históricos completos y se utilizan para clasificar consumos recientes. El interés por técnicas de aprendizaje \emph{online} que trabajan con información de forma secuencial y se ajustan a nuevos patrones de consumo ha aumentado debido al crecimiento de las infraestructuras inteligentes y a la disponibilidad de datos constantes. La posibilidad de detectar comportamientos no normales en tiempo real puede ser muy beneficiosa para acortar los tiempos de reacción ante acciones fraudulentas y optimizar la capacidad del sistema para adaptarse a modificaciones en el consumo.
+
+Este proyecto propone una comparativa entre técnicas de aprendizaje automático \emph{offline} y técnicas \emph{online} aplicadas a la detección de fraude eléctrico. Además de evaluar el rendimiento de predicción de ambos, se desarrolla un prototipo funcional que permite simular un entorno operativo real, incorporando tanto predicción histórica como procesamiento secuencial de datos en tiempo real.
+
+
+\section{Objetivo}
+
+El propósito principal es diseñar e implementar un sistema de detección de fraude en el consumo eléctrico que emplee métodos de aprendizaje automático, aplicado a un conjunto particular de datos. Que permite comparar los modelos de aprendizaje \emph{offline} con los modelos de aprendizaje \emph{online}. Los siguientes objetivos específicos se sugieren para alcanzar esta meta general: implementar seis métodos relevantes de aprendizaje \emph{offline}; aplicar cinco métodos importantes de aprendizaje \emph{online}; analizar ambos grupos de modelos con métricas adecuadas; determinar la técnica más eficaz en cada categoría y añadir los modelos seleccionados a un prototipo de software que permita comparar visualmente los resultados y las métricas. En el sistema desarrollado debe poder analizar el comportamiento de los modelos en un entorno controlado, facilitando la comparación objetiva entre modelos \emph{online} y \emph{offline}.
+
+
+\section{Alcance}
+
+El proyecto se fundamenta en el análisis, la implementación y la comparación de técnicas de aprendizaje automático que se utilizan para detectar fraudes en el consumo de electricidad. Su estructura se divide en diferentes secciones, como el análisis del estado del arte, donde se lleva a cabo un estudio de las metodologías empleadas en proyectos o artículos de internet relacionados con el fraude eléctrico. Incorpora procedimientos tradicionales de aprendizaje supervisado, técnicas para identificar patrones poco comunes y métodos de aprendizaje en línea. Se examinan diversas bases de datos públicas disponibles relacionadas con el uso de electricidad, que están etiquetadas por usuarios con fraude/no fraude o sin etiquetar, como parte del análisis de fuentes de datos.
+
+En el estudio e implementación de métodos se seleccionan e implementan distintas técnicas de aprendizaje automático que se diferencian en \emph{offline} o \emph{online}. La idea, en un principio, era de 10 técnicas en total, 5 para cada opción. Finalmente, se implementó una \emph{offline} más que es esencial para este trabajo, debido a su mejor rendimiento en comparación al resto. La evaluación y comparación de métodos que realiza una comparativa entre los enfoques \emph{offline} y \emph{online} analizando, la capacidad de detección de fraude, la robustez ante datos desbalanceados, la adaptabilidad a cambios en el patrón de consumo y el coste computacional. El objetivo es determinar qué tipo de técnica resulta más adecuada según el escenario, histórico o en tiempo real.
+
+A continuación, el diseño e implementación del prototipo, se desarrolla un entorno web que a través de los datos recogidos históricamente(\emph{offline}) o en tiempo real(\emph{online}) podrá simular un escenario real de detección de fraude eléctrico. El sistema permite simular consumo electrico, aplicar los métodos entrenados, mostrar resultados de la mejor técnica para \emph{offline} y \emph{online} en base a rendimiento, y comparar visualmente los enfoques \emph{online} y \emph{offline}. Este prototipo facilitará la escalabilidad y la incorporación futura de nuevos métodos. Para finalizar, se presentan las conclusiones obtenidas a partir del estudio comparativo, identificando fortalezas y debilidades de cada enfoque, y proponiendo posibles mejoras.
 
 
 \section{Estado del arte}
@@ -299,21 +317,7 @@ En la Figura~\ref{fig:tabla_clases} se puede ver un ejemplo del conjunto de dato
 Tras analizar todos los grupos de conjuntos de datos que se utilizan para detectar el fraude eléctrico, es posible notar que, sin importar su procedencia, suelen tener una serie de propiedades comunes. Se trata de datos de series temporales que vienen de contadores inteligentes. En este caso, cada instancia refleja el consumo de electricidad en un espacio temporal específico. Asimismo, es común que estos conjuntos tengan un gran desequilibrio entre clases, con los casos de fraude siendo mucho menos comunes que los consumos normales. Esta particularidad tiene un impacto directo en la efectividad de los modelos y requiere el empleo de métricas concretas, como el estadístico Kappa o la puntuación F1. Por otra parte, la ausencia de datos públicos ampliamente aceptados complica la comparación entre distintos enfoques; esto representa uno de los retos más importantes en este campo. Conforme a estos rasgos, se escoge un conjunto de datos públicos que cuentan con etiquetas y una estructura temporal, lo cual permite la implementación de métodos de aprendizaje supervisado y el análisis del desempeño de los modelos en escenarios\emph{online} y \emph{offline}.
 
 
-\section{Alcance}
-
-El proyecto se fundamenta en el análisis, la implementación y la comparación de técnicas de aprendizaje automático que se utilizan para detectar fraudes en el consumo de electricidad. Su estructura se divide en diferentes secciones, como el análisis del estado del arte, donde se lleva a cabo un estudio de las metodologías empleadas en proyectos o artículos de internet relacionados con el fraude eléctrico. Incorpora procedimientos tradicionales de aprendizaje supervisado, técnicas para identificar patrones poco comunes y métodos de aprendizaje en línea. Se examinan diversas bases de datos públicas disponibles relacionadas con el uso de electricidad, que están etiquetadas por usuarios con fraude/no fraude o sin etiquetar, como parte del análisis de fuentes de datos.
-
-En el estudio e implementación de métodos se seleccionan e implementan distintas técnicas de aprendizaje automático que se diferencian en \emph{offline} o \emph{online}. La idea, en un principio, era de 10 técnicas en total, 5 para cada opción. Finalmente, se implementó una \emph{offline} más que es esencial para este trabajo, debido a su mejor rendimiento en comparación al resto. La evaluación y comparación de métodos que realiza una comparativa entre los enfoques \emph{offline} y \emph{online} analizando, la capacidad de detección de fraude, la robustez ante datos desbalanceados, la adaptabilidad a cambios en el patrón de consumo y el coste computacional. El objetivo es determinar qué tipo de técnica resulta más adecuada según el escenario, histórico o en tiempo real.
-
-A continuación, el diseño e implementación del prototipo, se desarrolla un entorno web que a través de los datos recogidos históricamente(\emph{offline}) o en tiempo real(\emph{online}) podrá simular un escenario real de detección de fraude eléctrico. El sistema permite simular consumo electrico, aplicar los métodos entrenados, mostrar resultados de la mejor técnica para \emph{offline} y \emph{online} en base a rendimiento, y comparar visualmente los enfoques \emph{online} y \emph{offline}. Este prototipo facilitará la escalabilidad y la incorporación futura de nuevos métodos. Para finalizar, se presentan las conclusiones obtenidas a partir del estudio comparativo, identificando fortalezas y debilidades de cada enfoque, y proponiendo posibles mejoras.
-
-
-\section{Objetivo}
-
-El propósito principal es diseñar e implementar un sistema de detección de fraude en el consumo eléctrico que emplee métodos de aprendizaje automático, aplicado a un conjunto particular de datos. Que permite comparar los modelos de aprendizaje \emph{offline} con los modelos de aprendizaje \emph{online}. Los siguientes objetivos específicos se sugieren para alcanzar esta meta general: implementar seis métodos relevantes de aprendizaje \emph{offline}; aplicar cinco métodos importantes de aprendizaje \emph{online}; analizar ambos grupos de modelos con métricas adecuadas; determinar la técnica más eficaz en cada categoría y añadir los modelos seleccionados a un prototipo de software que permita comparar visualmente los resultados y las métricas. En el sistema desarrollado debe poder analizar el comportamiento de los modelos en un entorno controlado, facilitando la comparación objetiva entre modelos \emph{online} y \emph{offline}.
-
-
-\section{Glosario de Términos}
+\section{Glosario de términos}
 
 \begin{itemize}
 \item \emph{Machine Learning} (Aprendizaje Automático): Campo de la inteligencia artificial que permite a los sistemas aprender patrones a partir de datos y realizar predicciones o clasificaciones sin estar programados para cada tarea concreta.
@@ -371,19 +375,6 @@ La metodología iterativa e incremental se utiliza para ejecutar el proyecto, lo
 La planificación consta de varias etapas secuenciales y con iteraciones, debido a la metodología y el carácter mixto del proyecto, que integra la experimentación en aprendizaje automático con la creación de un entorno web. El análisis del problema incluye el estudio de la detección de fraude eléctrico, la revisión de técnicas actuales en el estado del arte y el examen del conjunto de datos elegido. La duración verdadera fue de tres semanas, mientras que la estimada era de cuatro. Se examinan distintos algoritmos de clasificación supervisada, incluyendo tanto los \emph{offline} como los \emph{online}, después de que el análisis, la investigación y la elección de técnicas de aprendizaje automático han concluido. Se eligen métodos de cada categoría según la problemática y la idoneidad para el conjunto de datos escogido. La duración estimada es de una semana, y la durabilidad concreta también es de una semana.
 
 La implementación de los modelos se lleva a cabo incluyendo la aplicación de modelos \emph{offline}. Se emplean cinco métodos de aprendizaje \emph{offline}con el uso de bibliotecas especializadas y mediante la modificación de parámetros. La duración calculada es de dos semanas, pero la verdadera fue de tres a causa de dificultades en la optimización de alguno de los modelos. Para poner en práctica modelos \emph{online}, se emplean cinco métodos de aprendizaje \emph{online} mediante el uso de bibliotecas especializadas y la realización de ajustes a los parámetros. La duración real fue de dos semanas, al igual que la duración estimada. Luego de implementar los modelos, se procede a la evaluación comparativa de los mismos, para lo cual se elabora un protocolo estandarizado que emplea métricas idóneas para detectar fraudes. Se ponen en práctica los modelos bajo las mismas condiciones y se examinan los resultados. La duración real fue de dos semanas, al igual que la duración estimada. Además, del diseño e implementación del entorno web, se desarrolla la arquitectura de la web, incluyendo \emph{backend}, integración de modelos y visualización de resultados. La duración estimada y real son de cinco semanas. Por último,  las pruebas y validación del sistema, se realizan pruebas funcionales y no funcionales para garantizar el correcto funcionamiento del sistema y la integración entre componentes. Duración estimada 1 semana.
-
-
-\subsection{Hitos principales}
-
-Para definir los hitos principales del proyecto se dividen en función de los entregables técnicos más relevantes del sistema. Hito 1. Análisis y definición del problema: Revisión del estado del arte y selección del conjunto de datos TDD2022. Hito 2. Selección de técnicas y métricas: Elección de métricas de evaluación, elección de cinco técnicas de aprendizaje automático \emph{offline} y elección de cinco técnicas de aprendizaje automático \emph{online}. Hito 3. Implementación de modelos: Desarrollo de las cinco técnicas \emph{offline} seleccionadas, desarrollo de las cinco técnicas \emph{online} seleccionadas, ajuste de hiperparámetros y validación inicial de resultados. Hito 4. Evaluación comparativa y selección: Definición del protocolo común de evaluación, aplicación de evaluación tradicional para modelos \emph{offline}, aplicación de evaluación prequential para modelos \emph{online}, comparación mediante métricas adecuadas al problema y selección del mejor modelo \emph{offline} y del mejor modelo \emph{online}. Hito 5. Desarrollo del sistema web: Diseño de la arquitectura del backend, integración de los modelos seleccionados e implementación de endpoints y visualización de resultados. Hito 6. Pruebas y validación final: Pruebas funcionales, pruebas no funcionales y ajustes finales del sistema.
-
-
-\subsection{Estimación temporal}
-
-La estimación inicial del proyecto se realiza considerando las distintas fases de desarrollo y la naturaleza experimental del trabajo. Se estimó una dedicación aproximada de entre 300 y 330 horas para el proyecto. Además, sumándole las horas estimadas para la documentación un aproximado de 60 horas, da como resultado un total de entre 360 y 390 horas para el proyecto al completo. Sin embargo, esta estimación puede resultar inferior en comparación a la real debido a la complejidad del ajuste de modelos y la curva de aprendizaje asociada al desarrollo de técnicas \emph{online}. (Por comprobar al acabar el proyecto).
-
-
-\subsection{Diagrama de Gantt}
 
 \begin{figure}[H]
 \centering
@@ -510,7 +501,8 @@ Además, debe de tener reproducibilidad, para que que los experimentos realizado
 % =========================
 % CAPÍTULO 3
 % =========================
-\chapter{Datos}
+\chapter{Detección de fraude}
+
 
 \section{Conjunto de datos seleccionado}
 
@@ -519,35 +511,27 @@ Para desarrollar este proyecto se trabaja con el conjunto de datos llamado Theft
 Se trata de un conjunto de datos de uso reciente, empleado en varios estudios actuales sobre detección de fraude eléctrico, como se analizó en la sección del estado del arte, lo que facilita la comparación con trabajos previos. También me gustaría destacar que, aunque este conjunto de datos proporciona un entorno controlado y bien estructurado para evaluación de métodos, su naturaleza parcialmente simulada puede no reflejar la complejidad de escenarios reales de fraude. A pesar de eso, representa una base muy sólida, estandarizada y adecuada para el análisis comparativo planteado en este proyecto y cumplir los objetivos propuestos.
 
 
-% =========================
-% CAPÍTULO 4
-% =========================
-\chapter{Técnicas}
-
-
-\section{Clasificación supervisada para detección de fraude}
+\section{Técnicas de aprendizaje automático seleccionadas}
 
 La detección de fraude eléctrico por medio de procedimientos de aprendizaje automático puede ser tratada de distintas formas, tal como se ha explicado en la sección sobre el estado del arte. El aprendizaje supervisado se distingue por su habilidad de manejar datos etiquetados y de aprender patrones relacionados con conductas que pueden ser fraudulentas. Se elige la clasificación supervisada en este trabajo porque el conjunto de datos seleccionado cuenta con etiquetas explícitas que hacen posible distinguir entre un consumo normal y uno fraudulento. Esto hace más sencillo el uso directo de modelos de clasificación y la evaluación objetiva de su desempeño a través de métricas. Estas métricas son examinadas y elegidas en partes subsiguientes. Además, ayuda a resolver el problema como una tarea binaria, donde el modelo tiene que decidir si un patrón de consumo específico tiene comportamientos normales o de fraude. Se usa mucho en los trabajos y proyectos en los que se usan distintos algoritmos, que se examinan y analizan en las siguientes secciones. En estos trabajos, la detección de fraude eléctrico ha tenido resultados positivos. En este trabajo, por lo tanto, se utilizan diversos modelos de clasificación supervisada con el propósito de comparar su eficacia en la identificación del fraude y examinar su actuación en situaciones \emph{online} y \emph{offline}.
-
-
-\section{Comparación entre métodos \emph{offline} y \emph{online}}
 
 Los modelos de aprendizaje automático utilizados se pueden dividir en dos grandes grupos según su forma de aprendizaje: métodos \emph{offline} y métodos \emph{online}. Los primeros se basan en el uso de conjuntos de datos históricos para la formación del modelo. El entrenamiento se lleva a cabo inicialmente con todos los datos existentes, y después se utiliza el modelo para hacer predicciones sin una actualización continua. Esto es apropiado si los datos son representativos y estáticos del problema, lo que permite alcanzar modelos estables con un rendimiento general adecuado. Lo malo, es que tienen restricciones en situaciones dinámicas, como el consumo de electricidad en redes inteligentes, donde los patrones de conducta pueden variar con el tiempo o instantáneamente. En estos casos, un modelo previamente entrenado podría dejar de ser capaz de hacer predicciones adecuadas si no se le incorpora información nueva.
 
 Por otro lado, los métodos de aprendizaje \emph{online} permiten la actualización y el entrenamiento del modelo de forma gradual conforme se reciben nuevos datos. El modelo no se entrena solo una vez, sino que sigue aprendiendo y se ajusta a eventuales alteraciones en los patrones de consumo y en las conductas potencialmente fraudulentas. Esto es relevante en situaciones donde los datos se producen de manera secuencial, como sucede con los medidores inteligentes de electricidad. Una de las mayores ventajas es su habilidad para ajustarse a las variaciones temporales, lo que facilita la identificación de nuevas formas de fraude sin requerir el reentrenamiento del modelo desde el principio. Sin embargo, estos métodos suelen ser más difíciles de poner en práctica. A causa de estas discrepancias, en este estudio se propone comparar modelos online y offline con el fin de examinar su adaptabilidad, estabilidad y rendimiento. Esta comparación posibilitará determinar qué modelo de aprendizaje automático es más apropiado para identificar el fraude en el consumo de electricidad en un contexto real.
 
 
-\section{Selección y Estudio de Técnicas de Aprendizaje Automático}
+% =========================
+% CAPÍTULO 4
+% =========================
 
-En esta sección se seleccionan y analizan los métodos de aprendizaje automático y las métricas consideradas más adecuados para el problema de detección de fraude en el consumo eléctrico. Además, cada categoría tendrá un modelo \emph{baseline} con el fin de tener un punto de referencia inicial que permita comparar el rendimiento de modelos más avanzados.
+\chapter{Selección y estudio de técnicas de aprendizaje automático}
 
-
-\subsection{Técnicas \emph{offline}}
+\section{Técnicas \emph{offline}}
 
 En este trabajo, el problema se presenta como un caso de clasificación supervisada cuyo propósito es determinar si un patrón específico de consumo eléctrico es normal o fraudulento. Se eligen varias metodologías de aprendizaje automático \emph{offline}, o sea, modelos que se entrenan con un conjunto de datos históricos completo antes de ser valorados. Este modo permite analizar en profundidad el rendimiento de distintos algoritmos bajo condiciones controladas. La selección de estos modelos se realiza de una manera minuciosa atendiendo a varios criterios: su uso en la literatura científica en problemas de detección de fraude eléctrico, su capacidad para manejar datos desbalanceados y complejos, y la posibilidad de comparar diferentes paradigmas de aprendizaje dentro de un mismo problema.
 
 
-\subsubsection{Regresión Logística}
+\subsection{Regresión logística}
 
 La regresión logística es un modelo lineal ampliamente utilizado en problemas de clasificación binaria en trabajos como \cite{articuloBase}. Para explicar como funciona este modelo, se tiene que tener en cuenta que se basa en modelar la probabilidad de pertenencia a una clase mediante una función sigmoidea: $f(x) = \frac{1}{1 + e^{-x}}$, este modelo estima la probabilidad de que una instancia pertenezca a la clase positiva, fraude, a partir de una combinación lineal de las variables de entrada. Si se representa esta ecuación de regresión logística, se consigue una curva en S como la que se muestra en la figura a continuación.
 
@@ -562,9 +546,9 @@ Teniendo los siguientes datos: Eje x es la variable de entrada o característica
 A pesar de su simplicidad, la regresión logística presenta importantes limitaciones en problemas complejos como la detección de fraude eléctrico, donde las relaciones entre variables suelen ser no lineales y altamente dependientes del contexto temporal y del tipo de consumo. Por este motivo, en este trabajo se utiliza como modelo \emph{baseline}. Su bajo coste computacional y facilidad de interpretación lo convierten en una herramienta útil para establecer una base sólida para los siguientes métodos.
 
 
-\subsubsection{\emph{Random Forest}}
+\subsection{\emph{Random forest}}
 
-\emph{Random Forest}, bosque aleatorio traducido al español, es un algoritmo de aprendizaje supervisado, que usa múltiples árboles de decisión utilizado en trabajos como \cite{articuloBase}, \cite{articulo2} y \cite{articulo3}, donde en este último se incluye como técnica dentro de la revisión de los métodos existentes. Cada árbol se entrena sobre una muestra aleatoria del conjunto de datos y utiliza un subconjunto aleatorio de variables, lo que añade diversidad en el modelo. Se componen de tres hiperparámetros principales, que deben configurarse antes del entrenamiento. Son el tamaño del nodo, la cantidad de árboles y la cantidad de características muestreadas. A partir de ahí, el clasificador de bosque aleatorio se utiliza para resolver problemas de regresión o clasificación.
+\emph{Random forest}, bosque aleatorio traducido al español, es un algoritmo de aprendizaje supervisado, que usa múltiples árboles de decisión utilizado en trabajos como \cite{articuloBase}, \cite{articulo2} y \cite{articulo3}, donde en este último se incluye como técnica dentro de la revisión de los métodos existentes. Cada árbol se entrena sobre una muestra aleatoria del conjunto de datos y utiliza un subconjunto aleatorio de variables, lo que añade diversidad en el modelo. Se componen de tres hiperparámetros principales, que deben configurarse antes del entrenamiento. Son el tamaño del nodo, la cantidad de árboles y la cantidad de características muestreadas. A partir de ahí, el clasificador de bosque aleatorio se utiliza para resolver problemas de regresión o clasificación.
 
 Su algoritmo se compone de una colección de árboles de decisión y cada árbol en el conjunto está compuesto por una muestra de datos extraída de un conjunto de entrenamiento con reemplazo, llamado \emph{bootstrapping}. De esa muestra de entrenamiento, un tercio de ella se reserva como datos de prueba, lo que se conoce como la muestra fuera de bolsa, \emph{oob}. Luego, se inyecta otra instancia de aleatoriedad mediante el embolsado de características, lo que agrega más diversidad al conjunto de datos y reduce la correlación entre los árboles de decisión. Dependiendo del tipo de problema, la determinación de la predicción variará. Para una tarea de regresión, se promediarán los árboles de decisión individuales, y para una tarea de clasificación, el voto mayoritario, es decir, la variable categórica más frecuente, arrojará la clase prevista. Finalmente, la muestra fuera de la bolsa se utiliza para la validación cruzada, finalizando esa predicción.
 
@@ -577,9 +561,9 @@ Su algoritmo se compone de una colección de árboles de decisión y cada árbol
 Este tipo de algoritmos es utilizado en la literatura para la detección de fraude eléctrico debido a su capacidad para capturar relaciones no lineales entre variables, manejar grandes volúmenes de datos y por ser robusto frente a ruido y datos desbalanceados, lo cuál es especialmente importante debido al conjunto de datos seleccionado. Además, este algoritmo permite obtener medidas de importancia de variables, lo que facilita la interpretación del modelo y la identificación de los factores más relevantes en la detección de fraude.
 
 
-\subsubsection{\emph{Gradient Boosting}}
+\subsection{\emph{Gradient boosting}}
 
-\emph{Gradient Boosting}, conocido es esnpañol como \emph{boosting} de gradiente, es un método de aprendizaje automático basado en técnicas ensamble que construye el modelo de forma secuencial. En este método cada modelo nuevo se entrena para corregir los errores cometidos por los modelos anteriores. El proceso consta de minimizar una función de pérdida mediante técnicas de optimización basadas en gradiente, lo que permite ajustar progresivamente el modelo a los datos. A continuación se va a explicar el funcionamiento de su algoritmo. Para empezar, se utiliza un conjunto de entrenamiento para establecer una base con un modelo base de aprendizaje, a menudo un árbol de decisión, cuyas predicciones iniciales se generan aleatoriamente. Normalmente, el árbol de decisión sólo contiene unos pocos nodos hoja, estos aprendices débiles sirven como un punto de partida óptimo. Esta configuración inicial allana el camino para que se desarrollen iteraciones posteriores. Después de la inicialización, para cada ejemplo de entrenamiento se calcula el error residual restando el valor previsto del valor real. Este paso identifica las áreas en las que es necesario mejorar las predicciones del modelo.
+\emph{Gradient boosting}, conocido es esnpañol como \emph{boosting} de gradiente, es un método de aprendizaje automático basado en técnicas ensamble que construye el modelo de forma secuencial. En este método cada modelo nuevo se entrena para corregir los errores cometidos por los modelos anteriores. El proceso consta de minimizar una función de pérdida mediante técnicas de optimización basadas en gradiente, lo que permite ajustar progresivamente el modelo a los datos. A continuación se va a explicar el funcionamiento de su algoritmo. Para empezar, se utiliza un conjunto de entrenamiento para establecer una base con un modelo base de aprendizaje, a menudo un árbol de decisión, cuyas predicciones iniciales se generan aleatoriamente. Normalmente, el árbol de decisión sólo contiene unos pocos nodos hoja, estos aprendices débiles sirven como un punto de partida óptimo. Esta configuración inicial allana el camino para que se desarrollen iteraciones posteriores. Después de la inicialización, para cada ejemplo de entrenamiento se calcula el error residual restando el valor previsto del valor real. Este paso identifica las áreas en las que es necesario mejorar las predicciones del modelo.
 
 Después del cálculo residual y antes del entrenamiento de un nuevo modelo, tiene lugar el proceso de regularización. Esta etapa implica reducir la influencia de cada nuevo aprendiz débil integrado en el conjunto. Al calibrar cuidadosamente esta escala, se puede controlar la rapidez con la que avanza el algoritmo de \emph{boosting}, lo que ayuda a prevenir el sobreajuste y a optimizar el rendimiento general. A continuación, se utilizan los errores residuales calculados en el paso anterior como objetivos y se entrena un nuevo modelo o un aprendiz débil para una predicción con precisión. El objetivo de este paso es corregir los errores cometidos por los modelos anteriores, refinando la predicción general. Ahora vienen las actualizaciones del conjunto, el rendimiento del conjunto actualizado, incluido el modelo recién entrenado, se suele evaluar mediante un conjunto de pruebas independiente. Si el rendimiento de este conjunto de datos reservado es satisfactorio, el conjunto se actualiza incorporando el nuevo aprendiz débil; de lo contrario, podría ser necesario realizar ajustes en los hiperparámetros.
 
@@ -594,9 +578,9 @@ Cuando estén las actualizaciones del conjunto, se repiten los pasos presentados
 Aunque no se encontró el uso de este algoritmo en estudios y trabajos similares, este presenta varias ventajas en el contexto de detección de fraude como la alta capacidad para modelar relaciones complejas, el buen rendimiento en datos desbalanceados y la mayor precisión en comparación con modelos individuales. Debido a estas características, los métodos de \emph{boosting} son frecuentemente utilizados en aplicaciones reales de detección de fraude. Como posible mejora, se emplea, en unas secciones más abajo, el uso de XGBoost, una versión optimizada del \emph{Gradient Boosting} ampliamente utilizada en problemas de detección de fraude y en trabajos como \cite{articulo3}.
 
 
-\subsubsection{K vecinos más cercanos}
+\subsection{K vecinos más cercanos}
 
-K vecinos más cercanos (KNN) es un algoritmo de aprendizaje automático utilizado en diversos trabajos como \cite{articulo1}, \cite{articulo2} y \cite{articuloBase}, donde en este último se utiliza como método de referencia para comparación. Está basado en instancias que clasifica nuevas observaciones en función de la clase mayoritaria entre sus vecinos más cercanos. Además, es uno de los métodos de clasificación y regresión más populares y sencillos que se emplean actualmente. Si bien el algoritmo se usa para problemas de regresión o clasificación, en este trabajo se utiliza como un algoritmo de clasificación, partiendo del supuesto de que se pueden encontrar puntos similares cerca uno del otro. La principal diferencia entre ambos es que la clasificación se emplea para valores discretos, mientras que en la regresión se emplea con valores continuos. Este método forma parte de una familia de modelos que sólo almacenan un conjunto de datos de entrenamiento en vez de hacer una fase de entrenamiento. Esto implica que todo el cálculo se produce cuando se realiza una clasificación o predicción.
+K vecinos más cercanos, KNN, es un algoritmo de aprendizaje automático utilizado en diversos trabajos como \cite{articulo1}, \cite{articulo2} y \cite{articuloBase}, donde en este último se utiliza como método de referencia para comparación. Está basado en instancias que clasifica nuevas observaciones en función de la clase mayoritaria entre sus vecinos más cercanos. Además, es uno de los métodos de clasificación y regresión más populares y sencillos que se emplean actualmente. Si bien el algoritmo se usa para problemas de regresión o clasificación, en este trabajo se utiliza como un algoritmo de clasificación, partiendo del supuesto de que se pueden encontrar puntos similares cerca uno del otro. La principal diferencia entre ambos es que la clasificación se emplea para valores discretos, mientras que en la regresión se emplea con valores continuos. Este método forma parte de una familia de modelos que sólo almacenan un conjunto de datos de entrenamiento en vez de hacer una fase de entrenamiento. Esto implica que todo el cálculo se produce cuando se realiza una clasificación o predicción.
 
 \begin{figure}[H]
     \centering
@@ -626,7 +610,7 @@ Ahora se va a mostrar cómo hallar el valor $k$. Este valor en el algoritmo kNN 
 El comportamiento del algoritmo depende bastante de la estructura del espacio de características y de la elección del parámetro $k$, que permite analizar cómo influye la proximidad entre patrones de consumo en la detección de fraudes. Este método permite analizar la similitud entre patrones de consumo eléctrico, bajo la condición de que comportamientos similares tienden a pertenecer a la misma clase. Pero, su rendimiento depende mucho de la elección del parámetro y de la escala de las variables, además de presentar limitaciones en términos de eficiencia computacional para grandes conjuntos de datos.
 
 
-\subsubsection{Perceptrón Multicapa}
+\subsection{Perceptrón multicapa}
 
 El Perceptrón Multicapa (MLP) es un modelo de aprendizaje supervisado usado en la literatura en trabajos como \cite{articulo3}, que pertenece a las redes neuronales artificiales y está diseñado para aprender relaciones complejas entre variables de entrada y salida. Se trata de una red neuronal donde la información va en una única dirección desde la entrada hasta la salida, sin ciclos. Sus neuronas funcionan a través de funciones de activación no lineales, con lo que permite aprender patrones complejos en los datos. La capacidad para aprender relaciones no lineales en los datos convierte a este método en un modelo potente para tareas como la clasificación, la regresión y el reconocimiento de patrones. Destaca por su capacidad para aproximarse a cualquier función en condiciones determinadas haciendo que se convierta en un elemento importante en la investigación de las redes neuronales. Está compuesto por tres tipos de capas como una capa de entrada, que recibe las variables del problema; una o varias capas ocultas, encargadas de transformar la información mediante combinaciones lineales y funciones de activación no lineales; y una capa de salida, que añade la predicción final del modelo.
 
@@ -665,9 +649,9 @@ donde \(\theta_t\) son los parámetros del modelo en la iteración \(t\), \(\the
 Durante el entrenamiento del modelo, se repite de manera iterativa este proceso de difusión, determinación del error y modificación de los parámetros. En la práctica, el entrenamiento no se efectúa en cada iteración con el conjunto de datos entero, sino que se hace con subconjuntos denominados \emph{mini-batches}, los cuales normalmente contienen 1000 datos cada uno. Esta modificación permite que el proceso de aprendizaje sea más estable y que la eficiencia computacional se optimice. MLP puede adecuar de manera gradual sus parámetros para acercarse a funciones complejas y representar relaciones no lineales entre las variables, gracias a este procedimiento. Esta capacidad lo convierte en un método muy importante para problemas en los que los modelos lineales resultan insuficientes, como es el caso de la detección de fraude en datos de consumo eléctrico.
 
 
-\subsubsection{XGBoost}
+\subsection{\emph{XGBoost}}
 
-Se le conoce como \emph{eXtreme Gradient Boosting} y se aplica en la literatura, incluyendo trabajos como \cite{articulo3}, donde se presenta como un método dentro del análisis de las técnicas existentes. Es un algoritmo de aprendizaje automático supervisado que usa árboles de decisión y aplica una versión mejorada del método \emph{gradient boosting}. El propósito es desarrollar un modelo predictivo sólido mediante la combinación secuencial de varios modelos débiles, que normalmente son árboles de decisión poco profundos. Los modelos no se entrenan de manera independiente; en su lugar, cada nuevo árbol se crea particularmente para rectificar los fallos que cometieron los árboles anteriores. Es reconocido por su rapidez, eficacia y habilidad para escalar eficientemente con conjuntos de datos extensos. El algoritmo opera a través de un proceso iterativo, donde en cada paso se agrega un árbol nuevo que busca acercarse a los residuos o errores del modelo vigente. Estos desechos son la diferencia entre los valores reales y las predicciones hechas hasta ese instante.
+Se le conoce como \emph{extreme gradient boosting} y se aplica en la literatura, incluyendo trabajos como \cite{articulo3}, donde se presenta como un método dentro del análisis de las técnicas existentes. Es un algoritmo de aprendizaje automático supervisado que usa árboles de decisión y aplica una versión mejorada del método \emph{gradient boosting}. El propósito es desarrollar un modelo predictivo sólido mediante la combinación secuencial de varios modelos débiles, que normalmente son árboles de decisión poco profundos. Los modelos no se entrenan de manera independiente; en su lugar, cada nuevo árbol se crea particularmente para rectificar los fallos que cometieron los árboles anteriores. Es reconocido por su rapidez, eficacia y habilidad para escalar eficientemente con conjuntos de datos extensos. El algoritmo opera a través de un proceso iterativo, donde en cada paso se agrega un árbol nuevo que busca acercarse a los residuos o errores del modelo vigente. Estos desechos son la diferencia entre los valores reales y las predicciones hechas hasta ese instante.
 
 La preparación de los datos es el primer paso para poder explicar el algoritmo. Para ello es imprescindible dividir el conjunto de datos en dos grupos menores, uno para entrenar el modelo y otro para comprobar su desempeño. Después, los datos se convierten en el formato \emph{DMatrix}, que es la estructura interna de XGBoost optimizada. Este formato se ha creado con el objetivo de optimizar la velocidad de entrenamiento y el uso de memoria, lo cual es esencial en casos que involucran grandes cantidades de datos. Una vez los datos han sido preparados, se inicia la creación del modelo. Activando el algoritmo y escogiendo una función objetivo apropiada según la clase de problema. El modelo se entrena utilizando el conjunto de entrenamiento y se crean predicciones sobre el conjunto de prueba. La evaluación del modelo se lleva a cabo mediante la comparación de las predicciones con los valores reales, utilizando para ello métricas como la sensibilidad (\emph{recall}), la precisión, la exactitud o la puntuación F1. El empleo de la matriz de confusión permite el análisis más detallado de los fallos y aciertos del modelo.
 
@@ -684,12 +668,12 @@ La implementación de mecanismos para la regularización, que contribuyen a prev
 Sin embargo, este método también presenta ciertas limitaciones. Su correcto funcionamiento depende en gran medida del ajuste de hiperparámetros, lo que puede requerir un proceso de optimización complejo. Además, sigue siendo menos transparente que modelos más simples. Por último, su complejidad computacional, aunque optimizada, puede ser elevada en comparación con algoritmos más básicos. Para terminar, XGBoost representa una evolución avanzada del \emph{gradient boosting} que combina precisión, eficiencia y robustez. Gracias a sus mejoras en optimización, regularización y escalabilidad, se convierte en uno de los algoritmos más utilizados en el ámbito del aprendizaje automático, especialmente en problemas donde se requiere un alto rendimiento predictivo.
 
 
-\subsection{Técnicas \emph{online}}
+\section{Técnicas \emph{online}}
 
 Los algoritmos de aprendizaje automático \emph{online} permiten la actualización paulatina de sus parámetros conforme se van recibiendo nuevas instancias de datos, sin requerir que el modelo entero sea reentrenado desde el principio. Es especialmente bueno, cuando los datos fluyen de manera continua, como en sistemas reales que monitorean el consumo eléctrico. En estas situaciones, los modelos tienen que ser capaces de ajustarse a las alteraciones en los patrones de consumo; este fenómeno se llama \emph{concept drift} o deriva de concepto. En él, la distribución de los datos cambia con el tiempo. Por eso, la detección de fraude eléctrico en tiempo real es considerada como esencial para el aprendizaje online. La selección de técnicas \emph{online} se realiza en base a su presencia en la literatura científica sobre la detección de fraude eléctrico en flujos de datos. En este proyecto se seleccionan algoritmos representativos de distintos modos, incluyendo un modelo \emph{baseline} que permita establecer un punto de referencia.
 
 
-\subsubsection{Perceptrón}
+\subsection{Perceptrón}
 
 El perceptrón es uno de los algoritmos más básicos del aprendizaje supervisado \emph{online} y constituye un clasificador lineal que actualiza sus pesos únicamente cuando comete errores de clasificación. Se selecciona este modelo como baseline, debido a su simplicidad, bajo coste computacional y capacidad de aprendizaje incremental puro. Además, se utilizará para comparar el rendimiento de técnicas más complejas.
 
@@ -734,9 +718,9 @@ donde \( \eta \) es la tasa de aprendizaje, que controla la magnitud del ajuste.
 Este proceso se repite de forma secuencial para cada nueva instancia de datos, siguiendo un esquema de aprendizaje incremental en el que el modelo predice, evalúa el error y actualiza sus parámetros en tiempo real. Gracias a este mecanismo, este modelo es capaz de adaptarse progresivamente a los patrones de los datos, lo que lo convierte en un algoritmo adecuado para entornos de aprendizaje online. Sin embargo, al tratarse de un modelo lineal, su capacidad para tratar relaciones complejas entre variables es bastante limitada.
 
 
-\subsubsection{Naive Bayes incremental}
+\subsection{Naive bayes incremental}
 
-El modelo Naive Bayes es un clasificador probabilístico basado en la regla de Bayes, que asume independencia condicional entre las variables de entrada. Esto significa que cada característica contribuye de forma independiente a la probabilidad final de pertenencia a una clase. Este método es utilizado en la literatura sobre detección de fraude eléctrico en trabajos como \cite{articulo1}, debido a su eficiencia y buen rendimiento en escenarios de clasificación en tiempo real. A partir del teorema de Bayes, la probabilidad de una clase \( y \) dado un vector de entrada \( x \) se calcula como:
+El modelo Naive bayes es un clasificador probabilístico basado en la regla de Bayes, que asume independencia condicional entre las variables de entrada. Esto significa que cada característica contribuye de forma independiente a la probabilidad final de pertenencia a una clase. Este método es utilizado en la literatura sobre detección de fraude eléctrico en trabajos como \cite{articulo1}, debido a su eficiencia y buen rendimiento en escenarios de clasificación en tiempo real. A partir del teorema de Bayes, la probabilidad de una clase \( y \) dado un vector de entrada \( x \) se calcula como:
 
 \[
 P(y|x) = \frac{P(x|y)\,P(y)}{P(x)}
@@ -761,9 +745,9 @@ En su versión incremental, \emph{online}, Naive Bayes no requiere almacenar tod
 La principal diferencia respecto a la versión \emph{offline} es que el modelo clásico estima todas las probabilidades utilizando el conjunto completo de entrenamiento de una sola vez, mientras que el modelo incremental actualiza estas estimaciones de forma continua sin necesidad de acceder a los datos históricos completos. Esto lo hace especialmente adecuado para escenarios de flujo de datos donde la información llega de manera secuencial. Este método presenta ventajas importantes en entornos \emph{online}, como su bajo coste computacional, su rapidez de actualización y su estabilidad ante grandes volúmenes de datos.
 
 
-\subsubsection{K Vecinos más cercanos \emph{online}}
+\subsection{K vecinos más cercanos \emph{online}}
 
-El algoritmo k vecinos más cercanos (kNN) es un método basado en instancias que clasifica una nueva observación en función de la clase mayoritaria de sus vecinos más cercanos en el espacio de características. Su funcionamiento general, así como las distintas métricas de distancia, la influencia del parámetro $k$ y sus referencias en la literatura, han sido descritos previamente en la sección de técnicas offline.
+El algoritmo k vecinos más cercanos, kNN, es un método basado en instancias que clasifica una nueva observación en función de la clase mayoritaria de sus vecinos más cercanos en el espacio de características. Su funcionamiento general, así como las distintas métricas de distancia, la influencia del parámetro $k$ y sus referencias en la literatura, han sido descritos previamente en la sección de técnicas offline.
 
 En su versión \emph{online}, el funcionamiento del algoritmo se mantiene prácticamente igual, pero introduce cambios en la gestión del conjunto de datos. En lugar de trabajar con un conjunto de entrenamiento estático, el modelo añade progresivamente nuevas instancias a medida que estas llegan en forma de flujo de datos. De este modo, el conjunto de referencia utilizado para calcular los vecinos más cercanos se va actualizando continuamente, permitiendo al modelo adaptarse a posibles cambios en los patrones de consumo eléctrico. La predicción sigue basándose en el cálculo de distancias entre la nueva instancia y las observaciones almacenadas, siendo la distancia euclídea una de las más utilizadas
 
@@ -782,9 +766,9 @@ Sin embargo, esta adaptación al entorno online se encuentra con algunos retos. 
 La técnica de ventanas deslizantes consiste en mantener únicamente un subconjunto reciente de los datos, eliminando las instancias más antiguas a medida que llegan nuevas observaciones, lo que permite al modelo centrarse en los patrones más actuales. Por otro lado, la técnica de olvido se basa en asignar menor peso a las instancias antiguas en el proceso de aprendizaje, reduciendo progresivamente su influencia sin necesidad de eliminarlas completamente. Su inclusión en este trabajo permite comparar el comportamiento de modelos basados en proximidad tanto en entornos \emph{offline} como \emph{online}, analizando su capacidad de adaptación frente a cambios en los datos.
 
 
-\subsubsection{\emph{Hoeffding Tree}}
+\subsection{\emph{Hoeffding tree}}
 
-El \emph{Hoeffding Tree}, también conocido como \emph{Very Fast Decision Tree} (VFDT), es un algoritmo diseñado específicamente para el aprendizaje en flujos de datos, donde las observaciones llegan de manera continua y no es posible almacenar todo el conjunto de datos. Este algoritmo es utilizado en la literatura de detección de fraude eléctrico en trabajos como \cite{articulo1} y \cite{articulo4}, destacando por su capacidad para procesar grandes volúmenes de información en tiempo real y adaptarse a cambios en los patrones de consumo. A diferencia de los árboles de decisión tradicionales en entornos \emph{offline}, este modelo construye el árbol de forma incremental, procesando cada instancia una única vez y actualizando sus estadísticas internas sin necesidad de reentrenamiento.
+El \emph{Hoeffding tree}, también conocido como \emph{Very Fast Decision Tree} (VFDT), es un algoritmo diseñado específicamente para el aprendizaje en flujos de datos, donde las observaciones llegan de manera continua y no es posible almacenar todo el conjunto de datos. Este algoritmo es utilizado en la literatura de detección de fraude eléctrico en trabajos como \cite{articulo1} y \cite{articulo4}, destacando por su capacidad para procesar grandes volúmenes de información en tiempo real y adaptarse a cambios en los patrones de consumo. A diferencia de los árboles de decisión tradicionales en entornos \emph{offline}, este modelo construye el árbol de forma incremental, procesando cada instancia una única vez y actualizando sus estadísticas internas sin necesidad de reentrenamiento.
 
 El funcionamiento del algoritmo se basa en el uso del límite de Hoeffding, que permite tomar decisiones de partición con garantías estadísticas utilizando únicamente un subconjunto de los datos. Este límite establece que, con un número suficiente de observaciones, la media estimada de una variable converge a su valor real con alta probabilidad. Formalmente, el límite de Hoeffding se define como:
 
@@ -805,9 +789,9 @@ Su proceso de funcionamiento puede resumirse de la siguiente forma. Para empezar
 Para terminar, los \emph{Hoeffding Trees} pueden extenderse para manejar la deriva de concepto mediante mecanismos adicionales como el uso de ventanas deslizantes, lo que los hace especialmente adecuados para entornos dinámicos como la detección de fraude eléctrico.
 
 
-\subsubsection{\emph{Adaptive Random Forest}}
+\subsection{\emph{Adaptive random forest}}
 
-\emph{Adaptive Random Forest} (ARF) es una extensión del algoritmo \emph{Random Forest} adaptada al aprendizaje \emph{online}, diseñada para trabajar con flujos de datos y entornos dinámicos donde la distribución de los datos puede cambiar con el tiempo. Este algoritmo ha demostrado un rendimiento muy bueno en estudios comparativos de detección de fraude eléctrico en entornos \emph{online} como en el trabajo \cite{articulo1}, debido a su capacidad para combinar múltiples clasificadores y adaptarse a cambios en los patrones de consumo.
+\emph{Adaptive random forest} (ARF) es una extensión del algoritmo \emph{Random forest} adaptada al aprendizaje \emph{online}, diseñada para trabajar con flujos de datos y entornos dinámicos donde la distribución de los datos puede cambiar con el tiempo. Este algoritmo ha demostrado un rendimiento muy bueno en estudios comparativos de detección de fraude eléctrico en entornos \emph{online} como en el trabajo \cite{articulo1}, debido a su capacidad para combinar múltiples clasificadores y adaptarse a cambios en los patrones de consumo.
 
 El funcionamiento de ARF se basa en la construcción de un conjunto de árboles de decisión incrementales, donde cada árbol se entrena de forma independiente utilizando diferentes subconjuntos de datos y características. Para ello, se emplea una técnica de \emph{online bagging}, en la que cada instancia del flujo de datos se replica un número de veces determinado por una distribución de Poisson, generando así diversidad entre los modelos.
 
@@ -829,10 +813,7 @@ En comparación con el \emph{Random Forest} tradicional en aprendizaje automáti
 % =========================
 % CAPÍTULO 5
 % =========================
-\chapter{Métricas}
-
-
-\section{Métricas de evaluación}
+\chapter{Métricas de evaluación}
 
 En la detección de fraude eléctrico, la selección de métricas de evaluación resulta especialmente importante debido al desbalance existente entre las clases y el distinto coste asociado a los errores de clasificación. Por un lado, el conjunto de datos seleccionado presenta una mayor proporción de consumos normales frente a casos de fraude, lo que puede llevar a métricas como la \emph{accuracy} a ofrecer resultados engañosos. Por otro lado, los errores no tienen el mismo impacto: un falso negativo implica no detectar un fraude real, mientras que un falso positivo puede generar costes operativos y molestias a clientes legítimos.
 
@@ -841,7 +822,7 @@ Una métrica es un valor numérico o categórico que permite cuantificar la cali
 En el caso de los modelos \emph{offline}, las métricas se calculan sobre un conjunto de test fijo. Sin embargo, en el aprendizaje \emph{online}, las métricas se evalúan de forma incremental mediante esquemas como la evaluación prequential, donde el modelo es evaluado y actualizado secuencialmente con cada nueva instancia. Esto implica que las métricas reflejan la evolución del rendimiento del modelo a lo largo del tiempo, permitiendo analizar su capacidad de adaptación ante cambios en la distribución de los datos. En este caso estamos antes una métrica de valor categórico porque se tiene un contexto de clasificación, fraude o no. Por este motivo, se seleccionan métricas representativas que permiten evaluar el rendimiento del modelo desde diferentes perspectivas, tanto en escenarios \emph{offline} como en aprendizaje \emph{online}.
 
 
-\subsection{\emph{Accuracy}}
+\section{\emph{Accuracy}}
 
 La \emph{accuracy} o exactitud utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2}, \cite{articulo3} y \cite{articulo5}, representa la proporción total de instancias correctamente clasificadas respecto al total de predicciones realizadas. Esta métrica tiene en cuenta tanto los verdaderos positivos como los verdaderos negativos, proporcionando una visión global del rendimiento del modelo. Aunque se utilizará como métrica descriptiva general, no será el criterio principal de comparación debido a la posible influencia del desbalance entre clases.
 
@@ -852,7 +833,7 @@ La \emph{accuracy} o exactitud utilizada en la literatura en trabajos como \cite
 El valor de esta métrica se encuentra entre 0 y 1, donde valores cercanos a 1 indican un mejor rendimiento del modelo. Como se destacó antes, hay que tener en cuenta que evalúa mal el rendimiento de un modelo basado en datos desequilibrados, o datos en los que los errores de predicción no tienen el mismo impacto. Por ello, el resto de métricas que se verán a continuación para ayudar a realizar una evaluación correcta.
 
 
-\subsection{\emph{Precision}}
+\section{\emph{Precision}}
 
 La precisión utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2} y \cite{articulo5}, mide la proporción de instancias clasificadas como fraude que realmente corresponden a fraude. Esta métrica permite evaluar el número de falsos positivos generados por el modelo, aspecto esencial para evitar clasificaciones incorrectas de clientes sin comportamiento posible de fraude. Su fórmula es
 
@@ -863,7 +844,7 @@ La precisión utilizada en la literatura en trabajos como \cite{articulo1}, \cit
 donde $TP$ representa el número de verdaderos positivos y $FP$ representa el número de falsos positivos. A diferencia de la \emph{accuracy} o exactitud, esta métrica se centra únicamente en las predicciones positivas, siendo especialmente relevante en escenarios donde el coste de los falsos positivos es elevado, como en la detección de fraude eléctrico.
 
 
-\subsection{\emph{Recall}}
+\section{\emph{Recall}}
 
 El \emph{recall} o también conocido en español como exhaustividad, sensibilidad o tasa de verdaderos positivos mide la proporción de fraudes reales correctamente detectados por el modelo. Esta métrica se utiliza en la literatura en trabajos como \cite{articulo1}, \cite{articulo2} y \cite{articulo5}. En la detección de fraude eléctrico, esta métrica resulta ser igual que otra métrica de fraudes llamada Tasa de Detección (DR) utilizada en la literatura en trabajos como \cite{articuloBase}.
 
@@ -874,7 +855,7 @@ El \emph{recall} o también conocido en español como exhaustividad, sensibilida
 donde $TP$ representa el número de verdaderos positivos y $FN$ representa el número de falsos negativos. Esta métrica es útil cuando el costo de los falsos negativos es alto. Además, su elección es realmente importante en este trabajo y en la literatura, ya que los falsos negativos implican no detectar casos reales de fraude. Estos falsos negativos pueden llevar a pérdidas millonarias para las empresas eléctricas.
 
 
-\subsection{\emph{F1-score}}
+\section{\emph{F1-score}}
 
 La puntuación F1 utilizada en la literatura en trabajos como \cite{articulo1}, \cite{articuloBase}, \cite{articulo2} y \cite{articulo5}, es la media armónica entre la precisión y el \emph{recall}, proporcionando una medida equilibrada del rendimiento del modelo cuando existe desbalance de clases, como es este caso. En este estudio, el \emph{F1-score} se considerará una de las métricas principales para la comparación entre técnicas.
 
@@ -887,7 +868,7 @@ F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \te
 siendo \emph{Precision}, la fórmula de la métrica de \emph{Precision}, y \emph{Recall}, la fórmula de la métrica de \emph{Recall} antes vistas. Se utiliza la media armónica en vez de la media aritmética porque esta última penaliza las grandes diferencias. En caso de alta precisión pero baja recuperación (o viceversa), el f1-score disminuirá significativamente, lo que refleja un desequilibrio.
 
 
-\subsection{\emph{False Positive Rate}}
+\section{\emph{False positive rate}}
 
 La Tasa de Falsos Positivos (FPR) utilizada en la literatura en trabajos como \cite{articuloBase}, mide la proporción de instancias normales que han sido incorrectamente clasificadas como fraude. Se define como:
 
@@ -900,7 +881,7 @@ donde $FP$ (Falsos Positivos) es el número de instancias normales clasificadas 
 Esta métrica resulta especialmente relevante en la detección de fraude eléctrico, ya que un alto número de falsos positivos puede implicar costes adicionales derivados de inspecciones innecesarias o afectar negativamente a la experiencia de clientes legítimos. Por este motivo, el FPR se utiliza en la literatura como una medida complementaria al \emph{recall}, permitiendo evaluar el equilibrio entre detección de fraude y tasa de falsas alarmas.
 
 
-\subsection{ROC-AUC}
+\section{ROC-AUC}
 
 El área bajo la curva ROC es una métrica utilizada en problemas de clasificación desbalanceados y en la literatura sobre detección de fraude eléctrico en trabajos como \cite{articuloBase} y \cite{articulo3}, ya que evalúa la capacidad de un modelo para distinguir entre clases a lo largo de distintos umbrales de decisión.
 
@@ -917,7 +898,7 @@ La curva ROC se construye variando el umbral de decisión del modelo, por ejempl
 A diferencia de métricas como \emph{accuracy}, \emph{precision} o \emph{recall}, esta es independiente de un umbral concreto, ya que evalúa el comportamiento del modelo en todos los posibles puntos de operación . Esto lo convierte en una métrica especialmente útil en problemas con clases desbalanceadas, como la detección de fraude eléctrico. Además, permite analizar el compromiso entre detectar el mayor número de fraudes posibles, alto TPR, y minimizar falsas alarmas, bajo FPR. Por todas estas razones y motivos, considero a esta métrica una buena forma de evaluar los resultados de los métodos de aprendizaje automáticos de este trabajo.
 
 
-\subsection{Matriz de confusión}
+\section{Matriz de confusión}
 
 Es una métrica para la visualización de los resultados de algoritmos clasificadores. Es una tabla que desglosa el número de instancias de verdad fundamental de una clase específica frente al número de instancias de clase previstas. Las matrices de confusión son una de las diferentes métricas de evaluación que miden el rendimiento de un modelo de clasificación.
 
@@ -926,9 +907,9 @@ Destacar que ninguno de los artículos analizados presenta explícitamente la ma
 En la práctica, debido a su amplia aplicabilidad en la ciencia de datos y en los modelos de aprendizaje automático, muchos paquetes y bibliotecas vienen precargados con funciones para crear matrices de confusión en Python. Su análisis resulta fundamental para interpretar el comportamiento del sistema en la detección de fraude.
 
 
-\subsection{Coeficiente Kappa}
+\section{Coeficiente kappa}
 
-El coeficiente Kappa es una métrica estadística utilizada en aprendizaje automático en trabajos como \cite{articulo1} para evaluar el rendimiento de un modelo de clasificación. Cuantifica la concordancia entre dos clasificadores en etiquetas categóricas, corrigiendo la concordancia que podría producirse por casualidad. Es decir, mide el grado de concordancia entre las predicciones del modelo y las etiquetas reales, teniendo en cuenta el acuerdo esperado por azar. 
+El coeficiente kappa de Cohen es una métrica estadística utilizada en aprendizaje automático en trabajos como \cite{articulo1} para evaluar el rendimiento de un modelo de clasificación. Cuantifica la concordancia entre dos clasificadores en etiquetas categóricas, corrigiendo la concordancia que podría producirse por casualidad. Es decir, mide el grado de concordancia entre las predicciones del modelo y las etiquetas reales, teniendo en cuenta el acuerdo esperado por azar. 
 
 Una de sus principales ventajas es que aporta una evaluación más robusta en escenarios con clases desbalanceadas. Cuando los datos están desbalanceados, la precisión general puede volverse engañosa porque un modelo puede ser muy preciso simplemente al predecir la clase mayoritaria. Esta métrica puede ayudar ajustando el acuerdo que podría ocurrir simplemente debido a la clase mayoritaria, proporcionando una estimación más realista del desempeño del modelo. Se define como:
 
@@ -954,12 +935,12 @@ Es decir, es la probabilidad de coincidir en fraude por azar y más probabilidad
 \chapter{Experimentación}
 
 
-\section{Implementación y Configuración de los Modelos}
+\section{Implementación y configuración de los modelos}
 
 En esta sección se explica y detalla de una manera clara y completa la implementación de todos los métodos de aprendizaje automático seleccionados anteriormente.
 
 
-\subsection{Modelos Offline}
+\subsection{Modelos \emph{offline}}
 
 Todos los modelos offline implementados en este proyecto siguen un proceso común de preparación de datos, entrenamiento y evaluación. Este procedimiento permite garantizar que los distintos algoritmos se comparen bajo las mismas condiciones experimentales.
 
@@ -972,7 +953,7 @@ Para garantizar la reproducibilidad de los experimentos, se añade el parámetro
 Para evaluar la capacidad de generalización del modelo y reducir la varianza asociada a una única partición de los datos, se emplea validación cruzada estratificada con 5 particiones (\emph{Stratified K-Fold}). En este proceso, el conjunto de datos se divide en cinco subconjuntos, garantizando que cada uno de ellos mantiene la misma proporción de clases que el conjunto original, lo cual resulta especialmente importante en problemas con desbalance de clases como la detección de fraude eléctrico. De forma iterativa, se utilizan cuatro particiones para el entrenamiento y una para la validación, repitiendo el proceso hasta completar las cinco combinaciones posibles. Durante la validación cruzada se utiliza la métrica \emph{F1-score}, debido a su precisión y rendimiento en datos desbalanceados, donde es necesario equilibrar la precisión y la capacidad de detección de la clase minoritaria.
 
 
-\subsubsection{Regresión Logística}
+\subsubsection{Regresión logística}
 
 La regresión logística es uno de los algoritmos más utilizados para problemas de clasificación binaria. En este trabajo, se utiliza como modelo \emph{baseline}, es decir, como una referencia simple y rápida de implementar que permite establecer un punto de comparación frente a modelos más complejos.
 
@@ -981,7 +962,7 @@ Para mejorar el rendimiento del algoritmo se utiliza un pipeline que permite apl
 Para terminar, se almacenan los resultados de las métricas calculadas como en todos los métodos anteriores y próximos. A pesar de ser un modelo relativamente simple, la regresión logística permite establecer una primera referencia de rendimiento que posteriormente será comparada con modelos más complejos.
 
 
-\subsubsection{Random Forest}
+\subsubsection{\emph{Random forest}}
 
 Con el objetivo de mejorar el rendimiento obtenido la Regresión logística, se implementa el algoritmo Bosque Aleatorio, uno de los métodos de aprendizaje supervisado más utilizados en problemas de clasificación. Es un algoritmo basado en conjuntos de árboles de decisión. En lugar de construir un único árbol, el algoritmo genera múltiples árboles utilizando diferentes subconjuntos de datos y variables. Posteriormente, cada árbol realiza una predicción y el resultado final se obtiene mediante votación mayoritaria.
 
@@ -992,7 +973,7 @@ Una de las ventajas principales de este método es que permite estimar la import
 Posteriormente, las variables se ordenan según su importancia y se genera un gráfico con las diez variables más relevantes, lo que permite interpretar qué factores tienen mayor influencia en la detección de fraude en el consumo eléctrico. Para terminar, al igual que en el resto de modelos, las métricas de evaluación se almacenan para su posterior comparación.
 
 
-\subsubsection{Gradient Boosting}
+\subsubsection{\emph{Gradient boosting}}
 
 Este método pertenece a la familia de algoritmos de los ensamble, los cuales combinan múltiples modelos débiles, generalmente árboles de decisión poco profundos, para construir un modelo más robusto y preciso. A diferencia de modelos como Bosque Aleatorio, donde los árboles de decisión se entrenan de forma independiente, este modelo construye los árboles de manera secuencial. Cada nuevo árbol se entrena sobre los errores, residuos, cometidos por los modelos anteriores, ajustándose progresivamente a los ejemplos mal clasificados.
 
@@ -1005,9 +986,9 @@ Tras el entrenamiento, se realizan predicciones sobre el conjunto de prueba y se
 Las variables más importantes se almacenan en un archivo independiente y también se representan mediante un gráfico que muestra las características con mayor influencia en la detección de fraude. Sin embargo, estas medidas pueden presentar cierto sesgo hacia variables con mayor variabilidad o número de posibles divisiones, por lo que deben interpretarse con cautela. Finalmente, las métricas obtenidas se almacenan, permitiendo realizar un análisis comparativo del rendimiento entre los distintos modelos implementados.
 
 
-\subsubsection{Perceptrón Multicapa}
+\subsubsection{Perceptrón multicapa}
 
-El Perceptrón Multicapa, MLP, es un modelo de red neuronal artificial compuesto por varias capas de neuronas completamente conectadas. Es capaz de modelar relaciones no lineales entre las variables de entrada gracias al uso de capas ocultas y funciones de activación no lineales. Esta capacidad lo convierte en una alternativa importante para problemas complejos de clasificación como la detección de fraude eléctrico. El modelo se implementa integrándose dentro de un \emph{Pipeline} junto con una etapa previa de escalado. Este escalado resulta necesario, ya que el entrenamiento de las redes neuronales depende en gran medida de que las variables de entrada se encuentren en rangos comparables, favoreciendo un proceso más estable del algoritmo de optimización.
+El Perceptrón multicapa, MLP, es un modelo de red neuronal artificial compuesto por varias capas de neuronas completamente conectadas. Es capaz de modelar relaciones no lineales entre las variables de entrada gracias al uso de capas ocultas y funciones de activación no lineales. Esta capacidad lo convierte en una alternativa importante para problemas complejos de clasificación como la detección de fraude eléctrico. El modelo se implementa integrándose dentro de un \emph{Pipeline} junto con una etapa previa de escalado. Este escalado resulta necesario, ya que el entrenamiento de las redes neuronales depende en gran medida de que las variables de entrada se encuentren en rangos comparables, favoreciendo un proceso más estable del algoritmo de optimización.
 
 Los parámetros principales, para la construcción del modelo, que incluye la configuración son: \emph{hidden\_layer\_sizes = (100, 50)}, que define una arquitectura con dos capas ocultas de 100 y 50 neuronas, respectivamente; \emph{activation = "relu"}, que establece la función de activación utilizada en las capas ocultas, \emph{solver = "adam"}, que indica el algoritmo de optimización empleado durante el entrenamiento, \emph{alpha = 0.0001}, que introduce regularización para reducir el riesgo de sobreajuste, \emph{batch\_size = 256}, que determina el número de muestras procesadas antes de cada actualización de los pesos, \emph{learning\_rate\_init = 0.001}, que fija la tasa de aprendizaje inicial, \emph{max\_iter = 300}, que marca el número máximo de iteraciones y \emph{random\_state = 42}, utilizado para garantizar la reproducibilidad de los experimentos. Además, se activa \emph{early\_stopping = True}, reservando automáticamente una fracción del conjunto de entrenamiento para validación interna mediante \emph{validation\_fraction = 0.1}. El entrenamiento se detiene cuando no se observan mejoras durante un número determinado de iteraciones consecutivas, fijado mediante \emph{n\_iter\_no\_change = 10}. Este mecanismo permite reducir el sobreajuste y limitar el coste computacional del modelo.
 
@@ -1016,7 +997,7 @@ A diferencia de otros métodos offline implementados en este trabajo, en este mo
 Este método se implementa en este estudio como modelo representativo de redes neuronales aplicadas a datos tabulares, permitiendo comparar su rendimiento frente a los métodos clásicos de aprendizaje automático y frente a modelos ensamble más avanzados. Su principal limitación es un mayor coste computacional y una menor claridad respecto a modelos basados en árboles.
 
 
-\subsubsection{k Vecinos más cercanos}
+\subsubsection{K vecinos más cercanos}
 
 El algoritmo k vecinos más cercanos (kNN) es un método de aprendizaje supervisado basado en instancias, que clasifica una observación en función de las etiquetas de sus vecinos más cercanos en el espacio de características. A diferencia de otros modelos, kNN no construye un modelo explícito durante la fase de entrenamiento, sino que almacena el conjunto de datos y realiza las predicciones en tiempo de inferencia. Para clasificar una nueva instancia, el algoritmo calcula la distancia entre dicha instancia y todas las observaciones del conjunto de entrenamiento, seleccionando las k más cercanas. La clase final se determina mediante votación mayoritaria o ponderada entre estos vecinos.
 
@@ -1027,7 +1008,7 @@ Dado que kNN se basa en distancias, es fundamental escalar previamente las varia
 De forma análoga a los modelos anteriores, se aplica validación cruzada estratificada con 5 particiones para evaluar la capacidad de generalización del modelo. Finalmente, se calculan las métricas de evaluación sobre el conjunto de prueba, permitiendo comparar el rendimiento de este modelo con el resto de algoritmos implementados en el proyecto.
 
 
-\subsubsection{XGBoost}
+\subsubsection{\emph{XGBoost}}
 
 El algoritmo XGBoost es una técnica avanzada de aprendizaje supervisado basada en métodos de \emph{gradient boosting}, diseñada para mejorar el rendimiento y la eficiencia del \emph{Gradient Boosting} tradicional. Al igual que este último, XGBoost construye los árboles de decisión de forma secuencial, donde cada nuevo árbol se entrena para corregir los errores cometidos por los anteriores. Sin embargo, introduce mejoras significativas como regularización, paralelización y optimización del proceso de entrenamiento, lo que lo convierte en uno de los modelos más eficaces para datos tabulares. Este modelo se incluye como modelo de referencia avanzado, permitiendo evaluar si técnicas de \emph{boosting} optimizadas ofrecen mejoras significativas frente a métodos clásicos.
 
@@ -1040,7 +1021,7 @@ Además, este método incorpora mecanismos de regularización que permiten contr
 También destacar, que se pueden obtener la importancia de las variables, calculada en función de la contribución de cada característica a la reducción del error en los árboles. Esta información resulta útil para interpretar el comportamiento del modelo. Finalmente, los resultados se almacenan para su posterior comparación con el resto de modelos implementados en el estudio.
 
 
-\subsection{Modelos Online}
+\subsection{Modelos \emph{online}}
 
 Todos los modelos de aprendizaje \emph{online} implementados en el proyecto siguen un procedimiento común de preparación de datos, entrenamiento incremental y evaluación continua. Este procedimiento permite comparar los distintos algoritmos bajo las mismas condiciones en un entorno que simula un flujo de datos en tiempo real.
 
@@ -1060,14 +1041,14 @@ Para llevar a cabo el entrenamiento del modelo y que permita la actualización i
 Este método se utiliza en este trabajo como modelo base dentro del entorno de aprendizaje \emph{online}. Su simplicidad, bajo coste computacional y capacidad de actualización incremental lo convierten en una referencia adecuada para comparar con modelos más avanzados. Sin embargo, al tratarse de un modelo lineal, presenta limitaciones para capturar relaciones no lineales en los datos, lo que puede afectar a su rendimiento en problemas complejos.
 
 
-\subsubsection{Naive Bayes incremental}
+\subsubsection{Naive bayes incremental}
 
 El modelo Naive Bayes es un algoritmo de clasificación probabilístico basado en el teorema de Bayes, que asume independencia condicional entre las variables de entrada. El modelo estima la probabilidad de pertenencia a cada clase a partir de la distribución de las características, asignando la clase con mayor probabilidad. En este trabajo se utiliza la variante \emph{Gaussian Naive Bayes} adecuada para variables numéricas continuas. Este modelo asume que cada característica sigue una distribución normal dentro de cada clase. A diferencia de los modelos lineales, este modelo no requiere escalado previo de las variables, ya que su funcionamiento se basa en la estimación de distribuciones estadísticas y no en distancias o márgenes de separación.
 
 El modelo se entrena de forma incremental, lo cuál permite actualizar las estimaciones de las distribuciones a medida que se procesan nuevos bloques de datos. Este proceso resulta muy eficiente desde el punto de vista computacional, ya que el modelo únicamente necesita mantener estadísticas agregadas de cada clase. Durante la evaluación, se utilizan directamente las probabilidades de pertenencia a la clase positiva obtenidas. Este método se incluye como una alternativa probabilística ligera dentro del aprendizaje automático \emph{online}. Sin embargo, la independencia entre variables puede limitar su capacidad de capturar relaciones complejas presentes en los datos, lo que puede traducirse en un rendimiento inferior frente a modelos más avanzados.
 
 
-\subsubsection{k Vecinos más cercanos \emph{online}}
+\subsubsection{K vecinos más cercanos \emph{online}}
 
 El algoritmo kNN se incluye en el entorno \emph{online} como una versión adaptada al procesamiento en flujo de datos. A diferencia de modelos incrementales puros, no actualiza parámetros internos, sino que su funcionamiento se basa en almacenar instancias previamente observadas y utilizar dichas instancias como referencia para clasificar nuevos datos. En esta implementación, el modelo se adapta a un escenario online mediante una estrategia de memoria incremental. El flujo de datos se divide en bloques o \emph{batches}, y cada nuevo bloque se clasifica utilizando únicamente las instancias vistas hasta ese preciso momento. Una vez realizadas las predicciones, el bloque actual se incorpora al conjunto de referencia, permitiendo que el modelo disponga de información más reciente en iteraciones posteriores. Además, dado que el algoritmo depende directamente del cálculo de distancias entre observaciones, se aplica un proceso de escalado previo, de forma que todas las variables contribuyan de manera equilibrada a la medida de similitud.
 
@@ -1078,14 +1059,14 @@ En una implementación directa, el algoritmo almacenaría todas las instancias o
 Es posible que los patrones de comportamiento evolucionen con el tiempo, así que priorizar la información más reciente permite que el modelo se adapte mejor a posibles cambios en la distribución de los datos, es decir, al \emph{concept drift}. Aunque, esta versión no constituye un método \emph{online} puro en sentido estricto, sí representa una adaptación razonable al contexto de flujo continuo y permite comparar su comportamiento con la versión \emph{offline} del mismo algoritmo y con otros métodos online implementados en el proyecto.
 
 
-\subsubsection{\emph{Hoeffding Tree}}
+\subsubsection{\emph{Hoeffding tree}}
 
-El \emph{Hoeffding Tree} es un algoritmo de aprendizaje incremental basado en árboles de decisión diseñado específicamente para entornos de flujo de datos. A diferencia de los árboles tradicionales, este modelo no requiere almacenar el conjunto completo de datos, sino que construye el árbol de forma progresiva a medida que recibe nuevas instancias. La función principal del algoritmo se basa en el límite de Hoeffding, el cual permite determinar, con alta probabilidad, cuándo se dispone de suficiente información para realizar una división óptima en un nodo del árbol. De este modo, el modelo puede tomar decisiones utilizando únicamente una fracción de los datos, garantizando eficiencia y rapidez en el aprendizaje.
+El \emph{Hoeffding tree} es un algoritmo de aprendizaje incremental basado en árboles de decisión diseñado específicamente para entornos de flujo de datos. A diferencia de los árboles tradicionales, este modelo no requiere almacenar el conjunto completo de datos, sino que construye el árbol de forma progresiva a medida que recibe nuevas instancias. La función principal del algoritmo se basa en el límite de Hoeffding, el cual permite determinar, con alta probabilidad, cuándo se dispone de suficiente información para realizar una división óptima en un nodo del árbol. De este modo, el modelo puede tomar decisiones utilizando únicamente una fracción de los datos, garantizando eficiencia y rapidez en el aprendizaje.
 
 Durante el proceso de aprendizaje, el árbol mantiene estadísticas suficientes en cada nodo para evaluar posibles divisiones basadas en medidas como la ganancia de información. Cuando la diferencia entre las mejores opciones de división supera el umbral establecido por el límite de Hoeffding, se realiza la partición del nodo. El proceso de este algoritmo sigue una estrategia \emph{prequential}, en la que cada nueva instancia es primero utilizada para realizar una predicción y posteriormente se emplea para actualizar el modelo. Una de las principales ventajas de este método es su bajo coste computacional y su capacidad para adaptarse a flujos de datos continuos sin necesidad de almacenar instancias previas. Esto lo convierte en un modelo especialmente adecuado para aplicaciones en tiempo real.
 
 
-\subsubsection{\emph{Adaptive Random Forest}}
+\subsubsection{\emph{Adaptive random forest}}
 
 El \emph{Adaptive Random Forest} es un modelo de aprendizaje \emph{online} basado en un conjunto de árboles de decisión incrementales, diseñado específicamente para trabajar en entornos de flujo de datos. Su funcionamiento se inspira en los métodos ensamble tradicionales, especialmente en \emph{Random Forest}, pero adaptado al aprendizaje secuencial y a la posible aparición de cambios en la distribución de los datos. A diferencia de un único árbol incremental, ARF construye un conjunto de árboles \emph{Hoeffding}, combinando sus predicciones para obtener una salida final más robusta. Cada árbol se entrena de manera incremental sobre diferentes subconjuntos del flujo de datos, lo que incrementa la diversidad del ensemble y mejora la capacidad de generalización del modelo.
 
@@ -1170,8 +1151,6 @@ Para terminar de mostrar resultados, se añade la influencia de las variables en
 \end{figure}
 
 
-\section{Análisis y discusión de resultados}
-
 En general, se observa un alto rendimiento en la mayoría de los modelos basados en técnicas de aprendizaje más avanzadas, mientras que los métodos más simples presentan un comportamiento claramente inferior. En primer lugar, la Regresión Logística muestra el peor rendimiento global, con una exactitud del 71.1\% y una puntuación F1 de 0.67. Aunque presenta un valor de \emph{recall} relativamente alto de 0.719, su baja precisión de 0.628 indica una mayor cantidad de falsos positivos. Esto se refleja también en una tasa de falsos positivos (FPR) bastante alta de 0.294 y un valor de ROC-AUC de 0.76, mostrando una capacidad limitada para distinguir entre las clases. Estos resultados indican que, si bien el modelo es capaz de detectar una parte considerable de los casos de fraude, lo hace a costa de generar un número elevado de clasificaciones erróneas.
 
 Por otro lado, los modelos basados en técnicas de ensamble muestran un rendimiento notablemente superior. En el caso de \emph{Random Forest}, se obtiene una exactitud del 95.6\% y una puntuación F1 de 0.943, acompañado de una precisión prácticamente perfecta de 0.998. Este modelo presenta además una tasa de falsos positivos extremadamente baja de 0.001, lo que indica una gran capacidad para evitar clasificaciones incorrectas de la clase mayoritaria. Su valor ROC-AUC de 0.954 confirma su elevado poder discriminativo. De forma similar, el modelo \emph{Gradient Boosting} presenta un comportamiento muy competitivo, con una puntuación F1 de 0.924 y una ROC-AUC de 0.949. Aunque su precisión de 0.981 y su tasa de falsos positivos de 0.012 son ligeramente inferiores a las de \emph{Random Forest}, sigue mostrando un equilibrio adecuado entre precisión y capacidad de detección, reflejado en sus métricas globales.
@@ -1195,7 +1174,7 @@ Finalmente, el modelo  \emph{XGBoost} presenta un comportamiento diferenciado re
 En conjunto, los resultados muestran que  \emph{Random Forest} y  \emph{Gradient Boosting} coinciden en otorgar mayor relevancia a variables relacionadas con el consumo energético. Mientras que  \emph{XGBoost}, incorpora con mayor peso variables categóricas relacionadas con el tipo de edificio. Sin embargo, es importante destacar que las medidas de importancia de variables pueden presentar sesgos, especialmente hacia variables con mayor variabilidad o número de categorías, por lo que estos resultados deben interpretarse con cautela.
 
 
-\section{Conclusiones}
+
 
 En este trabajo se realiza un estudio comparativo entre distintos modelos de aprendizaje automático, tanto en entornos \emph{offline} como \emph{online}, para detectar fraude en el consumo eléctrico. Con los resultados obtenidos se pueden extraer diversas conclusiones importantes sobre el rendimiento, la capacidad de generalización y la aplicabilidad de los modelos.
 
@@ -1210,43 +1189,15 @@ Los resultados muestran que existe una relación entre rendimiento y capacidad d
 % =========================
 % CAPÍTULO 7
 % =========================
-\chapter{Requisitos del Sistema}
+\chapter{Desarrollo del prototipo web}
 
-Para definir los requisitos del sistema del proyecto, se ha realizado un análisis del problema de detección de fraude en el consumo eléctrico y de las necesidades que tendría una empresa energética o analista encargado de supervisar los datos de consumo. El objetivo del sistema es proporcionar una herramienta que permita analizar datos de consumo energético y aplicar modelos de aprendizaje automático para detectar posibles casos de fraude. Además, se ofrece un entorno web que facilite la visualización de los resultados y la comparación entre distintos modelos de clasificación, permitiendo interpretar de forma clara el rendimiento de cada uno de ellos.
-
-
-\section{Situación actual}
-
-El fraude del consumo eléctrico es un problema importante para las compañías energéticas, porque provoca pérdidas económicas y puede afectar a la estabilidad de la red eléctrica. Gracias a los sistemas de medición inteligentes, existen cantidades grandes de datos del consumo energético de los usuarios. Sin embargo, analizar manualmente estos datos para identificar comportamientos que no son normales resulta una tarea difícil. El uso de técnicas de aprendizaje automático son una alternativa eficaz para detectar patrones de comportamiento que puedan indicar fraude.
-
-
-\section{Entorno Tecnológico}
+Para definir el desarrollo del prototipo web, se ha realizado un análisis del problema de detección de fraude en el consumo eléctrico y de las necesidades que tendría una empresa energética o analista encargado de supervisar los datos de consumo. El objetivo del sistema es proporcionar una herramienta que permita analizar datos de consumo energético y aplicar modelos de aprendizaje automático para detectar posibles casos de fraude. Además, se ofrece un entorno web que facilite la visualización de los resultados y la comparación entre distintos modelos de clasificación, permitiendo interpretar de forma clara el rendimiento de cada uno de ellos.
 
 El sistema se basa en un entorno web implementado en Python, que permite ejecutar modelos de aprendizaje automático y ver los resultados obtenidos de forma clara. El entorno tecnológico necesario para el uso del sistema incluye un ordenador con acceso a Internet, un navegador web moderno y, un servidor donde se ejecute el entorno web y los modelos de aprendizaje automático. Para que el sistema funcione no se necesita un \emph{hardware} específico por parte del usuario, ya que los modelos de aprendizaje automático se ejecutan en el servidor y los usuarios interactúan con el sistema a través de la interfaz web.
 
-Las tecnologías utilizadas en el desarrollo del sistema incluyen: Python como lenguaje principal de programación, Scikit-learn para la implementación de los modelos de aprendizaje automático, Pandas y NumPy para el procesamiento y análisis de los datos y FastApi como framework web en Python utilizado para la creación del entorno web. Este conjunto de tecnologías permite desarrollar una solución flexible y fácilmente extensible, facilitando la experimentación con distintos modelos de detección de fraude en el consumo eléctrico.
+Se propone el diseño de un prototipo de software que haga posible utilizar los resultados obtenidos en un ambiente funcional, tras llevar a cabo la etapa experimental, donde se ponen en práctica y analizan diversos modelos de aprendizaje automático para identificar el fraude eléctrico. El propósito fundamental del prototipo es ayudar a un operador de una compañía eléctrica a importar las curvas de consumo y clasificar automáticamente cada registro como posible fraude o consumo normal; para ello, se emplean los modelos que ya fueron entrenados y que han demostrado un mejor desempeño en la comparación experimental. El prototipo, además de su función principal, ofrece la posibilidad de comparar ambas categorías de manera objetiva y ver recursos gráficos como las curvas ROC o el valor que tienen las variables en la predicción. 
 
-
-\section{Fortalezas y Debilidades}
-
-La habilidad para examinar grandes volúmenes de datos sobre el consumo eléctrico y descubrir posibles patrones de fraude, empleando métodos de aprendizaje automático, es el principal punto fuerte del sistema. El sistema posibilita, además, el análisis comparativo de varios modelos de clasificación y la visualización de sus métricas de rendimiento, lo que simplifica la evaluación sobre cuáles algoritmos son más efectivos para resolver el problema. La presencia de un entorno en la web que centraliza la implementación de los modelos y la visualización de resultados, lo que posibilita a los usuarios llevar a cabo un análisis intuitivo de la información, es otra ventaja relevante.
-
-No obstante, el sistema también tiene ciertas limitaciones. La calidad y la representatividad de los datos empleados para entrenar los modelos son el primer elemento que define lo buenos que serán los resultados. Asimismo, los modelos de aprendizaje automático tienen la capacidad de producir falsos negativos o falsos positivos. Esto significa que el sistema debe ser utilizado como una herramienta adicional al análisis y no como un mecanismo de decisión totalmente determinante. Por último, el primer despliegue del sistema incorpora una cantidad restringida de modelos. Por lo tanto, será imprescindible continuar con la investigación y la prueba de procedimientos innovadores para aumentar su exactitud.
-
-
-\section{Necesidades de Negocio}
-
-El propósito fundamental del sistema es ofrecer un instrumento que facilite el análisis de datos sobre consumo de energía y la identificación automática de potenciales fraudes eléctricos. Para poder llevar a cabo inspecciones o investigaciones más exhaustivas, las compañías energéticas requieren detectar de manera rápida comportamientos anómalos en el consumo.
-
-
-\subsection{Objetivos de Negocio}
-
-El sistema creado tiene como objetivo simplificar el proceso de negocio a través del empleo de modelos de aprendizaje automático que posibiliten la categorización de los registros de consumo en normales o fraudulentos. El sistema también tiene que posibilitar la comparación del desempeño de diferentes modelos de clasificación y la visualización de los resultados logrados. Todo esto se verá reflejado en una interfaz web que haga más fácil ver los resultados y las métricas de evaluación. El sistema posibilita un análisis de los datos más eficaz que el de las técnicas tradicionales que solo se fundamentan en inspecciones manuales.
-
-
-\subsection{Procesos de Negocio}
-
-El sistema funciona en distintas fases. Primero, se carga el conjunto de datos que contiene información sobre el consumo eléctrico. En segundo lugar, el preprocesamiento de la información, que abarca la depuración de los registros, la conversión de variables categóricas y el acondicionamiento de los datos para su aplicación en modelos. Tercero: el entrenamiento de modelos de clasificación, que estudian los patrones en el consumo eléctrico y aprenden a diferenciar entre comportamientos fraudulentos y normales. Cuarto, la valoración de los modelos, empleando diferentes métricas como precisión, exactitud, Kappa de Cohen, matriz de confusión, F1-score y recall. Finalmente, la visualización de resultados en el ambiente web, donde los usuarios tienen la posibilidad de verificar las métricas del rendimiento y contrastar las diferentes categorías de los modelos. Además, se seleccionan los que ofrecen mejores resultados de cada categoría.
+El sistema emplea modelos que ya fueron entrenados y guardados, en lugar de reentrenarlos en tiempo real. Esta decisión posibilita disminuir el costo computacional, mejorar la velocidad de respuesta del prototipo y distinguir con claridad entre la fase experimental y la fase operativa. Por lo tanto, los modelos se entrenan y evalúan antes a través de scripts experimentales, mientras que la aplicación se enfoca en consultar resultados y crear predicciones basadas en datos nuevos importados.
 
 
 \section{Catálogo de Requisitos del Sistema}
@@ -1339,20 +1290,7 @@ RI6 & Protección de datos. & Los datos de los usuarios del sistema se almacenar
 \end{table}
 
 
-
-% =========================
-% CAPÍTULO 8
-% =========================
-\chapter{Análisis del Sistema}
-
-
-\section{Objetivo del prototipo software}
-
-Se propone el diseño de un prototipo de software que haga posible utilizar los resultados obtenidos en un ambiente funcional, tras llevar a cabo la etapa experimental, donde se ponen en práctica y analizan diversos modelos de aprendizaje automático para identificar el fraude eléctrico. El propósito fundamental del prototipo es ayudar a un operador de una compañía eléctrica a importar las curvas de consumo y clasificar automáticamente cada registro como posible fraude o consumo normal; para ello, se emplean los modelos que ya fueron entrenados y que han demostrado un mejor desempeño en la comparación experimental. El prototipo, además de su función principal, ofrece la posibilidad de comparar ambas categorías de manera objetiva y ver recursos gráficos como las curvas ROC o el valor que tienen las variables en la predicción. 
-
-El sistema emplea modelos que ya fueron entrenados y guardados, en lugar de reentrenarlos en tiempo real. Esta decisión posibilita disminuir el costo computacional, mejorar la velocidad de respuesta del prototipo y distinguir con claridad entre la fase experimental y la fase operativa. Por lo tanto, los modelos se entrenan y evalúan antes a través de scripts experimentales, mientras que la aplicación se enfoca en consultar resultados y crear predicciones basadas en datos nuevos importados.
-
-\section{Modelo conceptual del sistema}
+\section{Modelo conceptual de datos}
 
 El modelo conceptual del sistema se desarrolla considerando las etapas operativa y experimental del prototipo. La entidad \emph{ModeloPredictivo} es un reflejo de los modelos que han sido entrenados y analizados, los cuales se dividen en modelos \emph{online} y \emph{offline} a través de la entidad \emph{CategoriaModelo}. Cada modelo cuenta con un resultado de evaluación vinculado, curvas ROC y detalles acerca de la relevancia de las variables en los casos en que el algoritmo lo permite. En cambio, la entidad \emph{ArchivoConsumo} contiene el archivo CSV que el operador ha importado, que consta de una o varias \emph{CurvaConsumo}. Cada curva puede ser analizada por uno de los modelos entrenados, creando una entidad llamada \emph{Predicción}, que guarda la fecha en la que se realiza la clasificación. Además, hay que destacar la clase Usuario que es el operador que realiza una predicción importando archivos de consumo.
 
@@ -1372,7 +1310,7 @@ El actor principal del sistema es el operador de la compañía eléctrica. Es el
 El administrador del sistema es el actor encargado de gestionar los aspectos técnicos del prototipo. Su tarea principal es asegurar que el sistema esté listo para hacer predicciones con los modelos previamente entrenados, así como también que esté disponible y bien configurado. Dentro del marco de este proyecto, el administrador es el mismo que el creador del sistema; sin embargo, se distingue del operador debido a la clase de tareas que lleva a cabo. Entre las tareas fundamentales que realiza, están la gestión de los usuarios del sistema y la administración de los modelos entrenados y los resultados obtenidos durante las pruebas.
 
 
-\section{Casos de Uso}
+\section{Casos de uso}
 
 En esta sección se definen los principales casos de uso del sistema a partir de los actores anteriores. 
 
@@ -1928,15 +1866,6 @@ Ahora es el turno de los dos casos de uso del administrador, estos se consideran
 \end{enumerate}
 
 
-
-% =========================
-% CAPÍTULO 9
-% =========================
-\chapter{Diseño del Sistema}
-
-En este capítulo se describe el diseño del sistema software desarrollado. El objetivo es dejar claro la organización general de la solución, sus componentes principales, las responsabilidades de cada parte y la forma en la que interactúan entre sí para permitir la detección de posibles fraudes. El sistema se basa en un prototipo para ser utilizado por un operador de una distribuidora eléctrica.
-
-
 \section{Arquitectura del Sistema}
 
 La arquitectura del sistema se diseña separando la fase experimental de la fase operativa. La fase experimental se encarga del entrenamiento y evaluación de los modelos de aprendizaje automático, mientras que la fase operativa permite utilizar los modelos dentro de una \emph{API REST} para realizar predicciones. La arquitectura del sistema se compone de varios elementos. Empezando por el cliente, este representa el punto de acceso al sistema. El operador interactúa con la API mediante un navegador web o cliente HTTP, pudiendo iniciar sesión, importar archivos CSV, ejecutar predicciones y consultar resultados.
@@ -1966,10 +1895,7 @@ La base de datos solo dispone de una tabla, la cual se llama \emph{usuarios}. Es
 \label{fig:diseno_bd}
 \end{figure}
 
-
-\subsection{Tabla usuarios}
-
-Esta tabla está formada por varios elementos como un identificador único, un nombre de usuario, una contraseña almacenada mediante hash, un rol dentro del sistema, un estado de activación y una fecha de creación. El uso de contraseñas cifradas mediante hash evita tener contraseñas en texto plano, así se consigue reducir los casos de accesos no autorizados. El campo de estado permite desactivar usuarios sin necesidad de eliminarlos físicamente, conservando así la integridad de la información. En la Figura~\ref{fig:tabla_usuarios} se muestran sus atributos junto con detalles como el tipo de dato.
+La tabla usuarios está formada por varios elementos como un identificador único, un nombre de usuario, una contraseña almacenada mediante hash, un rol dentro del sistema, un estado de activación y una fecha de creación. El uso de contraseñas cifradas mediante hash evita tener contraseñas en texto plano, así se consigue reducir los casos de accesos no autorizados. El campo de estado permite desactivar usuarios sin necesidad de eliminarlos físicamente, conservando así la integridad de la información. En la Figura~\ref{fig:tabla_usuarios} se muestran sus atributos junto con detalles como el tipo de dato.
 
 \begin{figure}[H]
 \centering
@@ -1979,7 +1905,7 @@ Esta tabla está formada por varios elementos como un identificador único, un n
 \end{figure}
 
 
-\section{Diseño del almacenamiento de ficheros}
+\section{Almacenamiento de ficheros}
 
 El sistema guarda en disco los recursos creados durante la fase experimental y los resultados producidos durante el uso de la aplicación. Con esta división se reserva la base de datos para información relacionada a los usuarios, mientras que el sistema de ficheros se utiliza para almacenar recursos más pesados o generados externamente, como modelos entrenados, gráficas, métricas y resultados de predicción. Esta decisión se debe a que algunos elementos del sistema no encajan de forma natural en una tabla relacional. Los modelos entrenados, los escaladores, las listas de columnas esperadas, las curvas ROC, los ficheros de métricas y la importancia de variables son recursos producidos durante la fase experimental y posteriormente reutilizados por la aplicación. Se almacenan como ficheros dentro de la estructura del proyecto, permitiendo que la \emph{API} los cargue cuando sean necesarios sin repetir el entrenamiento de los modelos.
 
@@ -1988,12 +1914,18 @@ La carpeta \emph{models/} se utiliza para guardar los recursos necesarios para r
 Los archivos en el entorno local se guardan directamente en el sistema de ficheros del ordenador donde la aplicación está funcionando. Estos pueden estar en el disco persistente vinculado al servidor, como un volumen \emph{EBS}, por ejemplo, cuando se despliega en un servidor sobre una instancia de \emph{AWS EC2}. Así, los modelos, resultados y recursos adicionales continúan accesibles incluso si se vuelve a iniciar la aplicación. El almacenamiento de los ficheros podría trasladarse a un servicio externo como \emph{Amazon S3} para una versión más segura con requerimientos más altos de mantenimiento, disponibilidad y escalabilidad. Esto posibilita la separación de los archivos de la instancia de ejecución, el mejoramiento de la persistencia y la administración más sólida de los recursos que produce el sistema, así como también hacer copias de seguridad más fácilmente.
 
 
-\section{Diseño de la API REST}
+
+% =========================
+% CAPÍTULO 8
+% =========================
+\chapter{Diseño del prototipo web}
+
+En este capítulo se describe el diseño del sistema software desarrollado. El objetivo es dejar claro la organización general de la solución, sus componentes principales, las responsabilidades de cada parte y la forma en la que interactúan entre sí para permitir la detección de posibles fraudes. El sistema se basa en un prototipo para ser utilizado por un operador de una distribuidora eléctrica.
 
 En esta sección se puede visualizar el diseño del sistema, tanto en su versión inicial como estaba planeado el sistema, como en su versión final ya implementado y funcional.
 
 
-\subsection{Bocetos iniciales}
+\section{Bocetos iniciales}
 
 Antes de realizar la implementación y diseño final del sistema se realiza unos bocetos iniciales para plasmar la idea inicial del sistema. Estos bocetos están realizados a través de un software especializado llamado \emph{balsamiq} y muestran cada una de las ventanas y funcionalidades del sistema. En la Figura~\ref{fig:main_boceto} se puede ver la ventana principal del sistema.
 
@@ -2005,7 +1937,7 @@ Antes de realizar la implementación y diseño final del sistema se realiza unos
 \end{figure}
 
 
-\subsubsection{Ventanas de autenticación}
+\subsection{Ventanas de autenticación}
 
 Se muestran las ventanas que pertenecen a los casos de uso de Iniciar sesión y Cerrar sesión, relacionados con la autenticación en el sistema.
 
@@ -2040,7 +1972,7 @@ Se muestran las ventanas que pertenecen a los casos de uso de Iniciar sesión y 
 \end{figure}
 
 
-\subsubsection{Ventanas de predicción}
+\subsection{Ventanas de predicción}
 Se muestran las ventanas que pertenecen a los casos de uso de predecir fraude ya sea \emph{offline} o \emph{online} junto a posibles errores.
 
 \begin{figure}[H]
@@ -2080,7 +2012,7 @@ Se muestran las ventanas que pertenecen a los casos de uso de predecir fraude ya
 \end{figure}
 
 
-\subsubsection{Ventanas de consulta}
+\subsection{Ventanas de consulta}
 
 Se muestran las ventanas del caso de uso de consultar último resultado de predicción junto a sus posibles errores.
 
@@ -2103,16 +2035,16 @@ Se muestran las ventanas del caso de uso de consultar último resultado de predi
 \end{figure}
 
 
-\subsection{Diseño final}
-\subsubsection{Endpoints de autenticación}
-\subsubsection{Endpoints de predicción}
-\subsubsection{Endpoints de consulta}
+\section{Diseño final}
+\subsection{Endpoints de autenticación}
+\subsection{Endpoints de predicción}
+\subsection{Endpoints de consulta}
 
 
 % =========================
-% CAPÍTULO 10
+% CAPÍTULO 9
 % =========================
-\chapter{Construcción del Sistema}
+\chapter{Construcción del prototipo web}
 
 Este capítulo se ocupa de los elementos relacionados con la construcción del sistema de software creado. Se detalla el entorno de desarrollo que se usó, las tecnologías que se aplicaron, las resoluciones tomadas durante la creación del prototipo y la implementación a nivel de código. La aplicación \emph{back-end} ha sido creada a partir de una \emph{API REST}, la cual tiene la responsabilidad de autenticar a los usuarios, recibir archivos CSV con las curvas de consumo eléctrico, implementar los modelos predictivos escogidos en el periodo experimental y retornar los resultados al operador.
 
@@ -2138,15 +2070,6 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 \section{Implementación de la API REST}
 
 
-\subsection{Implementación de endpoints}
-
-
-\subsection{Integración de resultados experimentales}
-
-
-\section{Documentación interactiva con Swagger UI}
-
-
 \section{Código fuente y modularidad}
 
 
@@ -2158,9 +2081,9 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 
 
 % =========================
-% CAPÍTULO 11
+% CAPÍTULO 10
 % =========================
-\chapter{Validación del Sistema}
+\chapter{Validación del prototipo web}
 
 
 \section{Estrategia de validación}
@@ -2186,9 +2109,17 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 
 
 % =========================
-% CAPÍTULO 12
+% CAPÍTULO 11
 % =========================
 \chapter{Conclusiones}
+
+En este trabajo se realiza un estudio comparativo entre distintos modelos de aprendizaje automático, tanto en entornos \emph{offline} como \emph{online}, para detectar fraude en el consumo eléctrico. Con los resultados obtenidos se pueden extraer diversas conclusiones importantes sobre el rendimiento, la capacidad de generalización y la aplicabilidad de los modelos.
+
+Los modelos \emph{offline} muestran un rendimiento superior al de los modelos \emph{online}. Esto se debe a que estos algoritmos disponen del conjunto completo de datos durante el entrenamiento, lo que les permite ajustar sus parámetros de forma más precisa y capturar relaciones complejas entre las variables. Destacan los modelos basados en técnicas de ensamble, como \emph{Random Forest}, \emph{Gradient Boosting}, \emph{XGBoost} y MLP. \emph{XGBoost} es el algoritmo con mejor rendimiento global, ya que combina una precisión alta con una capacidad alta de detección de fraude, manteniendo al mismo tiempo una tasa de falsos positivos muy pequeña. Esto puede explicarse por que está basado en \emph{boosting}, donde cada nuevo modelo corrige los errores de los anteriores, así como por la incorporación de mecanismos de regularización que evitan el sobreajuste. Los modelos más simples, como la Regresión Logística, presentan un rendimiento bastante inferior. Esto se debe a su capacidad limitada para modelar relaciones no lineales en los datos. Aunque este modelo se usa como una base simple para comparar el resto de modelos más avanzados, no resulta útil para la detección de fraude eléctrico.
+
+En los modelos \emph{online} se observan comportamientos más variados. El modelo Adaptive Random Forest destaca por encima del resto. Este resultado demuestra que es posible obtener un rendimiento competitivo en escenarios de flujo de datos mediante el uso de técnicas de ensamble adaptativas. Los modelos como kNN \emph{online} y \emph{Hoeffding Tree} muestran un rendimiento aceptable, aunque inferior. Los modelos como Perceptrón online y el Naive Bayes incremental presentan limitaciones importantes, especialmente en la capacidad para distinguir entre comportamientos normales o fraudulentos. El bajo rendimiento de Naive Bayes se explica por la fuerte independencia entre variables, que no se cumple en el conjunto de datos utilizado.
+
+Los resultados muestran que existe una relación entre rendimiento y capacidad de adaptación al flujo de datos. Mientras que los modelos \emph{offline} ofrecen mejores resultados en términos de precisión y capacidad para separar entre comportamientos normales o fraudes, los modelos \emph{online} permiten trabajar en entornos dinámicos donde los datos llegan de forma continua, lo que resulta muy importante en aplicaciones en tiempo real. Este estudio destaca la importancia de seleccionar el modelo adecuado en función del contexto del problema. En escenarios donde se dispone de todos los datos y se busca maximizar el rendimiento, modelos como \emph{XGBoost} resultan la mejor opción. Sin embargo, en entornos donde los datos se generan de forma continua, algoritmos como \emph{Adaptive Random Forest} ofrecen una alternativa eficaz, combinando adaptabilidad y un rendimiento competitivo.
 
 
 \section{Objetivos alcanzados}
@@ -2207,13 +2138,13 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 
 
 % =========================
-% CAPÍTULO 13
+% CAPÍTULO 12
 % =========================
 \chapter{Dependencias y paquetes Python}
 
 
 % =========================
-% CAPÍTULO 14
+% CAPÍTULO 13
 % =========================
 \chapter{Manual de usuario}
 

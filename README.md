@@ -8,3 +8,6 @@ El proyecto incluye:
 - Validación cruzada para medir la estabilidad de los modelos
 - Creación de un entorno web donde comparar y ver resultados del mejor modelo de cada categoria
 
+Los modelos entrenados no se incluyen en el repositorio público. Deben generarse ejecutando los scripts de entrenamiento de la carpeta experiments.
+
+Los datasets utilizados no se incluyen en el repositorio público debido a su tamaño.

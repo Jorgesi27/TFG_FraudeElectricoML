@@ -35,6 +35,11 @@ Thumbs.db
 *.log
 
 # ======================
+# Base de datos
+# ======================
+*.db
+
+# ======================
 # Dataset
 # ======================
 data/
@@ -44,13 +49,17 @@ data/
 # ======================
 results/*.csv
 results/*.json
+results/*.png
 
-# Predicciones de usuarios
-results/predicciones_usuarios/
+# ======================
+# Modelos serializados
+# ======================
+models/*.pkl
 
+# ======================
 # Archivos auxiliares LaTeX
+# ======================
 *.aux
-*.log
 *.out
 *.toc
 *.lof
@@ -60,12 +69,8 @@ results/predicciones_usuarios/
 *.synctex.gz
 *.lol
 
-# Modelos serializados
-models/*.pkl
-results/*.pkl
-
-# Ignorar todos los PDF...
+# ======================
+# PDFs
+# ======================
 *.pdf
-
-# ...excepto el final
 !Latex/main.pdf

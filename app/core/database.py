@@ -1,3 +1,4 @@
+import json
 import pymysql
 from fastapi import HTTPException
 
@@ -47,3 +48,182 @@ def obtener_usuario_por_nombre(nombre_usuario: str):
             status_code=500,
             detail="No ha sido posible consultar el usuario en la base de datos."
         )
+    
+
+# Guarda un archivo importado por un usuario.
+def guardar_archivo(id_usuario: int, nombre_archivo: str):
+    try:
+        conexion = obtener_conexion()
+
+        with conexion:
+            with conexion.cursor() as cursor:
+
+                sql = """
+                    INSERT INTO archivos_consumo
+                    (
+                        id_usuario,
+                        nombre_archivo
+                    )
+                    VALUES (%s, %s)
+                """
+
+                cursor.execute(sql, (id_usuario, nombre_archivo))
+                conexion.commit()
+
+                return cursor.lastrowid
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="No ha sido posible guardar el archivo importado."
+        )
+
+
+# Guarda una curva de consumo asociada a un archivo.
+def guardar_curva(
+    id_archivo: int,
+    identificador_curva: str,
+    datos_consumo
+):
+    try:
+        conexion = obtener_conexion()
+
+        with conexion:
+            with conexion.cursor() as cursor:
+
+                sql = """
+                    INSERT INTO curvas_consumo
+                    (
+                        id_archivo,
+                        identificador_curva,
+                        datos_consumo
+                    )
+                    VALUES (%s, %s, %s)
+                """
+
+                cursor.execute(
+                    sql,
+                    (
+                        id_archivo,
+                        identificador_curva,
+                        json.dumps(datos_consumo)
+                    )
+                )
+
+                conexion.commit()
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="No ha sido posible guardar una curva de consumo."
+        )
+    
+
+# Recupera todas las curvas asociadas a un archivo importado.
+def obtener_curvas_archivo(id_archivo: int):
+    try:
+        conexion = obtener_conexion()
+
+        with conexion:
+            with conexion.cursor() as cursor:
+
+                sql = """
+                    SELECT
+                        id_curva,
+                        identificador_curva
+                    FROM curvas_consumo
+                    WHERE id_archivo = %s
+                    ORDER BY id_curva ASC
+                """
+
+                cursor.execute(sql, (id_archivo,))
+                curvas = cursor.fetchall()
+
+        return curvas
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="No ha sido posible recuperar las curvas del archivo."
+        )
+    
+
+# Recupera una curva de consumo concreta mediante su identificador.
+def obtener_curva_por_id(id_curva: int):
+    try:
+        conexion = obtener_conexion()
+
+        with conexion:
+            with conexion.cursor() as cursor:
+
+                sql = """
+                    SELECT
+                        id_curva,
+                        identificador_curva,
+                        datos_consumo
+                    FROM curvas_consumo
+                    WHERE id_curva = %s
+                    LIMIT 1
+                """
+
+                cursor.execute(sql, (id_curva,))
+                curva = cursor.fetchone()
+
+        return curva
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="No ha sido posible recuperar la curva de consumo."
+        )
+        
+
+def obtener_archivos_usuario(id_usuario):
+
+    conexion = obtener_conexion()
+
+    with conexion:
+        with conexion.cursor() as cursor:
+
+            sql = """
+                SELECT
+                    id_archivo,
+                    nombre_archivo
+                FROM archivos_consumo
+                WHERE id_usuario = %s
+                ORDER BY fecha_importacion DESC
+            """
+
+            cursor.execute(sql, (id_usuario,))
+
+            return cursor.fetchall()
+        
+
+def obtener_datos_curva(id_curva):
+
+    conexion = obtener_conexion()
+
+    with conexion:
+        with conexion.cursor() as cursor:
+
+            sql = """
+                SELECT
+                    identificador_curva,
+                    datos_consumo
+                FROM curvas_consumo
+                WHERE id_curva = %s
+                LIMIT 1
+            """
+
+            cursor.execute(sql, (id_curva,))
+
+            curva = cursor.fetchone()
+
+            if curva is None:
+                return None
+
+            curva["datos_consumo"] = json.loads(
+                curva["datos_consumo"]
+            )
+
+            return curva
