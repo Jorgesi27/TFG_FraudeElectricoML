@@ -6,44 +6,139 @@ from fastapi import (
     File,
     HTTPException,
     Form,
-    Request
+    Request,
+    Depends
 )
 
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from app.core.auth import autenticar_usuario
+from fastapi.security import (
+    HTTPAuthorizationCredentials
+)
+
+from app.core.auth import (
+    autenticar_usuario,
+    obtener_operador_actual,
+    security,
+    cerrar_sesion
+)
 
 from app.services.prediction_service import (
     importar_archivo_csv,
     listar_curvas_archivo,
     predecir_curva_historica,
-    realizar_prediccion_historica_desde_csv,
-    realizar_prediccion_tiempo_real_desde_csv,
-    obtener_detalle_curva
+    obtener_detalle_curva,
+    generar_estadisticas_archivo,
+    predecir_curva_tiempo_real,
+    predecir_stream
 )
 
 from app.core.database import (
     obtener_archivos_usuario
 )
 
+from pydantic import BaseModel
+from typing import List
+
+class StreamRequest(BaseModel):
+    valores: List[float]
+
+
 router = APIRouter()
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(
+    directory="app/templates"
+)
 
 
-@router.get("/", response_class=HTMLResponse)
-def interfaz(request: Request):
+# ========================================
+# PAGINAS HTML
+# ========================================
+
+@router.get(
+    "/home",
+    response_class=HTMLResponse,
+    include_in_schema=False
+)
+def home_page(request: Request):
 
     return templates.TemplateResponse(
-        "index.html",
+        "home.html",
         {"request": request}
     )
 
 
-# Login temporal (sin protección real aún)
+@router.get(
+    "/historica",
+    response_class=HTMLResponse,
+    include_in_schema=False
+)
+def historica_page(request: Request):
+
+    return templates.TemplateResponse(
+        "historica.html",
+        {"request": request}
+    )
+
+
+@router.get(
+    "/tiempo-real",
+    response_class=HTMLResponse,
+    include_in_schema=False
+)
+def tiempo_real_page(request: Request):
+
+    return templates.TemplateResponse(
+        "tiempo_real.html",
+        {"request": request}
+    )
+
+
+@router.post(
+    "/prediccion/stream"
+)
+def prediccion_stream(
+    request: StreamRequest
+):
+
+    return predecir_stream(
+        request.valores
+    )
+
+
+@router.get(
+    "/estadisticas",
+    response_class=HTMLResponse,
+    include_in_schema=False
+)
+def estadisticas_page(request: Request):
+
+    return templates.TemplateResponse(
+        "estadisticas.html",
+        {"request": request}
+    )
+
+
+@router.get(
+    "/login-page",
+    response_class=HTMLResponse,
+    include_in_schema=False
+)
+def login_page(request: Request):
+
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request}
+    )
+
+
+# ========================================
+# AUTH
+# ========================================
+
 @router.post("/login")
 def iniciar_sesion(
     usuario: str = Form(...),
@@ -56,8 +151,29 @@ def iniciar_sesion(
     )
 
 
+@router.post("/logout")
+def logout(
+    credenciales:
+    HTTPAuthorizationCredentials =
+    Depends(security)
+):
+
+    return cerrar_sesion(
+        credenciales.credentials
+    )
+
+
+# ========================================
+# IMPORTAR CSV
+# ========================================
+
 @router.post("/importar-csv")
 async def importar_csv(
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    ),
+
     archivo: UploadFile = File(...)
 ):
 
@@ -73,55 +189,123 @@ async def importar_csv(
     return importar_archivo_csv(
         contenido=contenido,
         nombre_archivo=archivo.filename,
-        id_usuario=1
+        id_usuario=usuario_actual["id_usuario"]
     )
 
 
+# ========================================
+# ARCHIVOS
+# ========================================
+
 @router.get("/archivos")
-def listar_archivos():
+def listar_archivos(
 
-    return obtener_archivos_usuario(1)
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
+):
 
+    return obtener_archivos_usuario(
+        usuario_actual["id_usuario"]
+    )
+
+
+# ========================================
+# CURVAS
+# ========================================
 
 @router.get("/curvas/{id_archivo}")
-def listar_curvas(id_archivo: int):
+def listar_curvas(
 
-    return listar_curvas_archivo(id_archivo)
+    id_archivo: int,
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
+):
+
+    return listar_curvas_archivo(
+        id_archivo,
+        usuario_actual["id_usuario"]
+    )
 
 
 @router.get("/curva/{id_curva}")
-def obtener_curva(id_curva: int):
+def obtener_curva(
 
-    return obtener_detalle_curva(id_curva)
+    id_curva: int,
 
-
-@router.post("/prediccion/historica/{id_curva}")
-def predecir_historica(id_curva: int):
-
-    return predecir_curva_historica(id_curva)
-
-
-@router.post("/prediccion/historica")
-async def predecir_fraude_historico(
-    archivo: UploadFile = File(...)
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
 ):
 
-    contenido = await archivo.read()
-
-    return realizar_prediccion_historica_desde_csv(
-        contenido=contenido,
-        nombre_archivo=archivo.filename
+    return obtener_detalle_curva(
+        id_curva,
+        usuario_actual["id_usuario"]
     )
 
 
-@router.post("/prediccion/tiempo-real")
-async def predecir_fraude_tiempo_real(
-    archivo: UploadFile = File(...)
+# ========================================
+# PREDICCION HISTORICA
+# ========================================
+
+@router.post(
+    "/prediccion/historica/{id_curva}"
+)
+def predecir_historica(
+
+    id_curva: int,
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
 ):
 
-    contenido = await archivo.read()
+    return predecir_curva_historica(
+        id_curva,
+        usuario_actual["id_usuario"]
+    )
 
-    return await realizar_prediccion_tiempo_real_desde_csv(
-        contenido=contenido,
-        nombre_archivo=archivo.filename
+
+# ========================================
+# PREDICCION TIEMPO REAL
+# ========================================
+
+@router.post(
+    "/prediccion/tiempo-real/{id_curva}"
+)
+def predecir_tiempo_real(
+
+    id_curva: int,
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
+):
+
+    return predecir_curva_tiempo_real(
+        id_curva,
+        usuario_actual["id_usuario"]
+    )
+
+# ========================================
+# ESTADISTICAS
+# ========================================
+
+@router.get(
+    "/estadisticas/{id_archivo}"
+)
+def obtener_estadisticas(
+
+    id_archivo: int,
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
+):
+
+    return generar_estadisticas_archivo(
+        id_archivo,
+        usuario_actual["id_usuario"]
     )

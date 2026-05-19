@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from app.api import operador
 
 app = FastAPI(
@@ -28,10 +28,9 @@ app.include_router(
 )
 
 
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def root(request: Request):
+@app.get("/", include_in_schema=False)
+def root():
 
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
+    return RedirectResponse(
+        url="/api/operador/home"
     )

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tiempo Real</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <div class="sidebar">
+
+        <h2>Fraude Eléctrico</h2>
+
+        <a href="/api/operador/home">
+            Inicio
+        </a>
+
+        <a href="/api/operador/historica">
+            Predicción histórica
+        </a>
+
+        <a href="/api/operador/tiempo-real">
+            Tiempo real
+        </a>
+
+        <a href="/api/operador/estadisticas">
+            Estadísticas
+        </a>
+
+        <button id="btnLogout" class="logout">
+            Cerrar sesión
+        </button>
+
+    </div>
+
+    <div class="contenido">
+
+        <h1>Predicción online</h1>
+
+        <div class="top">
+
+            <select id="archivoSelect">
+
+                <option value="">
+                    Seleccionar archivo
+                </option>
+
+            </select>
+
+            <select id="curvaSelect">
+
+                <option value="">
+                    Seleccionar curva
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="container">
+
+            <div class="chart-box">
+                <canvas id="graficaTiempoReal"></canvas>
+            </div>
+
+            <div class="result-box">
+
+                <h2>Resultado</h2>
+
+                <div id="resultadoTiempoReal" class="fraude">
+                    ---
+                </div>
+
+                <h3 id="probabilidadTiempoReal">
+                    ---
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module" src="/static/js/tiempo_real.js"></script>
+
+</body>
+</html>

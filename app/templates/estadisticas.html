@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Estadísticas
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>
+            Fraude Eléctrico
+        </h2>
+
+        <a href="/api/operador/home">
+            Inicio
+        </a>
+
+        <a href="/api/operador/historica">
+            Predicción histórica
+        </a>
+
+        <a href="/api/operador/tiempo-real">
+            Tiempo real
+        </a>
+
+        <a href="/api/operador/estadisticas">
+            Estadísticas
+        </a>
+
+        <button
+            id="btnLogout"
+            class="logout"
+        >
+            Cerrar sesión
+        </button>
+
+    </div>
+
+    <!-- CONTENIDO -->
+
+    <div class="contenido">
+
+        <h1>
+            Dashboard de estadísticas
+        </h1>
+
+        <div class="top">
+
+            <select id="archivoSelect">
+
+                <option value="">
+                    Seleccionar archivo
+                </option>
+
+            </select>
+
+            <button id="btnCargarEstadisticas">
+
+                Generar dashboard
+
+            </button>
+
+        </div>
+
+
+        <!-- KPIs -->
+
+        <div class="kpis-container">
+
+            <div class="kpi-card">
+
+                <h3>Total curvas</h3>
+
+                <div
+                    id="kpiTotal"
+                    class="kpi-value"
+                >
+                    0
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <h3>Fraudes detectados</h3>
+
+                <div
+                    id="kpiFraudes"
+                    class="kpi-value fraude-kpi"
+                >
+                    0
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <h3>Consumos normales</h3>
+
+                <div
+                    id="kpiNormales"
+                    class="kpi-value normal-kpi"
+                >
+                    0
+                </div>
+
+            </div>
+
+            <div class="kpi-card">
+
+                <h3>Tasa fraude</h3>
+
+                <div
+                    id="kpiPorcentaje"
+                    class="kpi-value"
+                >
+                    0%
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DASHBOARD -->
+
+        <div class="graficas-dashboard">
+
+            <div class="chart-card">
+
+                <h3>
+                    Distribución fraude
+                </h3>
+
+                <canvas id="graficaPie"></canvas>
+
+            </div>
+
+            <div class="chart-card">
+
+                <h3>
+                    Comparativa consumos
+                </h3>
+
+                <canvas id="graficaBarras"></canvas>
+
+            </div>
+
+            <div class="chart-card">
+
+                <h3>
+                    Evolución temporal
+                </h3>
+
+                <canvas id="graficaLineal"></canvas>
+
+            </div>
+
+            <div class="chart-card">
+
+                <h3>
+                    Radar de riesgo
+                </h3>
+
+                <canvas id="graficaRadar"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script
+    type="module"
+    src="/static/js/estadisticas.js"
+></script>
+
+</body>
+</html>

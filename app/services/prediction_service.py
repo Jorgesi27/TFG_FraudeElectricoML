@@ -13,7 +13,8 @@ from app.core.database import (
     guardar_archivo,
     guardar_curva,
     obtener_curvas_archivo,
-    obtener_curva_por_id
+    obtener_curva_por_id,
+    guardar_prediccion
 )
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -77,6 +78,21 @@ def cargar_pickle(path: Path, nombre_recurso: str):
                 f"el recurso: {nombre_recurso}."
             )
         )
+
+
+# ========================================
+# CARGA GLOBAL MODELOS STREAMING
+# ========================================
+
+ARF_SCALER = cargar_pickle(
+    ARF_SCALER_PATH,
+    "escalador Adaptive Random Forest"
+)
+
+ARF_COLUMNS = cargar_pickle(
+    ARF_COLUMNS_PATH,
+    "columnas Adaptive Random Forest"
+)
 
 
 # Lee el CSV importado.
@@ -236,19 +252,13 @@ def predecir_xgboost(df: pd.DataFrame):
 def predecir_arf(df: pd.DataFrame):
 
     modelo = cargar_pickle(
-        ARF_MODEL_PATH,
-        "modelo Adaptive Random Forest"
-    )
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
 
-    scaler = cargar_pickle(
-        ARF_SCALER_PATH,
-        "escalador Adaptive Random Forest"
-    )
+    scaler = ARF_SCALER
 
-    columnas = cargar_pickle(
-        ARF_COLUMNS_PATH,
-        "columnas Adaptive Random Forest"
-    )
+    columnas = ARF_COLUMNS
 
     X = preprocesar_datos(df, columnas)
 
@@ -359,19 +369,13 @@ async def realizar_prediccion_tiempo_real_desde_csv(
     df = leer_csv_subido(contenido)
 
     modelo = cargar_pickle(
-        ARF_MODEL_PATH,
-        "modelo Adaptive Random Forest"
-    )
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
 
-    scaler = cargar_pickle(
-        ARF_SCALER_PATH,
-        "escalador Adaptive Random Forest"
-    )
+    scaler = ARF_SCALER
 
-    columnas = cargar_pickle(
-        ARF_COLUMNS_PATH,
-        "columnas Adaptive Random Forest"
-    )
+    columnas = ARF_COLUMNS
 
     X = preprocesar_datos(df, columnas)
 
@@ -535,9 +539,15 @@ def importar_archivo_csv(
 
 
 # Lista curvas de un archivo.
-def listar_curvas_archivo(id_archivo: int):
+def listar_curvas_archivo(
+    id_archivo: int,
+    id_usuario: int
+):
 
-    curvas = obtener_curvas_archivo(id_archivo)
+    curvas = obtener_curvas_archivo(
+        id_archivo,
+        id_usuario
+    )
 
     if not curvas:
 
@@ -557,9 +567,9 @@ def listar_curvas_archivo(id_archivo: int):
 
 
 # Obtiene detalle completo de una curva.
-def obtener_detalle_curva(id_curva: int):
+def obtener_detalle_curva(id_curva: int, id_usuario: int):
 
-    curva = obtener_curva_por_id(id_curva)
+    curva = obtener_curva_por_id(id_curva, id_usuario)
 
     if curva is None:
 
@@ -568,20 +578,7 @@ def obtener_detalle_curva(id_curva: int):
             detail="La curva no existe."
         )
 
-    try:
-        datos_consumo = json.loads(
-            curva["datos_consumo"]
-        )
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                "No ha sido posible recuperar "
-                "los datos de consumo."
-            )
-        )
+    datos_consumo = curva["datos_consumo"]
 
     return {
         "id_curva": curva["id_curva"],
@@ -593,9 +590,9 @@ def obtener_detalle_curva(id_curva: int):
 
 
 # Predicción histórica de una curva concreta.
-def predecir_curva_historica(id_curva: int):
+def predecir_curva_historica(id_curva: int, id_usuario: int):
 
-    curva = obtener_curva_por_id(id_curva)
+    curva = obtener_curva_por_id(id_curva, id_usuario)
 
     if curva is None:
 
@@ -604,20 +601,7 @@ def predecir_curva_historica(id_curva: int):
             detail="La curva no existe."
         )
 
-    try:
-        datos_consumo = json.loads(
-            curva["datos_consumo"]
-        )
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                "No ha sido posible recuperar "
-                "los datos de consumo."
-            )
-        )
+    datos_consumo = curva["datos_consumo"]
 
     try:
         df = pd.DataFrame([datos_consumo])
@@ -651,6 +635,14 @@ def predecir_curva_historica(id_curva: int):
                 "la predicción histórica."
             )
         )
+    
+    guardar_prediccion(
+        id_curva=id_curva,
+        tipo_modelo="xgboost",
+        tipo_prediccion="historica",
+        resultado_prediccion=int(prediccion),
+        probabilidad_fraude=float(probabilidad)
+    )
 
     return {
         "id_curva": curva["id_curva"],
@@ -667,3 +659,387 @@ def predecir_curva_historica(id_curva: int):
             f"{probabilidad * 100:.2f}%"
         )
     }
+
+
+def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
+
+    curva = obtener_curva_por_id(id_curva, id_usuario)
+
+    if curva is None:
+
+        raise HTTPException(
+            status_code=404,
+            detail="La curva no existe."
+        )
+
+    datos_consumo = curva["datos_consumo"]
+
+    try:
+
+        df = pd.DataFrame([datos_consumo])
+
+        modelo = cargar_pickle(
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
+
+        scaler = ARF_SCALER
+
+        columnas = ARF_COLUMNS
+
+        X = preprocesar_datos(
+            df,
+            columnas
+        )
+
+        X_scaled = scaler.transform(X)
+
+        x_stream = dict(
+            zip(columnas, X_scaled[0])
+        )
+
+        prediccion = modelo.predict_one(
+            x_stream
+        )
+
+        if prediccion is None:
+            prediccion = 0
+
+        probabilidad = (
+            modelo.predict_proba_one(
+                x_stream
+            ).get(1, 0)
+        )
+
+    except Exception:
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "No ha sido posible realizar "
+                "la predicción en tiempo real."
+            )
+        )
+
+    # =========================
+    # GUARDAR EN BD
+    # =========================
+
+    guardar_prediccion(
+        id_curva=id_curva,
+        tipo_modelo="adaptive_random_forest",
+        tipo_prediccion="tiempo_real",
+        resultado_prediccion=int(prediccion),
+        probabilidad_fraude=float(probabilidad)
+    )
+
+    return {
+
+        "id_curva": curva["id_curva"],
+
+        "identificador_curva": (
+            curva["identificador_curva"]
+        ),
+
+        "modelo": "adaptive_random_forest",
+
+        "resultado": (
+            "Fraude"
+            if int(prediccion) == 1
+            else "Normal"
+        ),
+
+        "probabilidad_fraude": (
+            f"{probabilidad * 100:.2f}%"
+        )
+    }
+
+
+def generar_estadisticas_archivo(
+    id_archivo: int,
+    id_usuario: int
+):
+
+    curvas = obtener_curvas_archivo(
+        id_archivo,
+        id_usuario
+    )
+
+    if not curvas:
+
+        raise HTTPException(
+            status_code=404,
+            detail="No existen curvas."
+        )
+
+    total = 0
+    fraudes = 0
+    normales = 0
+
+    probabilidades = []
+
+    consumos_medios = []
+
+    top_curvas = []
+
+    evolucion_consumo = []
+
+    for curva_resumen in curvas:
+
+        curva = obtener_curva_por_id(
+            curva_resumen["id_curva"],
+            id_usuario
+        )
+
+        datos = curva["datos_consumo"]
+
+        if isinstance(datos, str):
+            datos = json.loads(datos)
+
+        valores = [
+
+            v for v in datos.values()
+
+            if isinstance(v, (int, float))
+        ]
+
+        if not valores:
+            continue
+
+        consumo_medio = round(
+            sum(valores) / len(valores),
+            2
+        )
+
+        consumos_medios.append(
+            consumo_medio
+        )
+
+        if not evolucion_consumo:
+
+            evolucion_consumo = [
+                0
+            ] * len(valores)
+
+        for i, valor in enumerate(valores):
+
+            evolucion_consumo[i] += valor
+
+        df = pd.DataFrame([datos])
+
+        resultado = predecir_xgboost(df)[0]
+
+        total += 1
+
+        probabilidad = float(
+
+            resultado[
+                "probabilidad_fraude"
+            ].replace("%", "")
+        )
+
+        probabilidades.append(
+            probabilidad
+        )
+
+        top_curvas.append({
+
+            "curva":
+                curva["identificador_curva"],
+
+            "probabilidad":
+                probabilidad
+        })
+
+        if resultado["resultado"] == "Fraude":
+            fraudes += 1
+        else:
+            normales += 1
+
+    evolucion_consumo = [
+
+        round(v / total, 2)
+
+        for v in evolucion_consumo
+    ]
+
+    top_curvas = sorted(
+
+        top_curvas,
+
+        key=lambda x: x["probabilidad"],
+
+        reverse=True
+
+    )[:10]
+
+    porcentaje_fraudes = round(
+        (fraudes / total) * 100,
+        2
+    )
+
+    porcentaje_normales = round(
+        (normales / total) * 100,
+        2
+    )
+
+    return {
+
+        "id_archivo": id_archivo,
+
+        "total_curvas": total,
+
+        "fraudes": fraudes,
+
+        "normales": normales,
+
+        "porcentaje_fraudes":
+            porcentaje_fraudes,
+
+        "porcentaje_normales":
+            porcentaje_normales,
+
+        "probabilidades":
+            probabilidades,
+
+        "consumos_medios":
+            consumos_medios,
+
+        "top_curvas":
+            top_curvas,
+
+        "evolucion_consumo":
+            evolucion_consumo
+    }
+
+
+def predecir_stream(valores):
+
+    try:
+
+        # =====================================
+        # RECARGAR MODELO EN CADA REQUEST
+        # =====================================
+
+        modelo = cargar_pickle(
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
+
+        scaler = ARF_SCALER
+
+        columnas = ARF_COLUMNS
+
+        # DEBUG
+        print("COLUMNAS:")
+        print(columnas[:10])
+
+        # =====================================
+        # CREAR DATOS STREAM
+        # =====================================
+
+        datos = {}
+
+        # usar solo valores disponibles
+        for i, valor in enumerate(valores):
+
+            if i >= len(columnas):
+                break
+
+            datos[columnas[i]] = float(valor)
+
+        # =====================================
+        # RELLENO PARCIAL
+        # SOLO 5 COLUMNAS EXTRA
+        # =====================================
+
+        if valores:
+
+            ultimo = float(valores[-1])
+
+            inicio = len(valores)
+
+            fin = min(
+                inicio + 5,
+                len(columnas)
+            )
+
+            for i in range(inicio, fin):
+
+                datos[columnas[i]] = ultimo
+
+        # =====================================
+        # DATAFRAME
+        # =====================================
+
+        df = pd.DataFrame([datos])
+
+        # DEBUG
+        print("--------------------------------")
+        print("INPUT DF:")
+        print(df.head())
+        print("--------------------------------")
+
+        # =====================================
+        # PREPROCESAR
+        # =====================================
+
+        X = preprocesar_datos(
+            df,
+            columnas
+        )
+
+        X_scaled = scaler.transform(X)
+
+        x_stream = dict(
+            zip(columnas, X_scaled[0])
+        )
+
+        # DEBUG
+        print("--------------------------------")
+        print("STREAM FEATURES:")
+        print(list(x_stream.items())[:10])
+        print("--------------------------------")
+
+        # =====================================
+        # PREDICCION
+        # =====================================
+
+        prediccion = modelo.predict_one(
+            x_stream
+        )
+
+        if prediccion is None:
+            prediccion = 0
+
+        probabilidades = modelo.predict_proba_one(
+            x_stream
+        )
+
+        probabilidad = probabilidades.get(1, 0)
+
+        # DEBUG
+        print("--------------------------------")
+        print("VALORES:", valores)
+        print("PREDICCION:", prediccion)
+        print("PROBABILIDAD:", probabilidad)
+        print("--------------------------------")
+
+        return {
+
+            "resultado": (
+                "Fraude"
+                if int(prediccion) == 1
+                else "Normal"
+            ),
+
+            "probabilidad_fraude":
+                f"{probabilidad * 100:.2f}%"
+        }
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

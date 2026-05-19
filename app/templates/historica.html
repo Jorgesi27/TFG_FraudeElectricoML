@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Predicción Histórica
+</title>
+
+<link
+    rel="stylesheet"
+    href="/static/css/style.css"
+>
+
+<script>
+
+    const token =
+        localStorage.getItem("token");
+
+    if(!token){
+
+        window.location.href =
+            "/api/operador/login-page";
+    }
+
+</script>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>
+        Fraude Eléctrico
+    </h2>
+
+    <a href="/api/operador/home">
+        Inicio
+    </a>
+
+    <a href="/api/operador/historica">
+        Predicción histórica
+    </a>
+
+    <a href="/api/operador/tiempo-real">
+        Tiempo real
+    </a>
+
+    <a href="/api/operador/estadisticas">
+        Estadísticas
+    </a>
+
+    <button
+        id="btnLogout"
+        class="logout"
+    >
+        Cerrar sesión
+    </button>
+
+</div>
+
+<!-- CONTENIDO -->
+
+<div class="contenido">
+
+    <h1>
+        Predicción histórica
+    </h1>
+
+    <!-- IMPORTAR CSV -->
+
+    <div class="upload-container">
+
+        <input
+            type="file"
+            id="csvFile"
+        >
+
+        <button id="btnImportar">
+
+            Importar archivo
+
+        </button>
+
+        <div
+            id="loaderImportar"
+            style="display:none;"
+        >
+            <div class="loader"></div>
+        </div>
+
+    </div>
+
+    <!-- SELECTORES -->
+
+    <div class="top">
+
+        <select id="archivoSelect">
+
+            <option value="">
+                Seleccionar archivo
+            </option>
+
+        </select>
+
+        <select id="curvaSelect">
+
+            <option value="">
+                Seleccionar curva
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- GRAFICA -->
+
+    <div class="container">
+
+        <div class="chart-box">
+
+            <canvas id="graficaHistorica"></canvas>
+
+        </div>
+
+        <!-- RESULTADO -->
+
+        <div class="result-box">
+
+            <h2>
+                Resultado
+            </h2>
+
+            <div
+                id="resultadoHistorico"
+                class="fraude"
+            >
+                ---
+            </div>
+
+            <h3 id="probabilidadHistorica">
+                ---
+            </h3>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script
+    type="module"
+    src="/static/js/historica.js"
+></script>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Inicio
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+    <script>
+
+        const token =
+            localStorage.getItem("token");
+
+        if(!token){
+
+            window.location.href =
+                "/api/operador/login-page";
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>
+            Fraude Eléctrico
+        </h2>
+
+        <a href="/api/operador/home">
+            Inicio
+        </a>
+
+        <a href="/api/operador/historica">
+            Predicción histórica
+        </a>
+
+        <a href="/api/operador/tiempo-real">
+            Tiempo real
+        </a>
+
+        <a href="/api/operador/estadisticas">
+            Estadísticas
+        </a>
+
+        <button
+            id="btnLogout"
+            class="logout"
+        >
+            Cerrar sesión
+        </button>
+
+    </div>
+
+    <!-- CONTENIDO -->
+
+    <div class="contenido">
+
+        <h1>
+            Sistema de detección de fraude eléctrico
+        </h1>
+
+        <p class="home-texto">
+
+            Plataforma para análisis de curvas
+            de consumo eléctrico mediante modelos de aprendizaje automático
+            orientados a la detección de fraude.
+
+        </p>
+
+        <!-- IMPORTAR CSV -->
+
+        <div class="upload-container">
+
+            <input
+                type="file"
+                id="csvFile"
+            >
+
+            <button id="btnImportar">
+
+                Importar archivo CSV
+
+            </button>
+
+        </div>
+
+        <!-- TARJETAS -->
+
+        <div class="cards-home">
+
+            <!-- CARD -->
+
+            <div class="card-home">
+
+                <h3>
+                    Modelo histórico
+                </h3>
+
+                <div class="card-value">
+
+                    XGBoost
+
+                </div>
+
+            </div>
+
+            <!-- CARD -->
+
+            <div class="card-home">
+
+                <h3>
+                    Modelo online
+                </h3>
+
+                <div class="card-value">
+
+                    Adaptive Random Forest
+
+                </div>
+
+            </div>
+
+            <!-- CARD -->
+
+            <div class="card-home">
+
+                <h3>
+                    Estado API
+                </h3>
+
+                <div class="card-value blue">
+
+                    ACTIVA
+
+                </div>
+
+            </div>
+
+            <!-- CARD -->
+
+            <div class="card-home">
+
+                <h3>
+                    Sistema
+                </h3>
+
+                <div class="card-value blue small">
+
+                    Detección de fraude eléctrico
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import {
+    fetchAuth,
+    obtenerData
+} from "/static/js/api.js";
+
+import {
+    logout
+} from "/static/js/auth.js";
+
+import {
+    mostrarError
+} from "/static/js/ui.js";
+
+
+// ========================================
+// IMPORTAR CSV
+// ========================================
+
+async function importarArchivo(){
+
+    const input =
+        document.getElementById("csvFile");
+
+    if(!input.files.length){
+
+        alert("Seleccione un archivo CSV");
+
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+        "archivo",
+        input.files[0]
+    );
+
+    try{
+
+        const response = await fetchAuth(
+
+            "/api/operador/importar-csv",
+
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+        if(!response){
+            return;
+        }
+
+        await obtenerData(response);
+
+        alert(
+            "Archivo importado correctamente"
+        );
+
+        input.value = "";
+
+    }catch(error){
+
+        mostrarError(
+            "Error importando archivo",
+            error
+        );
+    }
+}
+
+
+// ========================================
+// EVENTOS
+// ========================================
+
+document
+    .getElementById("btnImportar")
+    .addEventListener(
+        "click",
+        importarArchivo
+    );
+
+document
+    .getElementById("btnLogout")
+    .addEventListener(
+        "click",
+        logout
+    );
+
+</script>
+
+</body>
+</html>

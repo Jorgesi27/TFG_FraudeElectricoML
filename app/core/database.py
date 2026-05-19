@@ -120,7 +120,10 @@ def guardar_curva(
     
 
 # Recupera todas las curvas asociadas a un archivo importado.
-def obtener_curvas_archivo(id_archivo: int):
+def obtener_curvas_archivo(
+    id_archivo,
+    id_usuario
+):
     try:
         conexion = obtener_conexion()
 
@@ -128,15 +131,22 @@ def obtener_curvas_archivo(id_archivo: int):
             with conexion.cursor() as cursor:
 
                 sql = """
-                    SELECT
-                        id_curva,
-                        identificador_curva
-                    FROM curvas_consumo
-                    WHERE id_archivo = %s
-                    ORDER BY id_curva ASC
+                    SELECT c.*
+                    FROM curvas_consumo c
+                    JOIN archivos_consumo a
+                        ON c.id_archivo = a.id_archivo
+                    WHERE c.id_archivo = %s
+                    AND a.id_usuario = %s
                 """
 
-                cursor.execute(sql, (id_archivo,))
+                cursor.execute(
+                    sql,
+                    (
+                        id_archivo,
+                        id_usuario
+                    )
+                )
+
                 curvas = cursor.fetchall()
 
         return curvas
@@ -144,13 +154,21 @@ def obtener_curvas_archivo(id_archivo: int):
     except Exception:
         raise HTTPException(
             status_code=500,
-            detail="No ha sido posible recuperar las curvas del archivo."
+            detail=(
+                "No ha sido posible recuperar "
+                "las curvas del archivo."
+            )
         )
     
 
 # Recupera una curva de consumo concreta mediante su identificador.
-def obtener_curva_por_id(id_curva: int):
+# Recupera una curva concreta
+def obtener_curva_por_id(
+    id_curva: int,
+    id_usuario: int
+):
     try:
+
         conexion = obtener_conexion()
 
         with conexion:
@@ -158,23 +176,54 @@ def obtener_curva_por_id(id_curva: int):
 
                 sql = """
                     SELECT
-                        id_curva,
-                        identificador_curva,
-                        datos_consumo
-                    FROM curvas_consumo
-                    WHERE id_curva = %s
+                        c.id_curva,
+                        c.identificador_curva,
+                        c.datos_consumo
+                    FROM curvas_consumo c
+                    JOIN archivos_consumo a
+                        ON c.id_archivo = a.id_archivo
+                    WHERE c.id_curva = %s
+                    AND a.id_usuario = %s
                     LIMIT 1
                 """
 
-                cursor.execute(sql, (id_curva,))
+                cursor.execute(
+                    sql,
+                    (
+                        id_curva,
+                        id_usuario
+                    )
+                )
+
                 curva = cursor.fetchone()
+
+        if curva is None:
+            return None
+
+        datos = curva["datos_consumo"]
+
+        # SI ES BYTES
+        if isinstance(datos, bytes):
+            datos = datos.decode("utf-8")
+
+        # SI ES STRING JSON
+        if isinstance(datos, str):
+            datos = json.loads(datos)
+
+        curva["datos_consumo"] = datos
 
         return curva
 
-    except Exception:
+    except Exception as e:
+
+        print("ERROR CURVA:", e)
+
         raise HTTPException(
             status_code=500,
-            detail="No ha sido posible recuperar la curva de consumo."
+            detail=(
+                "No ha sido posible recuperar "
+                "la curva de consumo."
+            )
         )
         
 
@@ -222,8 +271,57 @@ def obtener_datos_curva(id_curva):
             if curva is None:
                 return None
 
-            curva["datos_consumo"] = json.loads(
-                curva["datos_consumo"]
-            )
+            datos = curva["datos_consumo"]
+
+            # SI ES BYTES
+            if isinstance(datos, bytes):
+                datos = datos.decode("utf-8")
+
+            # SI ES STRING JSON
+            if isinstance(datos, str):
+                datos = json.loads(datos)
+
+            curva["datos_consumo"] = datos
 
             return curva
+        
+
+def guardar_prediccion(
+    id_curva,
+    tipo_modelo,
+    tipo_prediccion,
+    resultado_prediccion,
+    probabilidad_fraude
+):
+
+    conexion = obtener_conexion()
+
+    cursor = conexion.cursor()
+
+    query = """
+        INSERT INTO predicciones (
+            id_curva,
+            tipo_modelo,
+            tipo_prediccion,
+            resultado_prediccion,
+            probabilidad_fraude
+        )
+        VALUES (%s, %s, %s, %s, %s)
+    """
+
+    cursor.execute(
+        query,
+        (
+            id_curva,
+            tipo_modelo,
+            tipo_prediccion,
+            resultado_prediccion,
+            probabilidad_fraude
+        )
+    )
+
+    conexion.commit()
+
+    cursor.close()
+
+    conexion.close()

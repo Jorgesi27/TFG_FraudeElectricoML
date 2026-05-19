@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <style>
+
+        body{
+            margin:0;
+            height:100vh;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            background:#0f172a;
+            font-family:Arial;
+        }
+
+        .login-box{
+
+            width:350px;
+
+            background:#1e293b;
+
+            padding:40px;
+
+            border-radius:15px;
+
+            box-shadow:0 0 20px rgba(0,0,0,0.3);
+        }
+
+        h1{
+            color:white;
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        input{
+
+            width:100%;
+            padding:12px;
+
+            margin-bottom:20px;
+
+            border:none;
+            border-radius:10px;
+
+            background:#334155;
+            color:white;
+
+            font-size:15px;
+        }
+
+        button{
+
+            width:100%;
+            padding:12px;
+
+            border:none;
+            border-radius:10px;
+
+            background:#93c5fd;
+            color:#0f172a;
+
+            font-size:16px;
+
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#bfdbfe;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+    <h1>Iniciar sesión</h1>
+
+    <input
+        type="text"
+        id="usuario"
+        placeholder="Usuario"
+        autocomplete="username"
+    >
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Contraseña"
+        autocomplete="current-password"
+    >
+
+    <button id="btnLogin">
+        Entrar
+    </button>
+
+</div>
+
+<script>
+
+async function login(){
+
+    const usuario =
+        document.getElementById("usuario").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    const formData = new FormData();
+
+    formData.append("usuario", usuario);
+
+    formData.append("password", password);
+
+    try{
+
+        const response = await fetch(
+            "/api/operador/login",
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+
+            alert(data.detail);
+
+            return;
+        }
+
+        localStorage.setItem(
+            "token",
+            data.access_token
+        );
+
+        localStorage.setItem(
+            "usuario",
+            data.usuario
+        );
+
+        window.location.href =
+            "/api/operador/home";
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Error iniciando sesión");
+    }
+}
+
+
+// ========================================
+// EVENTO BOTON LOGIN
+// ========================================
+
+document
+    .getElementById("btnLogin")
+    .addEventListener(
+        "click",
+        login
+    );
+
+</script>
+
+</body>
+</html>
