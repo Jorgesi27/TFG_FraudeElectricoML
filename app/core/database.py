@@ -1,13 +1,16 @@
 import json
 import pymysql
+import os
+from dotenv import load_dotenv
 from fastapi import HTTPException
 
+load_dotenv()
 
 DB_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "tfg_fraudeElectrico",
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME"),
     "cursorclass": pymysql.cursors.DictCursor
 }
 
@@ -248,44 +251,6 @@ def obtener_archivos_usuario(id_usuario):
             return cursor.fetchall()
         
 
-def obtener_datos_curva(id_curva):
-
-    conexion = obtener_conexion()
-
-    with conexion:
-        with conexion.cursor() as cursor:
-
-            sql = """
-                SELECT
-                    identificador_curva,
-                    datos_consumo
-                FROM curvas_consumo
-                WHERE id_curva = %s
-                LIMIT 1
-            """
-
-            cursor.execute(sql, (id_curva,))
-
-            curva = cursor.fetchone()
-
-            if curva is None:
-                return None
-
-            datos = curva["datos_consumo"]
-
-            # SI ES BYTES
-            if isinstance(datos, bytes):
-                datos = datos.decode("utf-8")
-
-            # SI ES STRING JSON
-            if isinstance(datos, str):
-                datos = json.loads(datos)
-
-            curva["datos_consumo"] = datos
-
-            return curva
-        
-
 def guardar_prediccion(
     id_curva,
     tipo_modelo,
@@ -325,3 +290,129 @@ def guardar_prediccion(
     cursor.close()
 
     conexion.close()
+
+
+# ========================================
+# GUARDAR ESTADISTICAS
+# ========================================
+
+def guardar_estadisticas_archivo(
+    id_archivo: int,
+    estadisticas: dict
+):
+
+    conexion = obtener_conexion()
+
+    with conexion:
+        with conexion.cursor() as cursor:
+
+            sql = """
+                UPDATE archivos_consumo
+                SET estadisticas_json = %s
+                WHERE id_archivo = %s
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    json.dumps(estadisticas),
+                    id_archivo
+                )
+            )
+
+            conexion.commit()
+
+
+# ========================================
+# OBTENER ESTADISTICAS
+# ========================================
+
+def obtener_estadisticas_archivo(
+    id_archivo: int,
+    id_usuario: int
+):
+
+    conexion = obtener_conexion()
+
+    with conexion:
+        with conexion.cursor() as cursor:
+
+            sql = """
+                SELECT estadisticas_json
+                FROM archivos_consumo
+                WHERE id_archivo = %s
+                AND id_usuario = %s
+                LIMIT 1
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    id_archivo,
+                    id_usuario
+                )
+            )
+
+            resultado = cursor.fetchone()
+
+    if not resultado:
+        return None
+
+    estadisticas = resultado["estadisticas_json"]
+
+    if not estadisticas:
+        return None
+
+    if isinstance(estadisticas, bytes):
+        estadisticas = estadisticas.decode("utf-8")
+
+    if isinstance(estadisticas, str):
+        estadisticas = json.loads(estadisticas)
+
+    return estadisticas
+
+
+# Recupera estadísticas precalculadas
+def obtener_estadisticas_archivo_bd(
+    id_archivo: int,
+    id_usuario: int
+):
+
+    conexion = obtener_conexion()
+
+    with conexion:
+        with conexion.cursor() as cursor:
+
+            sql = """
+                SELECT estadisticas_json
+                FROM archivos_consumo
+                WHERE id_archivo = %s
+                AND id_usuario = %s
+                LIMIT 1
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    id_archivo,
+                    id_usuario
+                )
+            )
+
+            resultado = cursor.fetchone()
+
+    if not resultado:
+        return None
+
+    estadisticas = resultado["estadisticas_json"]
+
+    if estadisticas is None:
+        return None
+
+    if isinstance(estadisticas, bytes):
+        estadisticas = estadisticas.decode("utf-8")
+
+    if isinstance(estadisticas, str):
+        estadisticas = json.loads(estadisticas)
+
+    return estadisticas

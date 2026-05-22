@@ -14,7 +14,9 @@ from app.core.database import (
     guardar_curva,
     obtener_curvas_archivo,
     obtener_curva_por_id,
-    guardar_prediccion
+    guardar_prediccion,
+    guardar_estadisticas_archivo,
+    obtener_estadisticas_archivo
 )
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -198,6 +200,9 @@ def formatear_prediccion(
             if pred_int == 1
             else "Normal"
         ),
+
+        "probabilidad": float(probabilidad) * 100,
+
         "probabilidad_fraude": (
             f"{float(probabilidad) * 100:.2f}%"
         )
@@ -248,68 +253,6 @@ def predecir_xgboost(df: pd.DataFrame):
     ]
 
 
-# Predicción online con Adaptive Random Forest.
-def predecir_arf(df: pd.DataFrame):
-
-    modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
-
-    scaler = ARF_SCALER
-
-    columnas = ARF_COLUMNS
-
-    X = preprocesar_datos(df, columnas)
-
-    try:
-        X_scaled = scaler.transform(X)
-
-        X_stream = [
-            dict(zip(columnas, row))
-            for row in X_scaled
-        ]
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Error durante el flujo online."
-        )
-
-    resultados = []
-
-    try:
-        for i, x in enumerate(X_stream):
-
-            pred = modelo.predict_one(x)
-
-            if pred is None:
-                pred = 0
-
-            prob = modelo.predict_proba_one(x).get(1, 0)
-
-            resultados.append(
-                formatear_prediccion(
-                    i,
-                    pred,
-                    prob
-                )
-            )
-
-        return resultados
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                "No ha sido posible completar "
-                "la simulación online."
-            )
-        )
-
-
 # Resumen agregado de predicciones.
 def resumen_predicciones(predicciones):
 
@@ -326,165 +269,6 @@ def resumen_predicciones(predicciones):
         "fraudes_detectados": fraudes,
         "consumos_normales": total - fraudes
     }
-
-
-# Predicción histórica desde CSV.
-def realizar_prediccion_historica_desde_csv(
-    contenido: bytes,
-    nombre_archivo: str,
-):
-
-    df = leer_csv_subido(contenido)
-
-    predicciones = predecir_xgboost(df)
-
-    resultado = {
-        "mensaje": (
-            "Predicción histórica de fraude "
-            "realizada correctamente."
-        ),
-        "tipo_prediccion": "historica",
-        "archivo_importado": nombre_archivo,
-        "modelo_utilizado": {
-            "categoria": "offline",
-            "nombre": "xgboost"
-        },
-        "procesamiento": {
-            "total_registros_procesados": len(predicciones)
-        },
-        "resumen": resumen_predicciones(predicciones),
-        "predicciones": predicciones
-    }
-
-    return limpiar_para_json(resultado)
-
-
-# Predicción en tiempo real desde CSV.
-async def realizar_prediccion_tiempo_real_desde_csv(
-    contenido: bytes,
-    nombre_archivo: str,
-    intervalo_segundos: float = 0.1
-):
-
-    df = leer_csv_subido(contenido)
-
-    modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
-
-    scaler = ARF_SCALER
-
-    columnas = ARF_COLUMNS
-
-    X = preprocesar_datos(df, columnas)
-
-    try:
-        X_scaled = scaler.transform(X)
-
-        X_stream = [
-            dict(zip(columnas, row))
-            for row in X_scaled
-        ]
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Error durante la preparación del flujo online."
-        )
-
-    cola = asyncio.Queue()
-
-    resultados = []
-
-    async def productor():
-
-        for indice, curva in enumerate(X_stream):
-
-            await cola.put((indice, curva))
-
-            await asyncio.sleep(intervalo_segundos)
-
-        await cola.put(None)
-
-    async def consumidor():
-
-        while True:
-
-            item = await cola.get()
-
-            if item is None:
-                break
-
-            indice, curva = item
-
-            try:
-                pred = modelo.predict_one(curva)
-
-                if pred is None:
-                    pred = 0
-
-                prob = modelo.predict_proba_one(curva).get(1, 0)
-
-                resultados.append(
-                    formatear_prediccion(
-                        indice,
-                        pred,
-                        prob
-                    )
-                )
-
-            except Exception:
-
-                raise HTTPException(
-                    status_code=500,
-                    detail=(
-                        "No ha sido posible clasificar "
-                        "una curva del flujo online."
-                    )
-                )
-
-    try:
-        await asyncio.gather(
-            productor(),
-            consumidor()
-        )
-
-    except HTTPException:
-        raise
-
-    except Exception:
-
-        raise HTTPException(
-            status_code=500,
-            detail=(
-                "No ha sido posible completar "
-                "la simulación en tiempo real."
-            )
-        )
-
-    resultado = {
-        "mensaje": (
-            "Predicción de fraude en tiempo real "
-            "realizada correctamente."
-        ),
-        "tipo_prediccion": "tiempo_real",
-        "archivo_importado": nombre_archivo,
-        "modelo_utilizado": {
-            "categoria": "online",
-            "nombre": "adaptive_random_forest"
-        },
-        "configuracion_flujo": {
-            "tecnologia_cola": "asyncio.Queue",
-            "intervalo_segundos": intervalo_segundos,
-            "registros_procesados": len(resultados)
-        },
-        "resumen": resumen_predicciones(resultados),
-        "predicciones": resultados
-    }
-
-    return limpiar_para_json(resultado)
 
 
 # Importa un archivo CSV y almacena sus curvas.
@@ -504,13 +288,30 @@ def importar_archivo_csv(
     total_curvas = 0
 
     try:
+
+        columna_tiempo = detectar_columna_temporal(df)
+
         for indice, fila in df.iterrows():
 
-            identificador_curva = (
-                f"CURVA_{indice + 1}"
-            )
+            identificador_curva = f"CURVA_{indice + 1}"
 
-            datos_consumo = fila.to_dict()
+            fila_dict = fila.to_dict()
+
+            timestamps = []
+            values = []
+
+            for columna, valor in fila_dict.items():
+
+                if columna == columna_tiempo:
+                    continue
+
+                timestamps.append(columna)
+                values.append(valor)
+
+            datos_consumo = {
+                "timestamps": timestamps,
+                "values": values
+            }
 
             guardar_curva(
                 id_archivo=id_archivo,
@@ -520,7 +321,13 @@ def importar_archivo_csv(
 
             total_curvas += 1
 
-    except Exception:
+        # ========================================
+        # GENERAR ESTADISTICAS AL IMPORTAR
+        # ========================================
+
+    except Exception as e:
+
+        print("ERROR IMPORTACION:", e)
 
         raise HTTPException(
             status_code=500,
@@ -530,11 +337,29 @@ def importar_archivo_csv(
             )
         )
 
+    estadisticas = generar_estadisticas_archivo(
+        id_archivo,
+        id_usuario
+    )
+
+    guardar_estadisticas_archivo(
+        id_archivo,
+        estadisticas
+    )
+
     return {
-        "mensaje": "Archivo importado correctamente.",
-        "id_archivo": id_archivo,
-        "nombre_archivo": nombre_archivo,
-        "total_curvas": total_curvas
+
+        "mensaje":
+            "Archivo importado correctamente.",
+
+        "id_archivo":
+            id_archivo,
+
+        "nombre_archivo":
+            nombre_archivo,
+
+        "total_curvas":
+            total_curvas
     }
 
 
@@ -580,12 +405,45 @@ def obtener_detalle_curva(id_curva: int, id_usuario: int):
 
     datos_consumo = curva["datos_consumo"]
 
+    # ====================================
+    # SOPORTAR STRING JSON
+    # ====================================
+
+    if isinstance(datos_consumo, str):
+        datos_consumo = json.loads(datos_consumo)
+
+    # ====================================
+    # OBTENER LABELS Y VALORES
+    # ====================================
+
+    labels = datos_consumo.get("timestamps")
+
+    if labels is None:
+        labels = datos_consumo.get("labels", [])
+
+    valores = datos_consumo.get("values")
+
+    if valores is None:
+        valores = datos_consumo.get("valores", [])
+
     return {
-        "id_curva": curva["id_curva"],
-        "identificador_curva": (
-            curva["identificador_curva"]
-        ),
-        "datos_consumo": datos_consumo
+
+        "id_curva":
+            curva["id_curva"],
+
+        "identificador_curva":
+            curva["identificador_curva"],
+
+        "labels":
+            labels,
+
+        "valores":
+            valores,
+
+        "datos_consumo": {
+            "timestamps": labels,
+            "values": valores
+        }
     }
 
 
@@ -604,29 +462,27 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
     datos_consumo = curva["datos_consumo"]
 
     try:
-        df = pd.DataFrame([datos_consumo])
 
-        modelo = cargar_pickle(
-            XGBOOST_MODEL_PATH,
-            "modelo XGBoost"
-        )
+        datos_modelo = {}
 
-        columnas = cargar_pickle(
-            XGBOOST_COLUMNS_PATH,
-            "columnas XGBoost"
-        )
+        for t, v in zip(
+            datos_consumo["timestamps"],
+            datos_consumo["values"]
+        ):
 
-        X = preprocesar_datos(
-            df,
-            columnas,
-            limpiar_nombres=True
-        )
+            try:
+                datos_modelo[str(t)] = float(v)
 
-        prediccion = modelo.predict(X)[0]
+            except:
+                datos_modelo[str(t)] = 0.0
 
-        probabilidad = modelo.predict_proba(X)[0][1]
+        df = pd.DataFrame([datos_modelo])
 
-    except Exception:
+        resultado = predecir_xgboost(df)[0]
+
+    except Exception as e:
+
+        print("ERROR HISTORICA:", e)
 
         raise HTTPException(
             status_code=500,
@@ -635,35 +491,48 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
                 "la predicción histórica."
             )
         )
-    
+
     guardar_prediccion(
         id_curva=id_curva,
         tipo_modelo="xgboost",
         tipo_prediccion="historica",
-        resultado_prediccion=int(prediccion),
-        probabilidad_fraude=float(probabilidad)
+        resultado_prediccion=(
+            1 if resultado["resultado"] == "Fraude"
+            else 0
+        ),
+        probabilidad_fraude=(
+            resultado["probabilidad"] / 100
+        )
     )
 
     return {
-        "id_curva": curva["id_curva"],
-        "identificador_curva": (
-            curva["identificador_curva"]
-        ),
-        "modelo": "xgboost",
-        "resultado": (
-            "Fraude"
-            if int(prediccion) == 1
-            else "Normal"
-        ),
-        "probabilidad_fraude": (
-            f"{probabilidad * 100:.2f}%"
-        )
+
+        "id_curva":
+            curva["id_curva"],
+
+        "identificador_curva":
+            curva["identificador_curva"],
+
+        "modelo":
+            "xgboost",
+
+        "resultado":
+            resultado["resultado"],
+
+        "probabilidad_fraude":
+            resultado["probabilidad_fraude"]
     }
 
 
-def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
+def predecir_curva_tiempo_real(
+    id_curva: int,
+    id_usuario: int
+):
 
-    curva = obtener_curva_por_id(id_curva, id_usuario)
+    curva = obtener_curva_por_id(
+        id_curva,
+        id_usuario
+    )
 
     if curva is None:
 
@@ -676,7 +545,61 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
 
     try:
 
-        df = pd.DataFrame([datos_consumo])
+        # ====================================
+        # SOPORTAR JSON STRING
+        # ====================================
+
+        if isinstance(datos_consumo, str):
+            datos_consumo = json.loads(
+                datos_consumo
+            )
+
+        # ====================================
+        # COMPATIBILIDAD FORMATOS
+        # ====================================
+
+        timestamps = (
+            datos_consumo.get("timestamps")
+            or datos_consumo.get("labels")
+        )
+
+        values = (
+            datos_consumo.get("values")
+            or datos_consumo.get("valores")
+        )
+
+        if not timestamps or not values:
+
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "La curva no contiene "
+                    "datos válidos."
+                )
+            )
+
+        # ====================================
+        # CREAR DATAFRAME
+        # ====================================
+
+        datos_modelo = {}
+
+        for t, v in zip(
+            datos_consumo["timestamps"],
+            datos_consumo["values"]
+        ):
+
+            try:
+                datos_modelo[str(t)] = float(v)
+
+            except:
+                datos_modelo[str(t)] = 0.0
+
+        df = pd.DataFrame([datos_modelo])
+
+        # ====================================
+        # CARGAR MODELO
+        # ====================================
 
         modelo = cargar_pickle(
             ARF_MODEL_PATH,
@@ -686,6 +609,10 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
         scaler = ARF_SCALER
 
         columnas = ARF_COLUMNS
+
+        # ====================================
+        # PREPROCESAR
+        # ====================================
 
         X = preprocesar_datos(
             df,
@@ -697,6 +624,10 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
         x_stream = dict(
             zip(columnas, X_scaled[0])
         )
+
+        # ====================================
+        # PREDICCION
+        # ====================================
 
         prediccion = modelo.predict_one(
             x_stream
@@ -711,7 +642,12 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
             ).get(1, 0)
         )
 
-    except Exception:
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        print("ERROR TIEMPO REAL:", e)
 
         raise HTTPException(
             status_code=500,
@@ -721,9 +657,9 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
             )
         )
 
-    # =========================
+    # ====================================
     # GUARDAR EN BD
-    # =========================
+    # ====================================
 
     guardar_prediccion(
         id_curva=id_curva,
@@ -735,13 +671,14 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
 
     return {
 
-        "id_curva": curva["id_curva"],
+        "id_curva":
+            curva["id_curva"],
 
-        "identificador_curva": (
-            curva["identificador_curva"]
-        ),
+        "identificador_curva":
+            curva["identificador_curva"],
 
-        "modelo": "adaptive_random_forest",
+        "modelo":
+            "adaptive_random_forest",
 
         "resultado": (
             "Fraude"
@@ -749,9 +686,8 @@ def predecir_curva_tiempo_real(id_curva: int, id_usuario: int):
             else "Normal"
         ),
 
-        "probabilidad_fraude": (
+        "probabilidad_fraude":
             f"{probabilidad * 100:.2f}%"
-        )
     }
 
 
@@ -759,6 +695,18 @@ def generar_estadisticas_archivo(
     id_archivo: int,
     id_usuario: int
 ):
+    
+    # ========================================
+    # CACHE BD
+    # ========================================
+
+    estadisticas_guardadas = obtener_estadisticas_archivo(
+        id_archivo,
+        id_usuario
+    )
+
+    if estadisticas_guardadas:
+        return estadisticas_guardadas
 
     curvas = obtener_curvas_archivo(
         id_archivo,
@@ -780,9 +728,7 @@ def generar_estadisticas_archivo(
 
     consumos_medios = []
 
-    top_curvas = []
-
-    evolucion_consumo = []
+    curvas_estadisticas = []
 
     for curva_resumen in curvas:
 
@@ -796,18 +742,27 @@ def generar_estadisticas_archivo(
         if isinstance(datos, str):
             datos = json.loads(datos)
 
-        valores = [
-
-            v for v in datos.values()
-
-            if isinstance(v, (int, float))
-        ]
+        valores = datos.get("values", [])
 
         if not valores:
             continue
 
+        # convertir a float y eliminar inválidos
+        valores_numericos = []
+
+        for v in valores:
+
+            try:
+                valores_numericos.append(float(v))
+
+            except (ValueError, TypeError):
+                continue
+
+        if not valores_numericos:
+            continue
+
         consumo_medio = round(
-            sum(valores) / len(valores),
+            sum(valores_numericos) / len(valores_numericos),
             2
         )
 
@@ -815,37 +770,32 @@ def generar_estadisticas_archivo(
             consumo_medio
         )
 
-        if not evolucion_consumo:
+        datos_modelo = dict(
+            zip(
+                datos["timestamps"],
+                valores_numericos
+            )
+        )
 
-            evolucion_consumo = [
-                0
-            ] * len(valores)
-
-        for i, valor in enumerate(valores):
-
-            evolucion_consumo[i] += valor
-
-        df = pd.DataFrame([datos])
+        df = pd.DataFrame([datos_modelo])
 
         resultado = predecir_xgboost(df)[0]
 
         total += 1
 
-        probabilidad = float(
-
-            resultado[
-                "probabilidad_fraude"
-            ].replace("%", "")
-        )
+        probabilidad = resultado["probabilidad"]
 
         probabilidades.append(
             probabilidad
         )
 
-        top_curvas.append({
+        curvas_estadisticas.append({
 
             "curva":
                 curva["identificador_curva"],
+
+            "consumo":
+                consumo_medio,
 
             "probabilidad":
                 probabilidad
@@ -856,16 +806,27 @@ def generar_estadisticas_archivo(
         else:
             normales += 1
 
-    evolucion_consumo = [
+    # ====================================
+    # TOP CONSUMOS
+    # ====================================
 
-        round(v / total, 2)
+    top_consumos = sorted(
 
-        for v in evolucion_consumo
-    ]
+        curvas_estadisticas,
 
-    top_curvas = sorted(
+        key=lambda x: x["consumo"],
 
-        top_curvas,
+        reverse=True
+
+    )[:10]
+
+    # ====================================
+    # TOP RIESGO
+    # ====================================
+
+    top_riesgo = sorted(
+
+        curvas_estadisticas,
 
         key=lambda x: x["probabilidad"],
 
@@ -883,7 +844,7 @@ def generar_estadisticas_archivo(
         2
     )
 
-    return {
+    estadisticas = {
 
         "id_archivo": id_archivo,
 
@@ -905,12 +866,19 @@ def generar_estadisticas_archivo(
         "consumos_medios":
             consumos_medios,
 
-        "top_curvas":
-            top_curvas,
+        "top_consumos":
+            top_consumos,
 
-        "evolucion_consumo":
-            evolucion_consumo
+        "top_riesgo":
+            top_riesgo
     }
+
+    guardar_estadisticas_archivo(
+        id_archivo,
+        estadisticas
+    )
+
+    return estadisticas
 
 
 def predecir_stream(valores):
@@ -1043,3 +1011,22 @@ def predecir_stream(valores):
             status_code=500,
             detail=str(e)
         )
+    
+
+def detectar_columna_temporal(df):
+
+    posibles = [
+        "timestamp",
+        "datetime",
+        "date",
+        "fecha",
+        "time",
+        "hora"
+    ]
+
+    for col in df.columns:
+
+        if col.lower() in posibles:
+            return col
+
+    return None

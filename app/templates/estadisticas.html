@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
 
     <title>
-        Estadísticas
+        Inicio
     </title>
 
     <link
@@ -28,7 +28,7 @@
             Fraude Eléctrico
         </h2>
 
-        <a href="/api/operador/home">
+        <a href="/api/operador/estadisticas">
             Inicio
         </a>
 
@@ -37,11 +37,7 @@
         </a>
 
         <a href="/api/operador/tiempo-real">
-            Tiempo real
-        </a>
-
-        <a href="/api/operador/estadisticas">
-            Estadísticas
+            Predicción tiempo real
         </a>
 
         <button
@@ -61,6 +57,39 @@
             Dashboard de estadísticas
         </h1>
 
+        <p class="home-texto">
+
+            Panel principal del sistema para la
+            importación de curvas de consumo y
+            visualización de estadísticas de fraude.
+
+        </p>
+
+        <!-- IMPORTAR CSV -->
+
+        <div class="upload-container">
+
+            <input
+                type="file"
+                id="csvFile"
+            >
+
+            <button id="btnImportar">
+
+                Importar archivo CSV
+
+            </button>
+
+            <div
+                id="loaderImportar"
+                class="loader-dashboard hidden"
+            >
+                <div class="spinner"></div>
+                <span>Importando archivo...</span>
+            </div>
+
+        </div>
+
         <div class="top">
 
             <select id="archivoSelect">
@@ -71,11 +100,13 @@
 
             </select>
 
-            <button id="btnCargarEstadisticas">
-
-                Generar dashboard
-
-            </button>
+            <div
+                id="loaderDashboard"
+                class="loader-dashboard hidden"
+            >
+                <div class="spinner"></div>
+                <span>Cargando gráficas...</span>
+            </div>
 
         </div>
 
@@ -166,7 +197,7 @@
             <div class="chart-card">
 
                 <h3>
-                    Evolución temporal
+                    Top curvas con mayor riesgo
                 </h3>
 
                 <canvas id="graficaLineal"></canvas>
@@ -176,7 +207,7 @@
             <div class="chart-card">
 
                 <h3>
-                    Radar de riesgo
+                    Histograma probabilidades fraude
                 </h3>
 
                 <canvas id="graficaRadar"></canvas>

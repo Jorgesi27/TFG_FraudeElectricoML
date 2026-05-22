@@ -228,13 +228,22 @@ async function iniciarStreaming(){
         // EXTRAER VALORES
         // =========================
 
-        const valores = Object.entries(
-            curva.datos_consumo
-        )
-        .filter(([_, valor]) =>
-            typeof valor === "number"
-        )
-        .map(([_, valor]) => valor);
+        const datos =
+            curva.datos_consumo || {};
+
+        const valores =
+            datos.values ||
+            curva.valores ||
+            [];
+
+        if(!valores.length){
+
+            mostrarError(
+                "La curva no contiene valores"
+            );
+
+            return;
+        }
 
         // =========================
         // RESETEAR GRAFICA
@@ -267,99 +276,73 @@ async function iniciarStreaming(){
 
         let indice = 0;
 
-        intervaloStream = setInterval(
+        intervaloStream = setInterval(async () => {
 
-            async () => {
+            // FIN STREAM
+            if(indice >= valores.length){
 
-                // =========================
-                // FIN STREAM
-                // =========================
+                clearInterval(intervaloStream);
 
-                if(indice >= valores.length){
+                intervaloStream = null;
 
-                    clearInterval(
-                        intervaloStream
-                    );
+                return;
+            }
 
-                    return;
-                }
+            try{
 
-                // =========================
                 // NUEVO PUNTO
-                // =========================
-
                 puntosConsumo.push(
                     valores[indice]
                 );
 
-                const fecha = new Date(
-
-                    2024,
-                    0,
-                    1,
-                    0,
-                    indice
-                );
+                const minutos =
+                    String(indice).padStart(2, "0");
 
                 labelsTiempo.push(
-
-                    fecha.toLocaleTimeString(
-                        "es-ES",
-                        {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }
-                    )
+                    `00:${minutos}`
                 );
 
-                // =========================
-                // ACTUALIZAR GRAFICA
-                // =========================
-
+                // ACTUALIZAR
                 chartTiempoReal.update();
 
-                // =========================
                 // DATOS PARCIALES
-                // =========================
-
                 const datosParciales =
+                    valores
+                        .slice(0, indice + 1)
+                        .filter(
+                            v =>
+                                v !== undefined &&
+                                v !== null &&
+                                !isNaN(v)
+                        );
 
-                    valores.slice(
-                        0,
-                        indice + 1
-                    );
+                // EVITAR REQUEST VACIO
+                if(!datosParciales.length){
 
-                // =========================
-                // LLAMAR AL MODELO REAL
-                // =========================
+                    indice++;
 
+                    return;
+                }
+
+                // PREDICCION
                 const predResponse =
                     await fetchAuth(
-
                         "/api/operador/prediccion/stream",
-
                         {
                             method: "POST",
 
                             headers: {
-
                                 "Content-Type":
                                     "application/json"
                             },
 
                             body: JSON.stringify({
-
-                                valores:
-                                    datosParciales
+                                valores: datosParciales
                             })
                         }
                     );
 
-                // =========================
-                // ACTUALIZAR RESULTADO
-                // =========================
-
-                if(predResponse){
+                if(predResponse && predResponse.ok){
 
                     const prediccion =
                         await obtenerData(
@@ -367,21 +350,28 @@ async function iniciarStreaming(){
                         );
 
                     mostrarResultado(
-
                         resultadoTiempoReal,
-
                         probabilidadTiempoReal,
-
                         prediccion
                     );
                 }
 
+                // AUMENTAR INDICE
                 indice++;
 
-            },
+            }catch(error){
 
-            3000
-        );
+                clearInterval(intervaloStream);
+
+                intervaloStream = null;
+
+                mostrarError(
+                    "Error en streaming",
+                    error
+                );
+            }
+
+        }, 3000);
 
     }catch(error){
 

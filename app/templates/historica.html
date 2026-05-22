@@ -42,7 +42,7 @@
         Fraude Eléctrico
     </h2>
 
-    <a href="/api/operador/home">
+    <a href="/api/operador/estadisticas">
         Inicio
     </a>
 
@@ -51,11 +51,7 @@
     </a>
 
     <a href="/api/operador/tiempo-real">
-        Tiempo real
-    </a>
-
-    <a href="/api/operador/estadisticas">
-        Estadísticas
+        Predicción tiempo real
     </a>
 
     <button
@@ -72,32 +68,12 @@
 <div class="contenido">
 
     <h1>
-        Predicción histórica
+        Predicción offline
     </h1>
 
-    <!-- IMPORTAR CSV -->
-
-    <div class="upload-container">
-
-        <input
-            type="file"
-            id="csvFile"
-        >
-
-        <button id="btnImportar">
-
-            Importar archivo
-
-        </button>
-
-        <div
-            id="loaderImportar"
-            style="display:none;"
-        >
-            <div class="loader"></div>
-        </div>
-
-    </div>
+    <p class="info-modelo">
+        Modelo utilizado: XGBoost
+    </p>
 
     <!-- SELECTORES -->
 

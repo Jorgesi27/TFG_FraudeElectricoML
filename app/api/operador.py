@@ -35,7 +35,8 @@ from app.services.prediction_service import (
 )
 
 from app.core.database import (
-    obtener_archivos_usuario
+    obtener_archivos_usuario,
+    obtener_estadisticas_archivo_bd
 )
 
 from pydantic import BaseModel
@@ -66,7 +67,7 @@ templates = Jinja2Templates(
 def home_page(request: Request):
 
     return templates.TemplateResponse(
-        "home.html",
+        "estadisticas.html",
         {"request": request}
     )
 
@@ -305,7 +306,7 @@ def obtener_estadisticas(
     )
 ):
 
-    return generar_estadisticas_archivo(
+    return obtener_estadisticas_archivo_bd(
         id_archivo,
         usuario_actual["id_usuario"]
     )

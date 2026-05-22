@@ -13,6 +13,11 @@ venv/
 env/
 
 # ======================
+# Environment variables
+# ======================
+.env
+
+# ======================
 # IDE
 # ======================
 .vscode/
@@ -40,9 +45,9 @@ Thumbs.db
 *.db
 
 # ======================
-# Dataset
+# Dataset grande
 # ======================
-data/
+data/df.csv
 
 # ======================
 # Resultados experimentos
@@ -50,11 +55,6 @@ data/
 results/*.csv
 results/*.json
 results/*.png
-
-# ======================
-# Modelos serializados
-# ======================
-models/*.pkl
 
 # ======================
 # Archivos auxiliares LaTeX

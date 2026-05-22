@@ -26,6 +26,16 @@ const archivoSelect =
         "archivoSelect"
     );
 
+const loaderDashboard =
+    document.getElementById(
+        "loaderDashboard"
+    );
+
+const loaderImportar =
+    document.getElementById(
+        "loaderImportar"
+    );
+
 
 // ========================================
 // CHARTS
@@ -52,6 +62,101 @@ function limpiarChart(chart){
     }
 
     return null;
+}
+
+
+// ========================================
+// IMPORTAR CSV
+// ========================================
+
+async function importarArchivo(){
+
+    const input =
+        document.getElementById(
+            "csvFile"
+        );
+
+    if(!input.files.length){
+
+        alert(
+            "Seleccione un archivo CSV"
+        );
+
+        return;
+    }
+
+    loaderImportar
+        .classList
+        .remove("hidden");
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "archivo",
+        input.files[0]
+    );
+
+    try{
+
+        const response = await fetchAuth(
+
+            "/api/operador/importar-csv",
+
+            {
+                method:"POST",
+                body:formData
+            }
+        );
+
+        if(!response){
+            return;
+        }
+
+        await obtenerData(response);
+
+        alert(
+            "Archivo importado correctamente"
+        );
+
+        input.value = "";
+
+        // RECARGAR LISTA ARCHIVOS
+
+        await cargarArchivos();
+
+        if(archivoSelect.options.length > 1){
+
+            const ultimoArchivoImportado =
+
+                archivoSelect.options[
+                    archivoSelect.options.length - 1
+                ].value;
+
+            archivoSelect.value =
+                ultimoArchivoImportado;
+
+            localStorage.setItem(
+                "ultimoArchivo",
+                ultimoArchivoImportado
+            );
+
+            await cargarDashboard();
+        }
+
+    }catch(error){
+
+        mostrarError(
+            "Error importando archivo",
+            error
+        );
+
+    }finally{
+
+        loaderImportar
+            .classList
+            .add("hidden");
+    }
 }
 
 
@@ -112,14 +217,23 @@ async function cargarDashboard(){
     const idArchivo =
         archivoSelect.value;
 
+    localStorage.setItem(
+        "ultimoArchivo",
+        idArchivo
+    );
+
     if(!idArchivo){
-
-        alert(
-            "Seleccione un archivo"
-        );
-
+        limpiarDashboard();
         return;
     }
+
+    // =========================
+    // MOSTRAR LOADER
+    // =========================
+
+    loaderDashboard
+        .classList
+        .remove("hidden");
 
     try{
 
@@ -147,10 +261,28 @@ async function cargarDashboard(){
 
     }catch(error){
 
+        // Ignorar errores al salir de página
+        if(
+            !document.body.contains(loaderDashboard)
+        ){
+            return;
+        }
+
         mostrarError(
             "Error generando dashboard",
             error
         );
+
+    }finally{
+
+        // =========================
+        // OCULTAR LOADER
+        // =========================
+
+        loaderDashboard
+            .classList
+            .add("hidden");
+
     }
 }
 
@@ -225,6 +357,14 @@ function crearPieChart(data){
 
             responsive:true,
 
+            maintainAspectRatio:true,
+
+            aspectRatio:1,
+
+            cutout:"50%",
+
+            radius:"75%",
+
             plugins:{
 
                 legend:{
@@ -232,6 +372,11 @@ function crearPieChart(data){
                         color:"white"
                     }
                 }
+            },
+
+            animation:{
+                duration:1500,
+                easing:"easeOutQuart"
             }
         }
     });
@@ -259,30 +404,38 @@ function crearBarChart(data){
 
         data:{
 
-            labels:[
-                "Fraudes",
-                "Normales"
-            ],
+            labels:
+                data.top_consumos.map(
+                    item => item.curva
+                ),
 
             datasets:[{
 
-                label:"Cantidad",
+                label:
+                    "Top consumos medios",
 
-                data:[
-                    data.fraudes,
-                    data.normales
-                ],
+                data:
+                    data.top_consumos.map(
+                        item => item.consumo
+                    ),
 
-                backgroundColor:[
-                    "#ef4444",
+                backgroundColor:
                     "#3b82f6"
-                ]
             }]
         },
 
         options:{
 
             responsive:true,
+
+            plugins:{
+
+                legend:{
+                    labels:{
+                        color:"white"
+                    }
+                }
+            },
 
             scales:{
 
@@ -299,13 +452,9 @@ function crearBarChart(data){
                 }
             },
 
-            plugins:{
-
-                legend:{
-                    labels:{
-                        color:"white"
-                    }
-                }
+            animation:{
+                duration:1500,
+                easing:"easeOutQuart"
             }
         }
     });
@@ -327,44 +476,29 @@ function crearLineChart(data){
     lineChart =
         limpiarChart(lineChart);
 
-    const puntos = [];
-
-    for(let i = 0; i < data.total_curvas; i++){
-
-        puntos.push(
-
-            Math.floor(
-                Math.random() * 100
-            )
-        );
-    }
-
     lineChart = new Chart(ctx, {
 
-        type:"line",
+        type:"bar",
 
         data:{
 
             labels:
-                puntos.map(
-                    (_, i) => `T${i+1}`
+                data.top_riesgo.map(
+                    item => item.curva
                 ),
 
             datasets:[{
 
                 label:
-                    "Riesgo temporal",
+                    "Probabilidad fraude (%)",
 
-                data:puntos,
-
-                borderColor:"#3b82f6",
+                data:
+                    data.top_riesgo.map(
+                        item => item.probabilidad
+                    ),
 
                 backgroundColor:
-                    "rgba(59,130,246,0.2)",
-
-                tension:0.4,
-
-                fill:true
+                    "#ef4444"
             }]
         },
 
@@ -384,16 +518,37 @@ function crearLineChart(data){
             scales:{
 
                 y:{
+
+                    beginAtZero:true,
+
                     ticks:{
+                        color:"white"
+                    },
+
+                    title:{
+                        display:true,
+                        text:"Probabilidad fraude (%)",
                         color:"white"
                     }
                 },
 
                 x:{
+
                     ticks:{
+                        color:"white"
+                    },
+
+                    title:{
+                        display:true,
+                        text:"Curvas",
                         color:"white"
                     }
                 }
+            },
+
+            animation:{
+                duration:1500,
+                easing:"easeOutQuart"
             }
         }
     });
@@ -415,67 +570,58 @@ function crearRadarChart(data){
     radarChart =
         limpiarChart(radarChart);
 
+    const rangos = [
+
+        "0-10%",
+        "10-20%",
+        "20-30%",
+        "30-40%",
+        "40-50%",
+        "50-60%",
+        "60-70%",
+        "70-80%",
+        "80-90%",
+        "90-100%"
+    ];
+
+    const conteos =
+        new Array(10).fill(0);
+
+    data.probabilidades.forEach(p => {
+
+        let indice =
+            Math.floor(p / 10);
+
+        if(indice >= 10){
+            indice = 9;
+        }
+
+        conteos[indice]++;
+    });
+
     radarChart = new Chart(ctx, {
 
-        type:"radar",
+        type:"bar",
 
         data:{
 
-            labels:[
-
-                "Fraudes",
-                "Normales",
-                "Riesgo",
-                "Consumo",
-                "Detección"
-            ],
+            labels: rangos,
 
             datasets:[{
 
-                label:"Indicadores",
+                label:
+                    "Número de curvas",
 
-                data:[
-
-                    data.fraudes,
-
-                    data.normales,
-
-                    data.porcentaje_fraudes,
-
-                    80,
-
-                    95
-                ],
-
-                borderColor:"#3b82f6",
+                data: conteos,
 
                 backgroundColor:
-                    "rgba(59,130,246,0.2)"
+                    "#3b82f6"
             }]
         },
 
         options:{
 
             responsive:true,
-
-            scales:{
-
-                r:{
-
-                    ticks:{
-                        color:"white"
-                    },
-
-                    pointLabels:{
-                        color:"white"
-                    },
-
-                    grid:{
-                        color:
-                            "rgba(255,255,255,0.1)"
-                    }
-                }
-            },
 
             plugins:{
 
@@ -484,6 +630,40 @@ function crearRadarChart(data){
                         color:"white"
                     }
                 }
+            },
+
+            scales:{
+
+                y:{
+
+                    ticks:{
+                        color:"white"
+                    },
+
+                    title:{
+                        display:true,
+                        text:"Número de curvas",
+                        color:"white"
+                    }
+                },
+
+                x:{
+
+                    ticks:{
+                        color:"white"
+                    },
+
+                    title:{
+                        display:true,
+                        text:"Rango probabilidad fraude",
+                        color:"white"
+                    }
+                }
+            },
+
+            animation:{
+                duration:1500,
+                easing:"easeOutQuart"
             }
         }
     });
@@ -504,14 +684,19 @@ function inicializarEventos(){
             "click",
             logout
         );
+    
+    archivoSelect.addEventListener(
+        "change",
+        cargarDashboard
+    );
 
     document
         .getElementById(
-            "btnCargarEstadisticas"
+            "btnImportar"
         )
         .addEventListener(
             "click",
-            cargarDashboard
+            importarArchivo
         );
 }
 
@@ -537,4 +722,65 @@ window.onload = async () => {
     inicializarEventos();
 
     await cargarArchivos();
+
+    const ultimoArchivo =
+        localStorage.getItem(
+            "ultimoArchivo"
+        );
+
+    if(
+        ultimoArchivo &&
+        [...archivoSelect.options].some(
+            option =>
+                option.value === ultimoArchivo
+        )
+    ){
+
+        archivoSelect.value =
+            ultimoArchivo;
+
+    }else if(archivoSelect.options.length > 1){
+
+        archivoSelect.value =
+            archivoSelect.options[
+                archivoSelect.options.length - 1
+            ].value;
+    }
+
+    if(archivoSelect.value){
+
+        await cargarDashboard();
+    }
 };
+
+
+function limpiarDashboard(){
+
+    // KPIs
+
+    document.getElementById(
+        "kpiTotal"
+    ).innerText = "---";
+
+    document.getElementById(
+        "kpiFraudes"
+    ).innerText = "---";
+
+    document.getElementById(
+        "kpiNormales"
+    ).innerText = "---";
+
+    document.getElementById(
+        "kpiPorcentaje"
+    ).innerText = "---";
+
+    // Charts
+
+    pieChart = limpiarChart(pieChart);
+
+    barChart = limpiarChart(barChart);
+
+    lineChart = limpiarChart(lineChart);
+
+    radarChart = limpiarChart(radarChart);
+}

@@ -32,6 +32,27 @@ breaklines=true,
 frame=single
 }
 
+\lstdefinelanguage{SQL}{
+    keywords={
+        CREATE, DATABASE, TABLE, PRIMARY, KEY,
+        AUTO_INCREMENT, NOT, NULL, UNIQUE,
+        DEFAULT, CURRENT_TIMESTAMP, FOREIGN,
+        REFERENCES, ENUM, INT, VARCHAR,
+        FLOAT, TIMESTAMP, LONGTEXT, USE
+    },
+    sensitive=false
+}
+
+\lstset{
+    language=SQL,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    frame=single,
+    breaklines=true,
+    columns=fullflexible
+}
+
 % Márgenes
 \geometry{
   top=3cm,
@@ -171,6 +192,14 @@ El proyecto lleva a cabo una comparación de varias técnicas para identificar f
 % =========================
 \newpage
 \listoftables
+\newpage
+
+% =========================
+% ÍNDICE DE LISTADOS
+% =========================
+\newpage
+\lstlistoflistings
+\newpage
 
 % =========================
 % PARTE I PROLEGÓMENO
@@ -1278,7 +1307,7 @@ Los dos actores del sistema son el administrador y el operador de la compañía 
 
 El actor principal del sistema es el operador de la compañía eléctrica. Es el usuario que tiene la responsabilidad de manejar la aplicación con el fin de importar curvas de consumo eléctrico y conseguir una predicción para cada una, señalando si el uso está dentro de lo habitual o si podría haber un caso potencial de fraude. Entre sus principales responsabilidades están: llevar a cabo la clasificación de las curvas de consumo de un archivo importado, señalando si cada una es normal o indica posible fraude, así como la probabilidad vinculada a la predicción y consultar estadísticas generales del total de curvas de cada archivo importado.
 
-El administrador del sistema es el actor encargado de gestionar los aspectos técnicos del prototipo. Su tarea principal es asegurar que el sistema esté listo para hacer predicciones con los modelos previamente entrenados, así como también que esté disponible y bien configurado. Dentro del marco de este proyecto, el administrador es el mismo que el creador del sistema; sin embargo, se distingue del operador debido a la clase de tareas que lleva a cabo. Entre las tareas fundamentales que realiza, están la gestión de los usuarios del sistema y la administración de los modelos entrenados.
+El administrador del sistema es el actor encargado de gestionar los aspectos técnicos del prototipo. Su tarea principal es asegurar que el sistema esté listo para hacer predicciones con los modelos previamente entrenados, así como también que esté disponible y bien configurado. Dentro del marco de este proyecto, el administrador es el mismo que el creador del sistema; sin embargo, se distingue del operador debido a la clase de tareas que lleva a cabo. Entre las tareas fundamentales que realiza, están la gestión de los usuarios del sistema y la administración de los modelos entrenados. Además, se ha tomado la decisión de que los usuarios no pueden registrarse en el sistema debido a que solo pueden acceder los operadores de las empresas de compañias eléctrica y no cualquier usuario. Por ello, el registro de usuario es una tarea solo para el administrador.
 
 
 \section{Casos de uso}
@@ -1324,10 +1353,10 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
 \noindent Escenario principal (éxito): Realizar predicción de fraude histórica.
 
 \begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona la opción realizar predicción de fraude histórica.
     \item El operador selecciona un archivo de consumo previamente importado.
     \item El sistema muestra las curvas asociadas al archivo seleccionado.
     \item El operador selecciona una curva de consumo.
-    \item El operador selecciona la opción realizar predicción de fraude histórica.
     \item El sistema obtiene los datos asociados a la curva seleccionada.
     \item El sistema aplica el modelo predictivo \emph{offline}.
     \item El sistema genera la clasificación de la curva.
@@ -1362,7 +1391,7 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
     \item Escenario principal (éxito): Realizar predicción de fraude en tiempo real.
     \item Escenario alternativo (error): Curva de consumo no válida.
     \item Escenario alternativo (error): Modelo predictivo no disponible.
-    \item Escenario alternativo (error): El flujo online no puede simularse correctamente.
+    \item Escenario alternativo (error): Error durante la generación de predicciones \emph{online}.
 \end{itemize}
 
 \medskip
@@ -1370,39 +1399,41 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
 \noindent Escenario principal (éxito): Realizar predicción de fraude en tiempo real.
 
 \begin{enumerate}[leftmargin=1.5cm]
+    \item El operador selecciona la opción realizar predicción de fraude en tiempo real.
     \item El operador selecciona un archivo de consumo previamente importado.
     \item El sistema muestra las curvas asociadas al archivo seleccionado.
     \item El operador selecciona una curva de consumo.
-    \item El operador selecciona la opción realizar predicción de fraude histórica.
+    \item El sistema inicia la simulación del flujo de datos en tiempo real.
     \item El sistema obtiene los datos asociados a la curva seleccionada.
-    \item El sistema aplica el modelo predictivo \emph{online}.
-    \item El sistema genera la clasificación de la curva.
-    \item El sistema muestra el resultado de la predicción indicando si el consumo corresponde a un posible fraude o a un caso normal y la probabilidad asociada a la predicción realizada.
+    \item El sistema procesa secuencialmente cada punto de consumo de la curva.
+    \item El sistema aplica el modelo predictivo online sobre cada nuevo punto recibido.
+    \item El sistema actualiza dinámicamente la predicción de fraude conforme avanza el flujo de datos.
+    \item El sistema muestra en tiempo real el estado de la predicción, indicando si el comportamiento corresponde a un posible fraude o a un consumo normal, junto con la probabilidad asociada.
 \end{enumerate}
 \medskip
 
 \noindent Extensiones:
 
-5a. Curva de consumo no válida.
+6a. Curva de consumo no válida.
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El sistema detecta que la curva contiene datos inválidos o incompatibles.
-    \item El sistema muestra un mensaje de error indicando que la predicción no puede realizarse.
+    \item El sistema detecta que la curva contiene datos inválidos, incompletos o incompatibles.
+    \item El sistema interrumpe la simulación del flujo \emph{online} y muestra un mensaje de error indicando que no es posible realizar las predicciones.
 \end{enumerate}
 
 \medskip
 
-6a. Modelo predictivo no disponible.
+8a. Modelo predictivo no disponible.
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El sistema detecta que el modelo predictivo histórico no está disponible.
-    \item El sistema muestra un mensaje de error indicando que no es posible realizar la predicción.
+    \item El sistema detecta que el modelo predictivo \emph{online} no está disponible.
+    \item El sistema cancela el proceso de predicción en tiempo real y muestra un mensaje de error indicando que no es posible realizar las predicciones.
 \end{enumerate}
 
 \medskip
 
-9a. Error durante la simulación del flujo online.
+9a. Error durante la generación de predicciones \emph{online}.
 \begin{enumerate}[leftmargin=1.5cm]
-    \item El sistema detecta un error durante la generación de predicciones online.
-    \item El sistema muestra un mensaje de error indicando que no ha sido posible completar la simulación del flujo online.
+    \item El sistema detecta un error durante el procesamiento secuencial de los datos.
+    \item El sistema detiene la simulación del flujo \emph{online} y muestra un mensaje de error indicando que no ha sido posible completar la simulación.
 \end{enumerate}
 
 \medskip
@@ -1470,7 +1501,6 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
     \item Escenario principal (éxito): Consultar estadísticas.
     \item Escenario alternativo (error): El archivo no contiene curvas de consumo.
     \item Escenario alternativo (error): Error al generar las estadísticas.
-    \item Escenario alternativo (excepción): El operador cancela la consulta.
 \end{itemize}
 
 \medskip
@@ -1478,10 +1508,10 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
 \noindent Escenario principal (éxito): Consultar estadísticas.
 
 \begin{enumerate}[leftmargin=1.5cm]
+    \item El operador accede al inicio.
     \item El operador selecciona un archivo de consumo previamente importado.
-    \item El operador selecciona la opción consultar estadísticas.
     \item El sistema obtiene las curvas asociadas al archivo seleccionado.
-    \item El sistema genera las estadísticas y carga las gráficas correspondientes.
+    \item El sistema genera las estadísticas y carga las gráficas correspondientes mientras muestra por pantalla un símbolo de carga.
     \item El sistema muestra las gráficas y los resultados estadísticos asociados al archivo.
 \end{enumerate}
 
@@ -1501,14 +1531,6 @@ A continuación, se desarrolla la descripción de los escenarios de casos de uso
 \begin{enumerate}[leftmargin=1.5cm]
     \item El sistema detecta un error durante la generación de estadísticas o la carga de las gráficas.
     \item El sistema muestra un mensaje indicando que no ha sido posible generar las estadísticas del archivo seleccionado.
-\end{enumerate}
-
-\medskip
-
-3a-4a. Cancelar consulta de estadísticas.
-\begin{enumerate}[leftmargin=1.5cm]
-    \item El operador selecciona la opción salir mientras se realiza la carga de estadísticas.
-    \item El sistema cancela la consulta y oculta las gráficas estadísticas.
 \end{enumerate}
 
 \medskip
@@ -1650,11 +1672,11 @@ Ahora es el turno de los dos casos de uso del administrador, estos se consideran
 
 \section{Arquitectura del Sistema}
 
-La arquitectura del sistema se diseña separando la fase experimental de la fase operativa. La fase experimental se encarga del entrenamiento y evaluación de los modelos de aprendizaje automático, mientras que la fase operativa permite utilizar los modelos dentro de una \emph{API REST} para realizar predicciones. La arquitectura del sistema se compone de varios elementos. Empezando por el cliente, este representa el punto de acceso al sistema. El operador interactúa con la API mediante un navegador web o cliente HTTP, pudiendo iniciar sesión, importar archivos CSV, ejecutar predicciones y consultar resultados.
+La arquitectura del sistema sigue un modelo cliente-servidor basado en una aplicación web y una \emph{API REST}. El sistema permite importar archivos que tienen curvas de consumo eléctrico, ejecutar predicciones de fraude y visualizar resultados de manera interactiva a través de una interfaz web. El cliente web representa el punto de acceso para el operador, mientras que la interfaz es desarrollada utilizando \emph{HTML, CSS} y \emph{JavaScript}, permitiendo realizar todas las operaciones permitidas. La comunicación entre la interfaz y el servidor se realiza mediante peticiones \emph{HTTP} a una \emph{API REST} desarrollada con \emph{FastAPI}. La \emph{API} se encarga de recibir las solicitudes del cliente, validar la autenticación de usuarios, procesar los datos recibidos y devolver las respuestas correspondientes..
 
-El componente principal y núcleo del sistema es la \emph{API REST}. Esta, recibe las peticiones del cliente, valida la autenticación, ejecuta las predicciones y devuelve las respuestas correspondientes. Además, se encarga del correcto funcionamiento de la predicción histórica, la predicción en tiempo real, la consulta de resultados y la visualización de curvas ROC. La base de datos MySQL almacena la información relativa a los usuarios del sistema, incluyendo credenciales cifradas, roles y estado de activación. La API consulta esta base de datos durante el proceso de inicio de sesión para validar el acceso al sistema.
+La lógica de negocio se encuentra organizada en servicios de predicción, responsables de cargar los modelos entrenados, realizar el preprocesamiento de datos y ejecutar las inferencias. El sistema tiene dos flujos principales de predicción. El primero corresponde a la predicción histórica, basada en el algoritmo \emph{XGBoost}, utilizada para analizar curvas de consumo almacenadas previamente. El segundo corresponde a la predicción en tiempo real, basada en \emph{Adaptive Random Forest}, orientada al procesamiento continuo de datos. El flujo en tiempo real se simula a partir de datos previamente almacenados, enviados de forma secuencial a través de una cola interna.
 
-Analizando más en profundidad, existen varios elementos más como los servicios de predicción que agrupan la lógica encargada de cargar los modelos entrenados, preprocesar los datos importados y ejecutar las predicciones. Dentro de este bloque se distinguen dos flujos: la predicción histórica, basada en \emph{XGBoost}, y la predicción en tiempo real, basada en \emph{Adaptive Random Forest}. La cola interna,dentro del flujo online, permite simular la llegada progresiva de datos en tiempo real. Un productor introduce las curvas de consumo en la cola cada cierto intervalo de tiempo, mientras que un consumidor las extrae y las clasifica mediante el modelo online. Y termina con el sistema de ficheros que almacena los modelos entrenados, columnas esperadas, escaladores, métricas experimentales, curvas ROC, importancia de variables y resultados de predicción generados por el sistema. La Figura~\ref{fig:arquitectura_sistema} muestra el esquema general de la arquitectura del sistema.
+La persistencia de la información se realiza mediante una base de datos \emph{MySQL}, encargada de almacenar usuarios, credenciales cifradas, archivos importados, curvas de consumo registradas y predicciones realizadas por los usuarios. Los modelos entrenados y las estructuras auxiliares necesarias para la predicción se cargan desde el almacenamiento interno del servidor durante la inicialización de los servicios de predicción. La Figura~\ref{fig:arquitectura_sistema} muestra el esquema general de la arquitectura implementada.
 
 \begin{figure}[H]
 \centering
@@ -1666,9 +1688,7 @@ Analizando más en profundidad, existen varios elementos más como los servicios
 
 \section{Diseño de la base de datos}
 
-Se crea una base de datos donde se guarda toda la información de los usuarios para controlar su acceso en el sistema. Esta información se almacena en una base de datos relacional, a diferencia de otras partes del proyecto como modelos entrenados, métricas experimentales o resultados de predicción que se guardan en el sistema de ficheros. Esto permite separar la gestión de usuarios del código de nuestra aplicación y evita tener credenciales escritas en los ficheros del proyecto. De este modo el sistema queda más seguro, manejable y preparado para futuras ampliaciones.
-
-La base de datos solo dispone de una tabla, la cual se llama \emph{usuarios}. Esta guarda la información que precisa el sistema para autenticar a los usuarios y controlar sus permisos de acceso. Además, no se almacenan las predicciones generadas por los modelos en la base de datos, ya que estas se guardan en ficheros JSON separados por usuario y tipo de predicción. Esto resulta suficiente para el alcance actual del sistema y evita sobrecargar la base de datos con grandes volúmenes de predicciones individuales. Esta estructura en el diseño permite una futura ampliación en la que los resultados puedan almacenarse también en tablas relacionales, permitiendo consultas históricas, auditoría y análisis más avanzados. En la Figura~\ref{fig:diseno_bd} se muestra el diseño de la base de datos utilizada por el sistema.
+Se crea una base de datos relacional donde se guarda toda la información de los usuarios para controlar su acceso en el sistema, de los archivos importados por ellos, las curvas de consumo de los archivos y las predicciones realizadas. Estos datos están recogidos en 4 tablas, las cuales se llaman respectivamente \texttt{usuarios}, \texttt{archivos\_consumo}, \texttt{curvas\_consumo} y \texttt{predicciones}. En la Figura~\ref{fig:diseno_bd} se muestra el diseño de la base de datos utilizada por el sistema.
 
 \begin{figure}[H]
 \centering
@@ -1677,7 +1697,7 @@ La base de datos solo dispone de una tabla, la cual se llama \emph{usuarios}. Es
 \label{fig:diseno_bd}
 \end{figure}
 
-La tabla usuarios está formada por varios elementos como un identificador único, un nombre de usuario, una contraseña almacenada mediante hash, un rol dentro del sistema, un estado de activación y una fecha de creación. El uso de contraseñas cifradas mediante hash evita tener contraseñas en texto plano, así se consigue reducir los casos de accesos no autorizados. El campo de estado permite desactivar usuarios sin necesidad de eliminarlos físicamente, conservando así la integridad de la información. En la Figura~\ref{fig:tabla_usuarios} se muestran sus atributos junto con detalles como el tipo de dato.
+La tabla \texttt{usuarios} está formada por varios elementos como un identificador único, un nombre de usuario, una contraseña almacenada mediante hash, un rol dentro del sistema, un estado de activación y una fecha de creación. El uso de contraseñas cifradas mediante hash evita tener contraseñas en texto plano, así se consigue reducir los casos de accesos no autorizados. El campo de estado permite desactivar usuarios sin necesidad de eliminarlos físicamente, conservando así la integridad de la información. En la Figura~\ref{fig:tabla_usuarios} se muestran sus atributos junto con detalles como el tipo de dato.
 
 \begin{figure}[H]
 \centering
@@ -1686,38 +1706,237 @@ La tabla usuarios está formada por varios elementos como un identificador únic
 \label{fig:tabla_usuarios}
 \end{figure}
 
+\medskip
 
-\section{Almacenamiento de ficheros}
+La tabla \texttt{archivos\_consumo} se compone de su identificador privado, del identificador del usuario para saber el usuario que importó el archivo, del nombre del archivo, de la fecha de importación, del total de curvas que dispone y de los datos que se utilizan para almacenar estadísticas y resultados generados automáticamente tras la importación de un archivo de curvas de consumo. En la Figura~\ref{fig:tabla_archivos} se muestran sus atributos junto con detalles como el tipo de dato.
 
-El sistema guarda en disco los recursos creados durante la fase experimental y los resultados producidos durante el uso de la aplicación. Con esta división se reserva la base de datos para información relacionada a los usuarios, mientras que el sistema de ficheros se utiliza para almacenar recursos más pesados o generados externamente, como modelos entrenados, gráficas, métricas y resultados de predicción. Esta decisión se debe a que algunos elementos del sistema no encajan de forma natural en una tabla relacional. Los modelos entrenados, los escaladores, las listas de columnas esperadas, las curvas ROC, los ficheros de métricas y la importancia de variables son recursos producidos durante la fase experimental y posteriormente reutilizados por la aplicación. Se almacenan como ficheros dentro de la estructura del proyecto, permitiendo que la \emph{API} los cargue cuando sean necesarios sin repetir el entrenamiento de los modelos.
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/tabla_archivos.png}
+\caption{Diseño de la tabla de archivos.}
+\label{fig:tabla_archivos}
+\end{figure}
 
-La carpeta \emph{models/} se utiliza para guardar los recursos necesarios para realizar las predicciones. En ella se encuentran los modelos entrenados, las columnas esperadas por cada modelo y, en el caso del modelo online, el escalador utilizado durante la fase experimental. Estos garantizan que los datos importados por el operador se procesen con la misma estructura y condiciones que los datos utilizados durante el entrenamiento. Por otro lado, la carpeta \emph{results/} almacena los resultados experimentales y los recursos complementarios asociados a los modelos. En esta carpeta se encuentran las métricas de evaluación, las curvas ROC, la importancia de variables de \emph{XGBoost} y los resultados. De esta forma, la aplicación puede mostrar información complementaria sin recalcularla en cada consulta. Los resultados de las predicciones se guardan separados por usuario y por tipo de predicción. Así se evita que los resultados de distintos operadores se mezclen y permite distinguir entre la última predicción histórica y la última predicción en tiempo real.
+\medskip
 
-Los archivos en el entorno local se guardan directamente en el sistema de ficheros del ordenador donde la aplicación está funcionando. Estos pueden estar en el disco persistente vinculado al servidor, como un volumen \emph{EBS}, por ejemplo, cuando se despliega en un servidor sobre una instancia de \emph{AWS EC2}. Así, los modelos, resultados y recursos adicionales continúan accesibles incluso si se vuelve a iniciar la aplicación. El almacenamiento de los ficheros podría trasladarse a un servicio externo como \emph{Amazon S3} para una versión más segura con requerimientos más altos de mantenimiento, disponibilidad y escalabilidad. Esto posibilita la separación de los archivos de la instancia de ejecución, el mejoramiento de la persistencia y la administración más sólida de los recursos que produce el sistema, así como también hacer copias de seguridad más fácilmente.
+La tabla \texttt{curvas\_consumo} almacena el identificador privado de la curva, el identificador del archivo para saber a cual pertenecen, su identificador público para poder ser seleccionada y buscada por el operador, los datos de consumo de cada curva y la fecha de registro de la curva. En la Figura~\ref{fig:tabla_curvas} se muestran sus atributos junto con detalles como el tipo de dato.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/tabla_curvas.png}
+\caption{Diseño de la tabla de curvas.}
+\label{fig:tabla_curvas}
+\end{figure}
+
+\medskip
+
+La tabla \texttt{predicciones} se forma por el identificador privado de la predicción, el identificador de la curva que se predice, los tipos de modelos y predicciones realizadas en cada predicción, los resultados junto a la probabilidad de fraude de la predicción y la fecha en la que se realiza. En la Figura~\ref{fig:tabla_predicciones} se muestran sus atributos junto con detalles como el tipo de dato.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/tabla_predicciones.png}
+\caption{Diseño de la tabla de predicciones.}
+\label{fig:tabla_predicciones}
+\end{figure}
 
 
 \section{Entorno de desarrollo}
 
-El desarrollo se realiza con un equipo con \emph{Windows} junto con \emph{Python} como el lenguaje de programación principal. Esta opción es apropiada para el proyecto porque posibilita la incorporación de los modelos de aprendizaje automático que se han conseguido en la fase experimental junto con la lógica del sistema, todo dentro del mismo entorno. Se crea un entorno virtual a través de \emph{venv} para juntar las dependencias del proyecto. Las bibliotecas necesarias para la aplicación se mantienen separadas de otras instalaciones de \emph{Python} que se encuentran en el equipo, con lo cual se previenen conflictos entre versiones y se simplifica la replicación del entorno en otros equipos o en un futuro despliegue. Se ha elegido \emph{Visual Studio Code} como el entorno de desarrollo integrado, que se emplea para la edición del código fuente, la estructuración del proyecto y la ejecución de comandos en la terminal integrada. 
+El desarrollo se realiza con un equipo con \emph{Windows} junto con \emph{Python} como el lenguaje de programación principal para el desarrollo del \emph{back-end} y de los servicios de predicción. Esta alternativa es muy buena para el proyecto ya que permite integrar la lógica del sistema con los modelos de aprendizaje automático obtenidos en la etapa experimental, todo ello dentro del mismo entorno. Para crear la interfaz web, se utilizan lenguajes como \emph{JavaScript}, \emph{CSS} y \emph{HTML} y son los que permiten desarrollar las páginas de interacción con el operador, ver gráficos y gestionar dinámicamente las predicciones del sistema.
 
-Para manejar e instalar las dependencias, se emplea \emph{pip}, este programa genera el archivo requirements.txt, que compila las librerías necesarias para que el sistema funcione. Durante la fase de desarrollo, la aplicación se ejecuta con \emph{Uvicorn}, un servidor \emph{ASGI} que es compatible con \emph{FastAPI}. \emph{XAMPP, phpMyAdmin} y \emph{MySQL} se utilizan para gestionar la base de datos. Esto permite crear y gestionar una base de datos de los usuarios del sistema, donde se encuentran los roles, el estado de activación y la información de autenticación. Finalmente, se utiliza \emph{Git} para controlar las versiones, lo que permite llevar un registro del progreso del código fuente y supervisar los cambios realizados durante la construcción del sistema.
+Se crea un entorno virtual a través de \emph{venv} para juntar las dependencias del proyecto. Las bibliotecas necesarias para la aplicación se mantienen separadas de otras instalaciones de \emph{Python} que se encuentran en el equipo o servidor, con lo cual se evitan conflictos entre versiones y se simplifica la replicación del entorno en otros equipos o en el despliegue. Se ha elegido \emph{Visual Studio Code} como el entorno de desarrollo integrado, que se emplea para la edición del código fuente, la estructuración del proyecto y la ejecución de comandos en la terminal integrada. 
+
+Para gestionar e instalar las dependencias, se utiliza \emph{pip}. Este software crea el archivo de texto \emph{requirements}, que contiene una lista de todas las librerías necesarias para que el sistema funcione con normalidad. En la etapa de desarrollo, se utiliza el servidor \emph{Uvicorn}, que es compatible con \emph{FastAPI}, para ejecutar la aplicación. Para administrar la base de datos se emplean \emph{XAMPP}, \emph{MySQL} y \emph{phpMyAdmin} que ayudan con la creación y administración de la base de datos Por último, se emplea \emph{Git} para controlar las versiones, lo que posibilita el seguimiento del avance del código fuente y la supervisión de las modificaciones efectuadas durante la edificación del sistema.
 
 
 \section{Tecnologías utilizadas}
 
-Para construir el sistema se emplean diversas tecnologías en las que cada una se encarga de una tarea distinta. Se emplea \emph{FastAPI} como base fundamental para crear la \emph{API REST}. Esta aporta que los \emph{endpoints} funcionen y hagan su tarea correctamente, la validación de los parámetros de entrada y la creación automática de una documentación del sistema que es interactiva. Garcias a esto el operador puede comprobar las funcionalidades disponibles a través de una interfaz a la que se accede por medio del navegador. La aplicación desarrollada con \emph{FastAPI} se ejecuta usando el servidor \emph{ASGI} llamado \emph{Uvicorn}. Este servidor permite atender las peticiones HTTP recibidas por la API y ejecutar los endpoints definidos en el sistema.
+Para construir el sistema se emplean diversas tecnologías en las que cada una se encarga de una tarea distinta. Se emplea \emph{FastAPI} como base fundamental para crear la \emph{API REST}. Esta aporta que los \emph{endpoints} funcionen y hagan su tarea correctamente, la validación de los parámetros de entrada y la creación automática de una documentación del sistema que es interactiva. Gracias a esto el operador puede comprobar las funcionalidades disponibles a través de una interfaz a la que se accede por medio del navegador. La aplicación desarrollada con \emph{FastAPI} se ejecuta usando el servidor \emph{Uvicorn}. Este servidor atiende las peticiones HTTP recibidas por la \emph{API} y ejecuta los \emph{endpoints} definidos en el sistema.
+
+Para crear la interfaz web, se emplean tecnologías estándar del lado cliente, como \emph{JavaScript}, \emph{CSS} y \emph{HTML}. Estas ayudan en la creación de las diversas visualizaciones del sistema, que incluyen los paneles de estadísticas, las páginas de predicción en tiempo real, de autenticación y las de predicción histórica. La biblioteca \emph{Chart.js} se utiliza para crear representaciones visuales de los resultados y métricas del sistema, incluyendo diagramas circulares, histogramas y gráficos de barras. Estos se muestran en el \emph{dashboard} de estadísticas.
 
 Para la lectura, manipulación y preprocesamiento de los archivos CSV importados por el operador se utiliza\emph{Pandas}. Esta se encarga de cargar las curvas de consumo, eliminar columnas innecesarias, adaptar las variables al formato requerido por los modelos y preparar los datos antes de realizar la predicción. Para la predicción sobre consumo histórico se ha utilizado el modelo \emph{XGBoost}, implementado mediante la biblioteca \emph{xgboost} de \emph{Python}. Este se selecciona como mejor técnica \emph{offline} durante la fase experimental y se integra en el sistema para clasificar archivos completos de curvas de consumo. Para la predicción en tiempo real se ha utilizado el modelo \emph{Adaptive Random Forest}, implementado mediante la biblioteca \emph{River}, orientada al aprendizaje automático online. Este modelo permite clasificar los registros de forma secuencial dentro de la simulación de flujo en tiempo real. También, se utiliza \emph{Scikit-learn} como biblioteca auxiliar en determinados procesos asociados a los modelos, especialmente en el escalado de datos necesario para mantener la coherencia entre la fase experimental y la fase operativa del sistema.
 
-Se emplea \emph{MySQL} como sistema gestor de base de datos para administrar usuarios. Se guardan los datos necesarios para la autenticación. La \emph{API} y la base de datos se comunican mediante \emph{PyMySQL}, lo que permite realizar consultas a través del código Python. Para una buena seguridad en las contraseñas se emplea \emph{hash} mediante el algoritmo \emph{bcrypt} y la biblioteca \emph{Passlib}. Estos ayudan a la verificación de las contraseñas que el usuario ingresa, al compararlas con el hash guardado en la base de datos. Así, se evita almacenar las contraseñas como texto plano.
+Se emplea \emph{MySQL} como sistema gestor de base de datos para administrar usuarios, archivos, curvas de consumo y predicciones. La \emph{API} y la base de datos se comunican mediante \emph{PyMySQL}, lo que permite realizar consultas a través del código \emph{Python}. Para una buena seguridad en las contraseñas se emplean funciones \emph{hash} mediante el algoritmo \emph{bcrypt} y la biblioteca \emph{Passlib}. Estos ayudan a la verificación de las contraseñas que el usuario ingresa, al compararlas con el hash guardado en la base de datos. Así, se evita almacenar las contraseñas como texto plano. Además, la autenticación de usuarios se basa en el uso de \emph{JSON Web Tokens (JWT)}. Tras iniciar sesión correctamente, el sistema genera un token que se utiliza para validar el acceso a los \emph{endpoints} protegidos de la \emph{API}, permitiendo mantener sesiones seguras sin almacenar información sensible en el servidor.
 
 Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recursos generados previamente durante la fase experimental, como modelos entrenados, listas de columnas esperadas y escaladores. Esto hace que la aplicación utilice los modelos ya entrenados sin necesidad de repetir el proceso de entrenamiento durante el uso del sistema. El uso de todas estas tecnologías permite construir un sistema modular, capaz de integrar modelos de aprendizaje automático previamente entrenados dentro de una \emph{API REST} protegida mediante autenticación y preparada para realizar predicciones sobre nuevas curvas de consumo eléctrico.
 
 
 \section{Control de versiones y Código fuente}
+\label{sec:repositorio}
+El control de versiones del proyecto se realiza mediante \emph{Git}, permitiendo registrar todos los cambios realizados durante el desarrollo del sistema y facilitando la trazabilidad del código fuente El código fuente completo del proyecto se encuentra disponible en un repositorio privado/público alojado en \emph{GitHub}, accesible mediante el siguiente enlace:
+
+\begin{center}
+ \url{https://github.com/Jorgesi27/TFG_FraudeElectricoML}
+\end{center}
+
+El uso de \emph{GitHub} permite mantener un historial completo de cambios, facilitando la gestión evolutiva del sistema, la recuperación de versiones anteriores y el seguimiento de las distintas funcionalidades implementadas durante el desarrollo.
 
 
 \section{Despliegue del sistema}
+
+En esta sección se describe el procedimiento necesario para desplegar y ejecutar el prototipo desarrollado, y se muestra el despligue en el servidor de \emph{AWS}. El objetivo es permitir la replicación del entorno de ejecución en otro equipo, incluyendo la instalación de dependencias, configuración de la base de datos y puesta en marcha de la aplicación web. Además, de ver las configuraciones elegidas para su despliegue en la nube.
+
+
+\subsection{Replicación del entorno local}
+
+Para ejecutar el sistema es necesario disponer de un entorno con soporte para \emph{Python} y un sistema gestor de base de datos \emph{MySQL}. Además, se requiere un navegador web moderno para acceder a la interfaz gráfica del prototipo. Los requisitos mínimos del entorno son los siguientes: \emph{Python} 3.10.11, \emph{MySQL Server}, \emph{Git} (opcional), navegador web moderno y un sistema operativo \emph{Windows} o \emph{Linux}.
+
+El proyecto puede obtenerse mediante clonación del repositorio utilizando Git o descargando directamente el código fuente en formato comprimido. Véase Sección \ref{sec:repositorio}.
+
+La clonación del repositorio puede realizarse mediante el siguiente comando: \texttt{git clone https://github.com/Jorgesi27/TFG\_FraudeElectricoML.git}
+
+Una vez descargado el proyecto, debe accederse al directorio raíz del sistema: \texttt{cd TFG\_FraudeElectricoML}
+
+Para aislar las dependencias del proyecto se utiliza un entorno virtual de Python. La creación del entorno virtual se realiza mediante el siguiente comando: \texttt{python -m venv venv}
+
+\noindent Activación del entorno virtual en Windows: \texttt{venv\textbackslash Scripts\textbackslash activate}
+
+\noindent Activación del entorno virtual en Linux: \texttt{source venv/bin/activate}
+
+Una vez activado el entorno virtual, deben instalarse las bibliotecas necesarias definidas en el archivo \emph{requirements.txt}. \texttt{pip install -r requirements.txt}
+
+Para crear y configurar la base de datos utilizada por el sistema es necesario utilizar \emph{MySQL}. En primer lugar, debe crearse la base de datos principal empleada por la aplicación. \texttt{CREATE DATABASE tfg\_fraudeelectrico;}
+
+\noindent Posteriormente, debe seleccionarse la base de datos creada. \texttt{USE tfg\_fraudeelectrico;}
+
+A continuación, se muestran las sentencias necesarias para crear las tablas utilizadas por el sistema. La tabla \texttt{usuarios} almacena la información relacionada con autenticación y gestión de usuarios del sistema.
+
+\begin{lstlisting}[caption={Tabla de usuarios.}, label={lst:tabla_usuarios}]
+CREATE TABLE usuarios (
+
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+
+    password_hash VARCHAR(255) NOT NULL,
+
+    rol ENUM('operador', 'administrador') NOT NULL,
+
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+\end{lstlisting}
+
+\medskip
+\noindent La tabla \texttt{archivos\_consumo} almacena los archivos importados por cada usuario.
+
+\begin{lstlisting}[caption={Tabla de archivos.}, label={lst:tabla_archivos}]
+CREATE TABLE archivos_consumo (
+
+    id_archivo INT AUTO_INCREMENT PRIMARY KEY,
+
+    id_usuario INT NOT NULL,
+
+    nombre_archivo VARCHAR(255) NOT NULL,
+
+    fecha_importacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    total_curvas INT NOT NULL,
+
+    estadisticas_json LONGTEXT NULL,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario)
+);
+\end{lstlisting}
+
+\medskip
+\noindent La tabla \texttt{curvas\_consumo} almacena las curvas eléctricas individuales extraídas de los archivos importados.
+
+\begin{lstlisting}[caption={Tabla de curvas.}, label={lst:tabla_curvas}]
+CREATE TABLE curvas_consumo (
+
+    id_curva INT AUTO_INCREMENT PRIMARY KEY,
+
+    id_archivo INT NOT NULL,
+
+    identificador_curva VARCHAR(100) NOT NULL,
+
+    datos_consumo LONGTEXT NOT NULL,
+
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_archivo)
+        REFERENCES archivos_consumo(id_archivo)
+);
+\end{lstlisting}
+
+\medskip
+\noindent La tabla \texttt{predicciones} almacena el historial de predicciones realizadas por los modelos del sistema.
+
+\begin{lstlisting}[caption={Tabla de predicciones.}, label={lst:tabla_predicciones}]
+CREATE TABLE predicciones (
+
+    id_prediccion INT AUTO_INCREMENT PRIMARY KEY,
+
+    id_curva INT NOT NULL,
+
+    tipo_modelo ENUM(
+        'xgboost',
+        'adaptive_random_forest'
+    ) NOT NULL,
+
+    tipo_prediccion ENUM(
+        'historica',
+        'tiempo_real'
+    ) NOT NULL,
+
+    resultado_prediccion TINYINT(1) NOT NULL,
+
+    probabilidad_fraude FLOAT NOT NULL,
+
+    fecha_prediccion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_curva)
+        REFERENCES curvas_consumo(id_curva)
+);
+\end{lstlisting}
+
+Tras la creación de la base de datos, deben configurarse las credenciales de acceso utilizadas por la aplicación. Para ello, el sistema utiliza un archivo de variables de entorno denominado \texttt{.env}, situado en la raíz del proyecto. Este archivo permite separar la configuración sensible del código fuente, evitando almacenar directamente las credenciales dentro de la aplicación. El archivo \texttt{.env} debe contener los parámetros necesarios para establecer la conexión con la base de datos \emph{MySQL}, incluyendo el host, el usuario, la contraseña y el nombre de la base de datos utilizada por el sistema. Un ejemplo de configuración es el siguiente:
+
+\begin{lstlisting}[language=bash, caption={Configuración de variables de entorno}]
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=tfg_fraudeelectrico
+\end{lstlisting}
+
+Estas variables son cargadas automáticamente por la aplicación mediante la biblioteca \emph{python-dotenv} desde el módulo encargado de la conexión con la base de datos (\texttt{database.py}). Además, el sistema requiere disponer de los modelos previamente entrenados utilizados durante la fase experimental. Dichos modelos se encuentran almacenados en formato \texttt{.pkl} dentro del directorio \texttt{models/}.
+
+Por otra parte, los archivos utilizados para realizar predicciones históricas o simulaciones en tiempo real deben almacenarse dentro del directorio \texttt{data/}. El sistema accede a estos archivos durante la ejecución para procesar las curvas de consumo eléctrico importadas por el operador.
+
+Debido a que las contraseñas no se almacenan en texto plano, es necesario generar previamente el \emph{hash} de la contraseña antes de insertar un usuario en la base de datos. Para ello, se utiliza la biblioteca \emph{Passlib} junto con el algoritmo \emph{bcrypt}. El siguiente \emph{script} permite generar un hash válido a partir de una contraseña introducida por consola:
+
+\begin{lstlisting}[language=Python, caption={Generación de hash para contraseñas}]
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+password = input("Introduce la contrasena: ")
+
+password_hash = pwd_context.hash(password)
+
+print("\nHash generado:\n")
+print(password_hash)
+\end{lstlisting}
+
+Una vez generado el \emph{hash}, el usuario puede insertarse manualmente en la tabla \texttt{usuarios}, usando el usuario y contraseña con \emph{hash} del  \emph{script} anterior, mediante una sentencia \emph{SQL} como la siguiente:
+
+\begin{lstlisting}[language=SQL, caption={Inserción manual de un usuario}]
+INSERT INTO usuarios(nombre_usuario, password_hash, rol)
+VALUES('usuario', 'hash sacado del script', 'administrador');
+\end{lstlisting}
+
+Finalmente, una vez completada toda la configuración, la aplicación puede iniciarse eejcutando el servidor \emph{Uvicorn} utilizando el siguiente comando: \texttt{uvicorn app.main:app --reload}
+
+Tras la ejecución del servidor, la interfaz web y la documentación automática de la API estarán disponibles desde el navegador web. Por defecto, el servidor se ejecuta sobre el puerto \texttt{8000}. Por tanto, la aplicación web puede accederse desde la dirección: \texttt{http://localhost:8000}. Y la documentación interactiva generada automáticamente por \emph{FastAPI} se encuentra disponible en: \texttt{http://localhost:8000/docs}.
+
+
+\subsection{Despliegue en servidor AWS}
+
+
 
 
 
@@ -1727,7 +1946,13 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 \chapter{Validación del prototipo web}
 
 
+
+\section{Entorno de validación}
+
+
+
 \section{Estrategia de validación}
+
 
 
 \section{Pruebas funcionales}
@@ -1737,9 +1962,6 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 
 
 \section{Pruebas de rendimiento}
-
-
-\section{Validación global del prototipo}
 
 
 
@@ -1754,22 +1976,42 @@ Se utiliza \emph{Pickle}, módulo estándar de \emph{Python}, para cargar recurs
 % =========================
 \chapter{Conclusiones}
 
-En este trabajo se realiza un estudio comparativo entre distintos modelos de aprendizaje automático, tanto en entornos \emph{offline} como \emph{online}, para detectar fraude en el consumo eléctrico. Con los resultados obtenidos se pueden extraer diversas conclusiones importantes sobre el rendimiento, la capacidad de generalización y la aplicabilidad de los modelos.
+En primer lugar, se examinan las conclusiones de la etapa experimental en relación con los modelos y métricas que se han estudiado. Se pueden sacar varias conclusiones relevantes acerca de la capacidad de generalización, el rendimiento y la aplicabilidad de los modelos a partir de los resultados obtenidos.
 
-Los modelos \emph{offline} muestran un rendimiento superior al de los modelos \emph{online}. Esto se debe a que estos algoritmos disponen del conjunto completo de datos durante el entrenamiento, lo que les permite ajustar sus parámetros de forma más precisa y capturar relaciones complejas entre las variables. Destacan los modelos basados en técnicas de ensamble, como \emph{Random Forest}, \emph{Gradient Boosting}, \emph{XGBoost} y MLP. \emph{XGBoost} es el algoritmo con mejor rendimiento global, ya que combina una precisión alta con una capacidad alta de detección de fraude, manteniendo al mismo tiempo una tasa de falsos positivos muy pequeña. Esto puede explicarse por que está basado en \emph{boosting}, donde cada nuevo modelo corrige los errores de los anteriores, así como por la incorporación de mecanismos de regularización que evitan el sobreajuste. Los modelos más simples, como la Regresión Logística, presentan un rendimiento bastante inferior. Esto se debe a su capacidad limitada para modelar relaciones no lineales en los datos. Aunque este modelo se usa como una base simple para comparar el resto de modelos más avanzados, no resulta útil para la detección de fraude eléctrico.
+Los modelos \emph{offline} son más eficientes que los modelos \emph{online}. Esto sucede porque estos algoritmos cuentan con la totalidad de los datos durante el entrenamiento, lo cual les posibilita calibrar sus parámetros de manera más exacta y captar conexiones complejas entre las variables. Los modelos que se basan en técnicas de ensamble, como \emph{MLP}, \emph{Random Forest}, \emph{Gradient Boosting} y \emph{XGBoost}, son notables. El algoritmo con mejor rendimiento es el \emph{XGBoost}, porque combina una precisión alta con una capacidad de detección de fraude también alta, manteniendo al mismo tiempo una tasa de falsos positivos muy pequeña. Esto puede explicarse por que está basado en \emph{boosting}, donde cada nuevo modelo corrige los errores de los anteriores. Los modelos más simples, como la Regresión Logística, presentan un rendimiento bastante inferior. Esto se debe a su capacidad limitada para modelar relaciones no lineales en los datos. Aunque este modelo se usa como una base simple para comparar el resto de modelos más avanzados, no resulta útil para la detección de fraude eléctrico.
 
-En los modelos \emph{online} se observan comportamientos más variados. El modelo Adaptive Random Forest destaca por encima del resto. Este resultado demuestra que es posible obtener un rendimiento competitivo en escenarios de flujo de datos mediante el uso de técnicas de ensamble adaptativas. Los modelos como kNN \emph{online} y \emph{Hoeffding Tree} muestran un rendimiento aceptable, aunque inferior. Los modelos como Perceptrón online y el Naive Bayes incremental presentan limitaciones importantes, especialmente en la capacidad para distinguir entre comportamientos normales o fraudulentos. El bajo rendimiento de Naive Bayes se explica por la fuerte independencia entre variables, que no se cumple en el conjunto de datos utilizado.
+En los modelos \emph{online} se observan comportamientos más variados. El modelo \emph{Adaptive Random Forest} destaca por encima del resto. Este resultado demuestra que es posible obtener un rendimiento competitivo en flujos de datos mediante el uso de técnicas de ensemble adaptativas. Los modelos como \emph{kNN online} y \emph{Hoeffding Tree} muestran un rendimiento aceptable, aunque inferior. Los modelos como \emph{Perceptrón online} y el \emph{Naive Bayes incremental} tienen limitaciones importantes, especialmente en la capacidad para distinguir entre comportamientos normales o fraudulentos.
 
-Los resultados muestran que existe una relación entre rendimiento y capacidad de adaptación al flujo de datos. Mientras que los modelos \emph{offline} ofrecen mejores resultados en términos de precisión y capacidad para separar entre comportamientos normales o fraudes, los modelos \emph{online} permiten trabajar en entornos dinámicos donde los datos llegan de forma continua, lo que resulta muy importante en aplicaciones en tiempo real. Este estudio destaca la importancia de seleccionar el modelo adecuado en función del contexto del problema. En escenarios donde se dispone de todos los datos y se busca maximizar el rendimiento, modelos como \emph{XGBoost} resultan la mejor opción. Sin embargo, en entornos donde los datos se generan de forma continua, algoritmos como \emph{Adaptive Random Forest} ofrecen una alternativa eficaz, combinando adaptabilidad y un rendimiento competitivo.
+Los resultados muestran que existe una relación entre la capacidad de predicción y la de adaptación al flujo de datos. Los modelos \emph{offline} logran mejores resultados en capacidad para distinguir entre comportamientos normales y fraudes, así como en precisión. Sin embargo, los modelos \emph{online} posibilitan el trabajo en entornos dinámicos en los que la información se recibe constantemente; esto es muy relevante para las aplicaciones en tiempo real. En este estudio se subraya la relevancia de elegir el modelo apropiado según el contexto del problema. Modelos como \emph{XGBoost} son la opción más adecuada en situaciones donde se cuenta con todas las informaciones disponibles y el objetivo es optimizar los resultados. No obstante, en contextos en los que se producen datos de manera constante, algoritmos como el \emph{Adaptive Random Forest} brindan una opción efectiva al fusionar un rendimiento competitivo con la adaptabilidad.
+
+Además de la fase experimental, se desarrolla un prototipo funcional orientado a la detección de fraude eléctrico, integrando distintos componentes software para el procesamiento de datos, ejecución de predicciones y visualización de resultados dentro de una aplicación web completa. Este desarrollo del prototipo permite validar la integración práctica de estos modelos dentro de un sistema software completo permitiendo trasladar el trabajo experimental a un entorno de uso más cercano a una aplicación real.
+
+Sin embargo, el sistema tiene algunas limitaciones que proceden del entorno experimental empleado. Entre ellas destacan la dependencia de los datos disponibles, la simulación del flujo en tiempo real y la ausencia de integración con infraestructuras eléctricas reales. Además, el rendimiento de los modelos puede verse condicionado por cambios en los patrones de consumo o por la disponibilidad de nuevos datos representativos.
 
 
 \section{Objetivos alcanzados}
 
+Los objetivos propuestos al principio del trabajo han sido cumplidos con éxito. En primer lugar, se lleva a cabo un análisis comparativo de varios algoritmos de aprendizaje automático que se utilizan para detectar el fraude eléctrico separando entre técnicas de aprendizaje \emph{offline} y \emph{online}. Para esto, se utilizan métricas de evaluación para implementar y evaluar los modelos, lo que facilita la identificación de las técnicas más efectivas en cada categoría. Además, se realiza el análisis y preprocesamiento de conjuntos de datos ayudando a ajustar la información para entrenar y evaluar los modelos implementados.
+
+El desarrollo de un prototipo de software funcional que pueda incorporar los modelos elegidos dentro de un ambiente web interactivo es otro de los logros obtenidos. También, se incluyen procedimientos de autenticación y administración de usuarios, así como el almacenamiento de datos del sistema en una base de datos, lo que posibilita un entorno estructurado y ordenado para su uso.
+
+En último lugar, el trabajo ha hecho posible corroborar la integración práctica de métodos de aprendizaje automático en una aplicación integral enfocada en identificar fraude eléctrico, logrando las metas que se habían establecido al principio a nivel de experimentación y funcional.
+
 
 \section{Lecciones aprendidas}
 
+El desarrollo de este trabajo me ha ayudado a adquirir conocimientos tanto en el área del aprendizaje automatizado como en la creación de sistemas informáticos complejos. Casi no contaba con experiencia previa en el funcionamiento interno de muchos, por no decir de casi todos, de los algoritmos de aprendizaje automático empleados al principio del proyecto. Así que, una parte importante del trabajo fue estudiar sus bases teóricas, entender cómo funcionan y analizar su desempeño en diferentes situaciones de detección de fraude eléctrico. Durante el desarrollo del proyecto he aprendido sobre la validación, evaluación y entrenamiento de modelos de clasificación, además de sobre el manejo y preprocesamiento de datos reales. Puedo decir, que hacer este trabajo me permitió entender las diferencias entre los métodos de aprendizaje \emph{online} y \emph{offline}, evaluando lo positivo y lo negativo de cada uno.
+
+Desde la perspectiva del desarrollo de \emph{software}, el proyecto ha sido una muy buena experiencia práctica en la creación y puesta en marcha de una arquitectura web fundamentada en \emph{FastAPI}. Además, se han adquirido conocimientos sobre la creación de \emph{APIs REST}, la identificación a través de \emph{tokens JWT}, la integración con bases de datos \emph{MySQL} y el manejo de usuarios en una aplicación web. Además, he aprendido aspectos sobre la organización de proyectos \emph{software}, gestión de dependencias, despliegue de aplicaciones y configuración de entornos de ejecución reproducibles. Todo ello me permite tener una visión más completa del proceso de desarrollo de sistemas basados en aprendizaje automático, desde la fase experimental hasta su integración dentro de un entorno \emph{software} funcional.
+
 
 \section{Trabajo futuro}
+
+El sistema desarrollado puede ampliarse en distintas líneas orientadas tanto a la mejora de los modelos de aprendizaje automático como a la evolución del prototipo software implementado. Podrían incorporarse nuevos modelos basados en técnicas de aprendizaje profundo diferentes y con mejor rendimiento que el Perceptrón y el MLP. Así, se podría estudiar su comportamiento sobre curvas de consumo eléctrico más complejas. Además, sería interesante integrar mecanismos de actualización automática de modelos y reentrenamiento periódico utilizando nuevos datos reales de consumo. Esto permitiría mejorar la capacidad de adaptación del sistema ante cambios en los patrones de comportamiento eléctrico y posibles nuevas estrategias de fraude.
+
+Otra posible línea futura sería  sustituir la simulación actual de flujo en tiempo real por una integración directa con dispositivos inteligentes de medición o plataformas \emph{IoT} \cite{IoT}, permitiendo evaluar el sistema en escenarios reales de monitorización continua. Desde el punto de vista software, podrían añadirse nuevas funcionalidades orientadas a la administración avanzada del sistema, generación automática de informes, auditoría de predicciones o paneles interactivos más completos para el análisis visual de resultados.
+
+El procesamiento de grandes archivos puede incrementar significativamente el tiempo de respuesta del sistema, debido a que la carga, predicción y almacenamiento se realizan de forma síncrona dentro de la API. Como mejora futura, podrían incorporarse mecanismos de procesamiento asíncrono o colas de tareas. Aunque el sistema ha sido desplegado sobre infraestructura cloud mediante \emph{AWS}, como trabajo futuro podrían incorporarse mecanismos adicionales de escalabilidad, monitorización y procesamiento distribuido orientados a entornos de producción con mayores volúmenes de datos.
 
 
 % =========================
@@ -1777,38 +2019,226 @@ Los resultados muestran que existe una relación entre rendimiento y capacidad d
 % =========================
 \part{Anexo}
 
-
 % =========================
 % CAPÍTULO 9
 % =========================
-\chapter{Dependencias y paquetes Python}
-
-
-% =========================
-% CAPÍTULO 10
-% =========================
 \chapter{Manual de usuario}
 
+El funcionamiento de la interfaz web desarrollada para el prototipo de detección de fraude eléctrico es descrito en este capítulo. Mediante esta interfaz, el operador puede autenticarse en el sistema, importar archivos que contengan curvas de consumo, realizar predicciones tanto históricas como en tiempo real y revisar estadísticas y gráficos creados por los modelos de aprendizaje automático que están integrados en la aplicación. Las secciones siguientes muestran el procedimiento para utilizar cada funcionalidad que esté disponible, utilizando ejemplos y capturas de la aplicación web.
 
-\section{Introducción}
+
+\section{Acceso al sistema}
+
+Para acceder a la web, el usuario tiene que abrir el navegador web e ir a la URL donde está desplegada la aplicación. La dirección es x. Cuando se cargue el sistema, la pantalla de inicio de sesión aparecerá automáticamente. La interfaz de inicio de sesión que ha sido implementada en el sistema se puede observar en la Figura~\ref{fig:login}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/login.png}
+\caption{Pantalla de inicio de sesión.}
+\label{fig:login}
+\end{figure}
+
+Para acceder, se necesita un nombre de usuario y una contraseña que hayan sido registrados en el sistema con anterioridad. Los pasos que se deben seguir para iniciar sesión son los siguientes:
+
+\begin{enumerate}
+    \item Introducir el nombre de usuario en el campo correspondiente.
+    \item Introducir la contraseña de acceso en el campo correspondiente.    
+    \item Hacer click en \emph{Entrar}.
+\end{enumerate}
+
+El sistema redirige automáticamente al menú principal de la aplicación si se introducen las credenciales adecuadas. Desde allí, el operador tiene acceso a las diferentes funciones disponibles. La pantalla de inicio del sistema se muestra en la Figura~\ref{fig:home}.
+
+Si se ingresan datos erróneos, la aplicación mostrará un mensaje de error que indica que las credenciales no son válidas. La Figura~\ref{fig:login_error} muestra la interfaz de inicio de sesión cuando se introduce mal las credenciales del usuario. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/login_error.png}
+\caption{Pantalla de inicio de sesión con error al introducir credenciales.}
+\label{fig:login_error}
+\end{figure}
+
+\noindent Si se ingresan datos erróneos, hay que seguir estos pasos:
+
+\begin{enumerate}
+    \item Hacer click en \emph{Aceptar}.
+    \item Introducir los datos de acceso correctos en cada campo correspondiente.
+    \item Hacer click en \emph{Entrar}.
+\end{enumerate}
 
 
 \section{Uso del sistema}
 
+Cuando el operador se autentica de forma correcta, entra al inicio de la aplicación web, desde donde tiene acceso a las diferentes funciones que se han incorporado. La interfaz web se organiza con un menú lateral, situado a la izquierda de la pantalla, que facilita el movimiento entre las distintas secciones del sistema. La pantalla de inicio se muestra en la Figura~\ref{fig:home}.
 
-\subsection{Consulta de modelos offline}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/home.png}
+\caption{Pantalla de inicio.}
+\label{fig:home}
+\end{figure}
+
+Las funciones que se encuentran disponibles son: la importación de archivos, las predicciones en tiempo real y las históricas, así como la consulta de estadísticas producidas por los modelos de aprendizaje automático incorporados a la aplicación. El funcionamiento de cada módulo del sistema se detalla a continuación en las subsecciones.
 
 
-\subsection{Consulta de modelos online}
+\subsection{Importar archivos}
+
+La función de importación suma la incorporación de archivos en formato .csv que albergan curvas de consumo eléctrico, lo que permite realizar análisis estadísticos y predicciones a continuación. Esta operación se lleva a cabo desde la página principal del sistema, la cual se puede acceder después de haber iniciado sesión de manera correcta. Para poder llevar a cabo todas las demás funcionalidades, es necesario importar al menos un archivo. La Figura~\ref{fig:importar} muestra la opción de importar un archivo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/importar.png}
+\caption{Importar un archivo.}
+\label{fig:importar}
+\end{figure}
+
+La selección para importar archivos se ubica en la parte superior de la interfaz. El operador tiene que elegir la opción de selección de archivo y elegir un archivo válido guardado en el equipo. Después, para transferir el archivo al sistema, se debe hacer click en la opción de \emph{Importar}. Las Figuras~\ref{fig:seleccionar} y~\ref{fig:seleccionado} enseñan el proceso de selección de un archivo para importarlo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/seleccionar.png}
+\caption{Seleccionar un archivo.}
+\label{fig:seleccionar}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/seleccionado.png}
+\caption{Archivo seleccionado.}
+\label{fig:seleccionado}
+\end{figure}
+
+Cuando se ha terminado de importar, el archivo queda guardado y accesible para las demás funciones del sistema. Después de una carga exitosa, el sistema presenta un mensaje de confirmación que señala que el archivo ha sido procesado de manera satisfactoria. Además, en los listados que emplean las secciones de predicción histórica y estadísticas, el archivo se incluirá de manera automática. La Figura~\ref{fig:importado} muestra como la subida del archivo se realizó correctamente.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/importado.png}
+\caption{Archivo importado.}
+\label{fig:importado}
+\end{figure}
+
+\noindent En definitiva, los pasos a seguir para importar un archivo correctamente son:
+\begin{enumerate}
+    \item Hacer click en \emph{Elegir archivo}.
+    \item Seleccionar, dentro del selector de archivos, haciendo click en un archivo válido.
+    \item Hacer click en \emph{Abrir}.
+    \item Hacer click en \emph{Importar archivo CSV}.
+\end{enumerate}
+
+Si el archivo tiene un formato erróneo o si ocurre un fallo durante la carga, se indicará al operador sobre la incidencia ocurrida mediante un mensaje de error del sistema. La Figura~\ref{fig:importar_error} muestra como se produce un error al importar un archivo no válido.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/importar_error.png}
+\caption{Error al importar un archivo.}
+\label{fig:importar_error}
+\end{figure}
 
 
-\subsection{Obtención del mejor modelo}
+\subsection{Consulta de estadísticas}
+
+El sistema en la pantalla de inicio incorpora la consulta de estadísticas para el análisis global de los archivos importados por el operador. Desde el inicio, el usuario puede seleccionar cualquiera de los archivos previamente importados en el sistema. Una vez seleccionado el archivo, se genera automáticamente un conjunto de representaciones gráficas asociadas a las curvas de consumo contenidas en el archivo elegido permitiendo al operador identificar rápidamente comportamientos anómalos o normales.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/seleccionar_curva.png}
+\caption{Seleccionar curva.}
+\label{fig:seleccionar_archivo}
+\end{figure}
+
+Las estadísticas y gráficas que se muestran en la figuras~\ref{fig:grafica1} y~\ref{fig:grafica2} calculan la distribución de fraude, el top de consumo medio de todas las curvas, el top de curvas con mayor probabilidad de fraude y el rango de probabilidades de fraude.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/grafica1.png}
+\caption{Gráficas mostradas de un archivo.}
+\label{fig:grafica1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/grafica2.png}
+\caption{Otras gráficas mostradas de un archivo.}
+\label{fig:grafica2}
+\end{figure}
 
 
-\subsection{Visualización de curvas ROC}
+\subsection{Predicción histórica}
+
+La función de predicción histórica permite analizar una curva de consumo completa. Para realizar una predicción histórica, el usuario debe acceder al apartado correspondiente desde el menú principal haciendo click en \emph{Predicción histórica}. A continuación, deberá seleccionar un archivo previamente importado y posteriormente una de las curvas disponibles dentro de dicho archivo.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{imagenes/menuH.png}
+\caption{Menú de la izquierda seleccionando predicción histórica.}
+\label{fig:menuH}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/seleccionar_curva.png}
+\caption{Seleccionar curva de un archivo en predicción histórica.}
+\label{fig:seleccionar_curva}
+\end{figure}
+
+Una vez seleccionada la curva, el sistema muestra la gráfica de consumo junto al resultado y probabilidad de fraude. En la figura~\ref{fig:historica} puede verse la gráfica, donde el eje horizontal representa la evolución temporal completa de la curva, incluyendo la fecha y hora de cada medición, mientras que el eje vertical muestra los valores de consumo eléctrico registrados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/historica.png}
+\caption{Predicción \emph{offline}.}
+\label{fig:historica}
+\end{figure}
 
 
-\subsection{Lectura de respuestas JSON}
+\subsection{Predicción en tiempo real}
+
+La función de predicción en tiempo real permite simular el análisis progresivo de una curva de consumo eléctrico, reproduciendo el comportamiento de un sistema de monitorización continua. Para utilizar esta funcionalidad, el usuario debe acceder al apartado de predicción en tiempo real desde el menú principal haciendo click en \emph{Predicción tiempo real}. Posteriormente, deberá seleccionar un archivo previamente importado y una curva de consumo asociada.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{imagenes/menuT.png}
+\caption{Menú de la izquierda seleccionando predicción en tiempo real.}
+\label{fig:menuT}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/seleccionar_curva2.png}
+\caption{Seleccionar curva de un archivo en predicción en tiempo real.}
+\label{fig:seleccionar_curva2}
+\end{figure}
+
+Una vez iniciada la simulación, en las figuras~\ref{fig:real} y~\ref{fig:real2} el sistema representa gráficamente los valores de consumo de manera secuencial, incorporando nuevos puntos de consumo de forma periódica para emular la llegada de datos en tiempo real. Además, presenta al lado derecho el resultado y probabilidad de fraude en cada punto.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/real.png}
+\caption{Predicción \emph{online}.}
+\label{fig:real}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{imagenes/real2.png}
+\caption{Predicción \emph{online} más adelante en el tiempo.}
+\label{fig:real2}
+\end{figure}
+
+En esta representación, el eje horizontal muestra los instantes temporales simulados de adquisición de datos, mientras que el eje vertical representa los valores de consumo eléctrico.
+
+
+\subsection{Cierre de sesión}
+
+El sistema incorpora un mecanismo de cierre de sesión para garantizar la seguridad y el control de acceso al sistema. El usuario puede finalizar su sesión en cualquier momento haciendo click en \emph{Cerrar sesión} situado abajo a la izquierda en cualquier pantalla en la que se encuentre. En la figura~\ref{fig:cerrar} se muestra un ejemplo de la opción de cerrar sesión.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{imagenes/cerrar.png}
+\caption{Cerrar sesión.}
+\label{fig:cerrar}
+\end{figure}
+
+Al realizar esta acción, el sistema elimina el token de autenticación almacenado localmente en el navegador y redirige automáticamente al usuario a la pantalla de inicio de sesión. De esta forma, se evita el acceso no autorizado a las funciones de la plataforma una vez finalizada la sesión activa del operador.
 
 
 \cleardoublepage
@@ -2000,6 +2430,11 @@ Disponible en: \url{https://medium.com/we-talk-data/a-beginners-guide-to-hoeffdi
 \bibitem{Adaptive Random Forest Python}
 Adaptive Random Forest Python Package
 Disponible en: \url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html}
+
+\bibitem{IoT}
+Plataformas IoT.
+Disponible en: \url{https://www.cognizant.com/es/es/glossary/internet-of-things-platform}
+
 
 
 \end{thebibliography}

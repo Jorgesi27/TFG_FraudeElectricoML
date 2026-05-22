@@ -31,10 +31,17 @@ export function crearGraficaLineal(
 
                 borderColor: "#3b82f6",
 
-                backgroundColor:
-                    "rgba(59,130,246,0.2)",
+                backgroundColor: "rgba(59,130,246,0.2)",
 
-                tension: 0.4
+                pointRadius: 4,
+
+                pointHoverRadius: 6,
+
+                pointBackgroundColor: "#3b82f6",
+
+                pointBorderColor: "#3b82f6",
+
+                tension: 0.3
             }]
         },
 
@@ -62,7 +69,15 @@ export function crearGraficaLineal(
 
                     ticks: {
 
-                        maxTicksLimit: 12
+                        color: "white",
+
+                        autoSkip: true,
+
+                        maxTicksLimit: 12,
+
+                        maxRotation: 45,
+
+                        minRotation: 45
                     }
                 },
 
@@ -71,7 +86,7 @@ export function crearGraficaLineal(
                     beginAtZero: false
                 }
             }
-}
+        }
     });
 }
 
@@ -83,7 +98,7 @@ export function crearGraficaPie(
 
     return new Chart(ctx, {
 
-        type: "pie",
+        type: "doughnut",
 
         data: {
 
@@ -104,6 +119,15 @@ export function crearGraficaPie(
                     "#3b82f6"
                 ]
             }]
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: true,
+
+            aspectRatio: 1
         }
     });
 }

@@ -27,24 +27,11 @@ import {
 } from "./auth.js";
 
 
-// ========================================
-// ELEMENTOS DOM
-// ========================================
-
-const archivoSelect =
-    document.getElementById("archivoSelect");
-
-const curvaSelect =
-    document.getElementById("curvaSelect");
-
-const resultadoHistorico =
-    document.getElementById("resultadoHistorico");
-
-const probabilidadHistorica =
-    document.getElementById("probabilidadHistorica");
-
-const graficaHistorica =
-    document.getElementById("graficaHistorica");
+let archivoSelect = null;
+let curvaSelect = null;
+let resultadoHistorico = null;
+let probabilidadHistorica = null;
+let graficaHistorica = null;
 
 
 // ========================================
@@ -53,79 +40,6 @@ const graficaHistorica =
 
 let chart = null;
 
-
-// ========================================
-// IMPORTAR CSV
-// ========================================
-
-async function importarArchivo(){
-
-    const loader =
-        document.getElementById(
-            "loaderImportar"
-        );
-
-    loader.style.display = "block";
-
-    const input =
-        document.getElementById("csvFile");
-
-    if(!input.files.length){
-
-        loader.style.display = "none";
-
-        alert("Seleccione un archivo CSV");
-
-        return;
-    }
-
-    const formData = new FormData();
-
-    formData.append(
-        "archivo",
-        input.files[0]
-    );
-
-    try{
-
-        const response = await fetchAuth(
-
-            "/api/operador/importar-csv",
-
-            {
-                method:"POST",
-                body:formData
-            }
-        );
-
-        if(!response){
-            return;
-        }
-
-        await obtenerData(response);
-
-        alert(
-            "Archivo importado correctamente"
-        );
-
-        input.value = "";
-
-        await cargarArchivos();
-
-    }catch(error){
-
-        mostrarError(
-            "Error importando archivo",
-            error
-        );
-
-    }finally{
-
-        loader.style.display = "none";
-    }
-}
-
-
 // ========================================
 // CARGAR ARCHIVOS
 // ========================================
@@ -133,6 +47,7 @@ async function importarArchivo(){
 async function cargarArchivos(){
 
     try{
+
 
         const response = await fetchAuth(
             "/api/operador/archivos"
@@ -144,6 +59,7 @@ async function cargarArchivos(){
 
         const archivos =
             await obtenerData(response);
+
 
         archivoSelect.innerHTML =
 
@@ -165,6 +81,8 @@ async function cargarArchivos(){
         });
 
     }catch(error){
+
+        console.error(error);
 
         mostrarError(
             "Error cargando archivos",
@@ -285,32 +203,11 @@ async function mostrarGrafica(){
         const curva =
             await obtenerData(response);
 
-        const valores = Object.entries(
-            curva.datos_consumo
-        )
-        .filter(([_, valor]) =>
-            typeof valor === "number"
-        )
-        .map(([_, valor]) => valor);
+        const labels =
+            curva.datos_consumo.timestamps;
 
-        const labels = valores.map((_, i) => {
-
-            const fecha = new Date(
-                2024,
-                0,
-                1,
-                0,
-                i
-            );
-
-            return fecha.toLocaleTimeString(
-                "es-ES",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
-        });
+        const valores =
+            curva.datos_consumo.values;
 
         chart =
             limpiarGrafica(chart);
@@ -384,34 +281,53 @@ async function ejecutarPrediccionHistorica(){
 
 function inicializarEventos(){
 
-    document
-        .getElementById("btnImportar")
-        .addEventListener(
-            "click",
-            importarArchivo
-        );
+    const btnLogout =
+        document.getElementById("btnLogout");
 
-    document
-        .getElementById("btnLogout")
-        .addEventListener(
+    if(btnLogout){
+
+        btnLogout.addEventListener(
             "click",
             logout
         );
+    }else{
 
-    archivoSelect.addEventListener(
-        "change",
-        cargarCurvas
-    );
+        console.error(
+            "No existe #btnLogout"
+        );
+    }
 
-    curvaSelect.addEventListener(
-        "change",
-        async () => {
+    if(archivoSelect){
 
-            await mostrarGrafica();
+        archivoSelect.addEventListener(
+            "change",
+            cargarCurvas
+        );
+    }else{
 
-            await ejecutarPrediccionHistorica();
-        }
-    );
+        console.error(
+            "No existe #archivoSelect"
+        );
+    }
+
+    if(curvaSelect){
+
+        curvaSelect.addEventListener(
+            "change",
+            async () => {
+
+                await mostrarGrafica();
+
+                await ejecutarPrediccionHistorica();
+            }
+        );
+
+    }else{
+
+        console.error(
+            "No existe #curvaSelect"
+        );
+    }
 }
 
 
@@ -419,19 +335,39 @@ function inicializarEventos(){
 // INIT
 // ========================================
 
-window.onload = async () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
 
-    const token =
-        localStorage.getItem("token");
+        const token =
+            localStorage.getItem("token");
 
-    if(!token){
+        if(!token){
 
-        redirigirLogin();
+            redirigirLogin();
 
-        return;
+            return;
+        }
+
+        archivoSelect =
+            document.getElementById("archivoSelect");
+
+        curvaSelect =
+            document.getElementById("curvaSelect");
+
+        resultadoHistorico =
+            document.getElementById("resultadoHistorico");
+
+        probabilidadHistorica =
+            document.getElementById("probabilidadHistorica");
+
+        graficaHistorica =
+            document.getElementById("graficaHistorica");
+
+        inicializarEventos();
+
+        activarMenu();
+
+        await cargarArchivos();
     }
-
-    inicializarEventos();
-    activarMenu();
-    await cargarArchivos();
-};
+);
