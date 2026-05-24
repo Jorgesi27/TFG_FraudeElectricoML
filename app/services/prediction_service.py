@@ -261,14 +261,14 @@ def importar_archivo_csv(
     nombre_archivo: str,
     id_usuario: int
 ):
-
+    print("INICIO IMPORTACION")
     df = leer_csv_subido(contenido)
-
+    print("CSV LEIDO")
     id_archivo = guardar_archivo(
         id_usuario=id_usuario,
         nombre_archivo=nombre_archivo
     )
-
+    print("ARCHIVO GUARDADO EN BD")
     total_curvas = 0
 
     try:
@@ -276,7 +276,7 @@ def importar_archivo_csv(
         columna_tiempo = detectar_columna_temporal(df)
 
         for indice, fila in df.iterrows():
-
+            print(f"Procesando fila {indice}")
             identificador_curva = f"CURVA_{indice + 1}"
 
             fila_dict = fila.to_dict()
@@ -318,7 +318,7 @@ def importar_archivo_csv(
                 "las curvas del archivo."
             )
         )
-
+    print("ANTES ESTADISTICAS")
     estadisticas = generar_estadisticas_archivo(
         id_archivo,
         id_usuario
