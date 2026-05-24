@@ -264,10 +264,17 @@ def importar_archivo_csv(
     print("INICIO IMPORTACION")
     df = leer_csv_subido(contenido)
     print("CSV LEIDO")
-    id_archivo = guardar_archivo(
-        id_usuario=id_usuario,
-        nombre_archivo=nombre_archivo
-    )
+    try:
+        id_archivo = guardar_archivo(
+            id_usuario=id_usuario,
+            nombre_archivo=nombre_archivo
+        )
+
+        print("ARCHIVO GUARDADO EN BD")
+
+    except Exception as e:
+        print("ERROR GUARDAR_ARCHIVO:", repr(e))
+        raise
     print("ARCHIVO GUARDADO EN BD")
     total_curvas = 0
 
