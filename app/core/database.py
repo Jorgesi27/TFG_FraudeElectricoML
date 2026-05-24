@@ -73,10 +73,13 @@ def guardar_archivo(id_usuario: int, nombre_archivo: str):
 
                 return cursor.lastrowid
 
-    except Exception:
+    except Exception as e:
+
+        print("ERROR MYSQL:", e)
+
         raise HTTPException(
             status_code=500,
-            detail="No ha sido posible guardar el archivo importado."
+            detail=str(e)
         )
 
 
