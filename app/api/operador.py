@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from fastapi import (
     APIRouter,
     UploadFile,
@@ -9,42 +8,34 @@ from fastapi import (
     Request,
     Depends
 )
-
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-
 from fastapi.security import (
     HTTPAuthorizationCredentials
 )
-
 from app.core.auth import (
     autenticar_usuario,
     obtener_operador_actual,
     security,
     cerrar_sesion
 )
-
 from app.services.prediction_service import (
     importar_archivo_csv,
     listar_curvas_archivo,
     predecir_curva_historica,
     obtener_detalle_curva,
-    generar_estadisticas_archivo,
     predecir_curva_tiempo_real,
     predecir_stream
 )
-
 from app.core.database import (
     obtener_archivos_usuario,
     obtener_estadisticas_archivo_bd
 )
-
 from pydantic import BaseModel
 from typing import List
 
 class StreamRequest(BaseModel):
     valores: List[float]
-
 
 router = APIRouter()
 
@@ -54,11 +45,7 @@ templates = Jinja2Templates(
     directory="app/templates"
 )
 
-
-# ========================================
 # PAGINAS HTML
-# ========================================
-
 @router.get(
     "/home",
     response_class=HTMLResponse,
@@ -70,7 +57,6 @@ def home_page(request: Request):
         "estadisticas.html",
         {"request": request}
     )
-
 
 @router.get(
     "/historica",
@@ -84,7 +70,6 @@ def historica_page(request: Request):
         {"request": request}
     )
 
-
 @router.get(
     "/tiempo-real",
     response_class=HTMLResponse,
@@ -97,7 +82,6 @@ def tiempo_real_page(request: Request):
         {"request": request}
     )
 
-
 @router.post(
     "/prediccion/stream"
 )
@@ -108,7 +92,6 @@ def prediccion_stream(
     return predecir_stream(
         request.valores
     )
-
 
 @router.get(
     "/estadisticas",
@@ -121,7 +104,6 @@ def estadisticas_page(request: Request):
         "estadisticas.html",
         {"request": request}
     )
-
 
 @router.get(
     "/login-page",
@@ -136,10 +118,8 @@ def login_page(request: Request):
     )
 
 
-# ========================================
-# AUTH
-# ========================================
 
+# AUTH
 @router.post("/login")
 def iniciar_sesion(
     usuario: str = Form(...),
@@ -150,7 +130,6 @@ def iniciar_sesion(
         nombre_usuario=usuario,
         password=password
     )
-
 
 @router.post("/logout")
 def logout(
@@ -164,10 +143,7 @@ def logout(
     )
 
 
-# ========================================
-# IMPORTAR CSV
-# ========================================
-
+# IMPORTAR ARCHIVOS
 @router.post("/importar-csv")
 async def importar_csv(
 
@@ -193,11 +169,7 @@ async def importar_csv(
         id_usuario=usuario_actual["id_usuario"]
     )
 
-
-# ========================================
 # ARCHIVOS
-# ========================================
-
 @router.get("/archivos")
 def listar_archivos(
 
@@ -210,11 +182,7 @@ def listar_archivos(
         usuario_actual["id_usuario"]
     )
 
-
-# ========================================
 # CURVAS
-# ========================================
-
 @router.get("/curvas/{id_archivo}")
 def listar_curvas(
 
@@ -229,7 +197,6 @@ def listar_curvas(
         id_archivo,
         usuario_actual["id_usuario"]
     )
-
 
 @router.get("/curva/{id_curva}")
 def obtener_curva(
@@ -246,11 +213,7 @@ def obtener_curva(
         usuario_actual["id_usuario"]
     )
 
-
-# ========================================
 # PREDICCION HISTORICA
-# ========================================
-
 @router.post(
     "/prediccion/historica/{id_curva}"
 )
@@ -268,11 +231,7 @@ def predecir_historica(
         usuario_actual["id_usuario"]
     )
 
-
-# ========================================
 # PREDICCION TIEMPO REAL
-# ========================================
-
 @router.post(
     "/prediccion/tiempo-real/{id_curva}"
 )
@@ -290,10 +249,7 @@ def predecir_tiempo_real(
         usuario_actual["id_usuario"]
     )
 
-# ========================================
 # ESTADISTICAS
-# ========================================
-
 @router.get(
     "/estadisticas/{id_archivo}"
 )

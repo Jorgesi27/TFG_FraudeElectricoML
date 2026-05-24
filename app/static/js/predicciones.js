@@ -7,7 +7,7 @@ import {
     mostrarError
 } from "./ui.js";
 
-
+// Muestra el resultado visual de la predicción.
 export function mostrarResultado(
     resultadoHistorico,
     probabilidadHistorica,
@@ -57,7 +57,7 @@ export function mostrarResultado(
         `Probabilidad de fraude: ${data.probabilidad_fraude}`;
 }
 
-
+// Realiza una predicción histórica de una curva.
 export async function prediccionHistorica(
     idCurva
 ){

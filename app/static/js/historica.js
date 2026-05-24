@@ -32,22 +32,12 @@ let curvaSelect = null;
 let resultadoHistorico = null;
 let probabilidadHistorica = null;
 let graficaHistorica = null;
-
-
-// ========================================
-// GRAFICA
-// ========================================
-
 let chart = null;
 
-// ========================================
-// CARGAR ARCHIVOS
-// ========================================
-
+// Carga los archivos disponibles del usuario.
 async function cargarArchivos(){
 
     try{
-
 
         const response = await fetchAuth(
             "/api/operador/archivos"
@@ -91,11 +81,7 @@ async function cargarArchivos(){
     }
 }
 
-
-// ========================================
-// CARGAR CURVAS
-// ========================================
-
+// Carga las curvas asociadas al archivo seleccionado.
 async function cargarCurvas(){
 
     const idArchivo =
@@ -152,11 +138,7 @@ async function cargarCurvas(){
     }
 }
 
-
-// ========================================
-// LIMPIAR RESULTADOS
-// ========================================
-
+// Limpia los resultados mostrados en pantalla.
 function limpiarResultados(){
 
     resultadoHistorico.innerText =
@@ -169,11 +151,7 @@ function limpiarResultados(){
         "#ffffff";
 }
 
-
-// ========================================
-// MOSTRAR GRAFICA
-// ========================================
-
+// Muestra la gráfica de la curva seleccionada.
 async function mostrarGrafica(){
 
     const idCurva =
@@ -229,11 +207,7 @@ async function mostrarGrafica(){
     }
 }
 
-
-// ========================================
-// REALIZAR PREDICCION
-// ========================================
-
+// Ejecuta la predicción histórica de la curva.
 async function ejecutarPrediccionHistorica(){
 
     const idCurva =
@@ -274,11 +248,7 @@ async function ejecutarPrediccionHistorica(){
     }
 }
 
-
-// ========================================
-// EVENTOS
-// ========================================
-
+// Inicializa todos los eventos de la interfaz.
 function inicializarEventos(){
 
     const btnLogout =
@@ -330,11 +300,7 @@ function inicializarEventos(){
     }
 }
 
-
-// ========================================
-// INIT
-// ========================================
-
+// Inicializa la pantalla al cargar el documento.
 document.addEventListener(
     "DOMContentLoaded",
     async () => {

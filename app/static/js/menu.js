@@ -1,3 +1,4 @@
+// Activa el menú y la navegación a través de él.
 export function activarMenu(){
 
     const links =

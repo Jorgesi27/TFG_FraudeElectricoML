@@ -17,43 +17,18 @@ import {
 } from "./ui.js";
 
 
-// ========================================
-// ELEMENTOS DOM
-// ========================================
+// Elementos DOM
+const archivoSelect = document.getElementById("archivoSelect");
+const loaderDashboard = document.getElementById("loaderDashboard");
+const loaderImportar = document.getElementById("loaderImportar");
 
-const archivoSelect =
-    document.getElementById(
-        "archivoSelect"
-    );
-
-const loaderDashboard =
-    document.getElementById(
-        "loaderDashboard"
-    );
-
-const loaderImportar =
-    document.getElementById(
-        "loaderImportar"
-    );
-
-
-// ========================================
-// CHARTS
-// ========================================
-
+// Charts
 let pieChart = null;
-
 let barChart = null;
-
 let lineChart = null;
-
 let radarChart = null;
 
-
-// ========================================
-// LIMPIAR CHART
-// ========================================
-
+// Elimina una gráfica existente antes de recrearla.
 function limpiarChart(chart){
 
     if(chart){
@@ -64,11 +39,7 @@ function limpiarChart(chart){
     return null;
 }
 
-
-// ========================================
-// IMPORTAR CSV
-// ========================================
-
+// Importa un archivo CSV al sistema.
 async function importarArchivo(){
 
     const input =
@@ -159,11 +130,7 @@ async function importarArchivo(){
     }
 }
 
-
-// ========================================
-// CARGAR ARCHIVOS
-// ========================================
-
+// Carga los archivos importados por el usuario.
 async function cargarArchivos(){
 
     try{
@@ -207,11 +174,7 @@ async function cargarArchivos(){
     }
 }
 
-
-// ========================================
-// CARGAR ESTADISTICAS
-// ========================================
-
+// Genera el dashboard de estadísticas del archivo seleccionado.
 async function cargarDashboard(){
 
     const idArchivo =
@@ -227,9 +190,7 @@ async function cargarDashboard(){
         return;
     }
 
-    // =========================
     // MOSTRAR LOADER
-    // =========================
 
     loaderDashboard
         .classList
@@ -274,10 +235,7 @@ async function cargarDashboard(){
         );
 
     }finally{
-
-        // =========================
         // OCULTAR LOADER
-        // =========================
 
         loaderDashboard
             .classList
@@ -286,11 +244,7 @@ async function cargarDashboard(){
     }
 }
 
-
-// ========================================
-// KPIs
-// ========================================
-
+// Actualiza los indicadores KPI del dashboard.
 function cargarKPIs(data){
 
     document.getElementById(
@@ -314,11 +268,7 @@ function cargarKPIs(data){
         `${data.porcentaje_fraudes}%`;
 }
 
-
-// ========================================
-// PIE CHART
-// ========================================
-
+// Genera la gráfica circular de fraudes y consumos normales.
 function crearPieChart(data){
 
     const ctx =
@@ -382,11 +332,7 @@ function crearPieChart(data){
     });
 }
 
-
-// ========================================
-// BARRAS
-// ========================================
-
+// Genera la gráfica de barras de consumos medios.
 function crearBarChart(data){
 
     const ctx =
@@ -460,11 +406,7 @@ function crearBarChart(data){
     });
 }
 
-
-// ========================================
-// LINEAL
-// ========================================
-
+// Genera la gráfica de riesgo de fraude.
 function crearLineChart(data){
 
     const ctx =
@@ -554,11 +496,7 @@ function crearLineChart(data){
     });
 }
 
-
-// ========================================
-// RADAR
-// ========================================
-
+// Genera la distribución de probabilidades de fraude.
 function crearRadarChart(data){
 
     const ctx =
@@ -669,11 +607,7 @@ function crearRadarChart(data){
     });
 }
 
-
-// ========================================
-// EVENTOS
-// ========================================
-
+// Inicializa los eventos de interacción de la página.
 function inicializarEventos(){
 
     document
@@ -700,11 +634,7 @@ function inicializarEventos(){
         );
 }
 
-
-// ========================================
-// INIT
-// ========================================
-
+// Inicializa la pantalla de estadísticas al cargar la página.
 window.onload = async () => {
 
     const token =
@@ -753,7 +683,7 @@ window.onload = async () => {
     }
 };
 
-
+// Limpia los KPIs y destruye las gráficas activas.
 function limpiarDashboard(){
 
     // KPIs

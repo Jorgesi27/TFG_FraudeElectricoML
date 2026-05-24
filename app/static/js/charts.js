@@ -1,3 +1,4 @@
+// Destruye una gráfica existente y libera memoria.
 export function limpiarGrafica(chartInstance){
 
     if(chartInstance){
@@ -7,7 +8,7 @@ export function limpiarGrafica(chartInstance){
     return null;
 }
 
-
+// Crea una gráfica lineal para representar curvas de consumo.
 export function crearGraficaLineal(
     ctx,
     labels,
@@ -90,7 +91,7 @@ export function crearGraficaLineal(
     });
 }
 
-
+// Crea una gráfica circular con la distribución de fraudes y consumos normales.
 export function crearGraficaPie(
     ctx,
     data
@@ -132,7 +133,7 @@ export function crearGraficaPie(
     });
 }
 
-
+// Crea una gráfica de barras comparando fraudes y consumos normales.
 export function crearGraficaBarras(
     ctx,
     data

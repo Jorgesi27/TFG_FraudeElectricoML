@@ -21,50 +21,20 @@ import {
     redirigirLogin
 } from "./auth.js";
 
+// Elementos DOM
+const archivoSelect = document.getElementById("archivoSelect");
+const curvaSelect = document.getElementById("curvaSelect");
+const resultadoTiempoReal = document.getElementById("resultadoTiempoReal");
+const probabilidadTiempoReal = document.getElementById("probabilidadTiempoReal");
+const graficaTiempoReal = document.getElementById("graficaTiempoReal");
 
-// ========================================
-// ELEMENTOS DOM
-// ========================================
-
-const archivoSelect =
-    document.getElementById("archivoSelect");
-
-const curvaSelect =
-    document.getElementById("curvaSelect");
-
-const resultadoTiempoReal =
-    document.getElementById(
-        "resultadoTiempoReal"
-    );
-
-const probabilidadTiempoReal =
-    document.getElementById(
-        "probabilidadTiempoReal"
-    );
-
-const graficaTiempoReal =
-    document.getElementById(
-        "graficaTiempoReal"
-    );
-
-
-// ========================================
-// VARIABLES
-// ========================================
-
+// Variables
 let chartTiempoReal = null;
-
 let intervaloStream = null;
-
 let puntosConsumo = [];
-
 let labelsTiempo = [];
 
-
-// ========================================
-// LIMPIAR
-// ========================================
-
+// Limpia los resultados mostrados en pantalla.
 function limpiarResultados(){
 
     resultadoTiempoReal.innerText =
@@ -77,11 +47,7 @@ function limpiarResultados(){
         "#ffffff";
 }
 
-
-// ========================================
-// CARGAR ARCHIVOS
-// ========================================
-
+// Recupera los archivos importados por el usuario.
 async function cargarArchivos(){
 
     try{
@@ -125,11 +91,7 @@ async function cargarArchivos(){
     }
 }
 
-
-// ========================================
-// CARGAR CURVAS
-// ========================================
-
+// Carga las curvas asociadas al archivo seleccionado.
 async function cargarCurvas(){
 
     const idArchivo =
@@ -181,11 +143,7 @@ async function cargarCurvas(){
     }
 }
 
-
-// ========================================
-// STREAMING TIEMPO REAL
-// ========================================
-
+// Simula el flujo de consumo en tiempo real y realiza predicciones online.
 async function iniciarStreaming(){
 
     const idCurva =
@@ -195,9 +153,7 @@ async function iniciarStreaming(){
         return;
     }
 
-    // =========================
-    // LIMPIAR STREAM ANTERIOR
-    // =========================
+    // LIMPIAR ANTERIOR
 
     if(intervaloStream){
 
@@ -207,10 +163,7 @@ async function iniciarStreaming(){
     }
 
     try{
-
-        // =========================
         // OBTENER CURVA
-        // =========================
 
         const response = await fetchAuth(
 
@@ -224,9 +177,7 @@ async function iniciarStreaming(){
         const curva =
             await obtenerData(response);
 
-        // =========================
         // EXTRAER VALORES
-        // =========================
 
         const datos =
             curva.datos_consumo || {};
@@ -245,10 +196,8 @@ async function iniciarStreaming(){
             return;
         }
 
-        // =========================
-        // RESETEAR GRAFICA
-        // =========================
-
+        // REINICIAR GRAFICA
+ 
         puntosConsumo = [];
 
         labelsTiempo = [];
@@ -270,9 +219,7 @@ async function iniciarStreaming(){
                 curva.identificador_curva
             );
 
-        // =========================
-        // STREAMING
-        // =========================
+        // FLUJO ONLINE
 
         let indice = 0;
 
@@ -384,11 +331,7 @@ async function iniciarStreaming(){
     }
 }
 
-
-// ========================================
-// EVENTOS
-// ========================================
-
+// Inicializa los eventos principales de la interfaz.
 function inicializarEventos(){
 
     document
@@ -409,11 +352,7 @@ function inicializarEventos(){
     );
 }
 
-
-// ========================================
-// INIT
-// ========================================
-
+// Inicializa la pantalla al cargar la aplicación.
 window.onload = async () => {
 
     const token =

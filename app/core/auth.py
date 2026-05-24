@@ -1,12 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from passlib.context import CryptContext
-
 from app.core.database import obtener_usuario_por_nombre
-
 
 security = HTTPBearer()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -14,11 +11,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 TOKEN_EXPIRATION_MINUTES = 60
 TOKENS_ACTIVOS = {}
 
-
-# Función para verifciar la contraseña.
+# Función para verificar la contraseña.
 def verificar_password(password: str, password_hash: str):
     return pwd_context.verify(password, password_hash)
-
 
 # Función para autenticar a cada usuario y controlar los accesos no autorizados.
 def autenticar_usuario(nombre_usuario: str, password: str):
@@ -60,7 +55,6 @@ def autenticar_usuario(nombre_usuario: str, password: str):
         "expires_in_minutes": TOKEN_EXPIRATION_MINUTES
     }
 
-
 # Función para recuperar el usuario actual.
 def obtener_usuario_actual(
     credenciales: HTTPAuthorizationCredentials = Depends(security)
@@ -88,7 +82,6 @@ def obtener_usuario_actual(
         "token": token
     }
 
-
 # Función para recuperar el oeprador actual.
 def obtener_operador_actual(usuario_actual: dict = Depends(obtener_usuario_actual)):
     if usuario_actual["rol"] not in ["operador", "administrador"]:
@@ -99,8 +92,7 @@ def obtener_operador_actual(usuario_actual: dict = Depends(obtener_usuario_actua
 
     return usuario_actual
 
-
-# Cerrar sesión del usuario.
+# Función para cerrar sesión del usuario.
 def cerrar_sesion(token: str):
     TOKENS_ACTIVOS.pop(token, None)
 

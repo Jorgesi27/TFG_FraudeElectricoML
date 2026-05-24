@@ -1,14 +1,10 @@
 import json
 import math
 import pickle
-import asyncio
 from io import BytesIO
 from pathlib import Path
-
 import pandas as pd
-
 from fastapi import HTTPException
-
 from app.core.database import (
     guardar_archivo,
     guardar_curva,
@@ -29,7 +25,6 @@ XGBOOST_COLUMNS_PATH = MODELS_DIR / "xgboost_columns.pkl"
 ARF_MODEL_PATH = MODELS_DIR / "arf_model.pkl"
 ARF_SCALER_PATH = MODELS_DIR / "arf_scaler.pkl"
 ARF_COLUMNS_PATH = MODELS_DIR / "arf_columns.pkl"
-
 
 # Convierte valores incompatibles con JSON a None.
 def limpiar_para_json(obj):
@@ -52,7 +47,6 @@ def limpiar_para_json(obj):
             return None
 
     return obj
-
 
 # Carga modelos y recursos serializados.
 def cargar_pickle(path: Path, nombre_recurso: str):
@@ -81,11 +75,7 @@ def cargar_pickle(path: Path, nombre_recurso: str):
             )
         )
 
-
-# ========================================
-# CARGA GLOBAL MODELOS STREAMING
-# ========================================
-
+# Carga global de modelos online.
 ARF_SCALER = cargar_pickle(
     ARF_SCALER_PATH,
     "escalador Adaptive Random Forest"
@@ -95,7 +85,6 @@ ARF_COLUMNS = cargar_pickle(
     ARF_COLUMNS_PATH,
     "columnas Adaptive Random Forest"
 )
-
 
 # Lee el CSV importado.
 def leer_csv_subido(contenido: bytes):
@@ -126,7 +115,6 @@ def leer_csv_subido(contenido: bytes):
         df = df.drop(columns=columnas_indice)
 
     return df
-
 
 # Aplica el mismo preprocesamiento usado en entrenamiento.
 def preprocesar_datos(
@@ -183,7 +171,6 @@ def preprocesar_datos(
             detail="Error durante el preprocesamiento."
         )
 
-
 # Formatea la salida de predicción.
 def formatear_prediccion(
     indice: int,
@@ -207,7 +194,6 @@ def formatear_prediccion(
             f"{float(probabilidad) * 100:.2f}%"
         )
     }
-
 
 # Predicción histórica con XGBoost.
 def predecir_xgboost(df: pd.DataFrame):
@@ -252,7 +238,6 @@ def predecir_xgboost(df: pd.DataFrame):
         for i, pred in enumerate(predicciones)
     ]
 
-
 # Resumen agregado de predicciones.
 def resumen_predicciones(predicciones):
 
@@ -269,7 +254,6 @@ def resumen_predicciones(predicciones):
         "fraudes_detectados": fraudes,
         "consumos_normales": total - fraudes
     }
-
 
 # Importa un archivo CSV y almacena sus curvas.
 def importar_archivo_csv(
@@ -321,9 +305,7 @@ def importar_archivo_csv(
 
             total_curvas += 1
 
-        # ========================================
         # GENERAR ESTADISTICAS AL IMPORTAR
-        # ========================================
 
     except Exception as e:
 
@@ -362,7 +344,6 @@ def importar_archivo_csv(
             total_curvas
     }
 
-
 # Lista curvas de un archivo.
 def listar_curvas_archivo(
     id_archivo: int,
@@ -390,7 +371,6 @@ def listar_curvas_archivo(
         "curvas": curvas
     }
 
-
 # Obtiene detalle completo de una curva.
 def obtener_detalle_curva(id_curva: int, id_usuario: int):
 
@@ -405,16 +385,12 @@ def obtener_detalle_curva(id_curva: int, id_usuario: int):
 
     datos_consumo = curva["datos_consumo"]
 
-    # ====================================
     # SOPORTAR STRING JSON
-    # ====================================
 
     if isinstance(datos_consumo, str):
         datos_consumo = json.loads(datos_consumo)
 
-    # ====================================
     # OBTENER LABELS Y VALORES
-    # ====================================
 
     labels = datos_consumo.get("timestamps")
 
@@ -445,7 +421,6 @@ def obtener_detalle_curva(id_curva: int, id_usuario: int):
             "values": valores
         }
     }
-
 
 # Predicción histórica de una curva concreta.
 def predecir_curva_historica(id_curva: int, id_usuario: int):
@@ -523,7 +498,7 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
             resultado["probabilidad_fraude"]
     }
 
-
+# Predicción de una curva a través del modelo online
 def predecir_curva_tiempo_real(
     id_curva: int,
     id_usuario: int
@@ -545,18 +520,14 @@ def predecir_curva_tiempo_real(
 
     try:
 
-        # ====================================
         # SOPORTAR JSON STRING
-        # ====================================
 
         if isinstance(datos_consumo, str):
             datos_consumo = json.loads(
                 datos_consumo
             )
 
-        # ====================================
         # COMPATIBILIDAD FORMATOS
-        # ====================================
 
         timestamps = (
             datos_consumo.get("timestamps")
@@ -578,9 +549,7 @@ def predecir_curva_tiempo_real(
                 )
             )
 
-        # ====================================
         # CREAR DATAFRAME
-        # ====================================
 
         datos_modelo = {}
 
@@ -597,9 +566,7 @@ def predecir_curva_tiempo_real(
 
         df = pd.DataFrame([datos_modelo])
 
-        # ====================================
         # CARGAR MODELO
-        # ====================================
 
         modelo = cargar_pickle(
             ARF_MODEL_PATH,
@@ -610,9 +577,7 @@ def predecir_curva_tiempo_real(
 
         columnas = ARF_COLUMNS
 
-        # ====================================
         # PREPROCESAR
-        # ====================================
 
         X = preprocesar_datos(
             df,
@@ -625,9 +590,7 @@ def predecir_curva_tiempo_real(
             zip(columnas, X_scaled[0])
         )
 
-        # ====================================
         # PREDICCION
-        # ====================================
 
         prediccion = modelo.predict_one(
             x_stream
@@ -657,9 +620,7 @@ def predecir_curva_tiempo_real(
             )
         )
 
-    # ====================================
     # GUARDAR EN BD
-    # ====================================
 
     guardar_prediccion(
         id_curva=id_curva,
@@ -690,15 +651,13 @@ def predecir_curva_tiempo_real(
             f"{probabilidad * 100:.2f}%"
     }
 
-
+# Generar las estadísticas de un archivo.
 def generar_estadisticas_archivo(
     id_archivo: int,
     id_usuario: int
 ):
     
-    # ========================================
     # CACHE BD
-    # ========================================
 
     estadisticas_guardadas = obtener_estadisticas_archivo(
         id_archivo,
@@ -806,9 +765,7 @@ def generar_estadisticas_archivo(
         else:
             normales += 1
 
-    # ====================================
     # TOP CONSUMOS
-    # ====================================
 
     top_consumos = sorted(
 
@@ -820,9 +777,7 @@ def generar_estadisticas_archivo(
 
     )[:10]
 
-    # ====================================
     # TOP RIESGO
-    # ====================================
 
     top_riesgo = sorted(
 
@@ -881,13 +836,12 @@ def generar_estadisticas_archivo(
     return estadisticas
 
 
+#Predicción online
 def predecir_stream(valores):
 
     try:
 
-        # =====================================
         # RECARGAR MODELO EN CADA REQUEST
-        # =====================================
 
         modelo = cargar_pickle(
             ARF_MODEL_PATH,
@@ -902,9 +856,7 @@ def predecir_stream(valores):
         print("COLUMNAS:")
         print(columnas[:10])
 
-        # =====================================
-        # CREAR DATOS STREAM
-        # =====================================
+        # CREAR DATOS ONLINE
 
         datos = {}
 
@@ -916,10 +868,8 @@ def predecir_stream(valores):
 
             datos[columnas[i]] = float(valor)
 
-        # =====================================
         # RELLENO PARCIAL
         # SOLO 5 COLUMNAS EXTRA
-        # =====================================
 
         if valores:
 
@@ -936,21 +886,11 @@ def predecir_stream(valores):
 
                 datos[columnas[i]] = ultimo
 
-        # =====================================
         # DATAFRAME
-        # =====================================
 
         df = pd.DataFrame([datos])
 
-        # DEBUG
-        print("--------------------------------")
-        print("INPUT DF:")
-        print(df.head())
-        print("--------------------------------")
-
-        # =====================================
         # PREPROCESAR
-        # =====================================
 
         X = preprocesar_datos(
             df,
@@ -963,15 +903,7 @@ def predecir_stream(valores):
             zip(columnas, X_scaled[0])
         )
 
-        # DEBUG
-        print("--------------------------------")
-        print("STREAM FEATURES:")
-        print(list(x_stream.items())[:10])
-        print("--------------------------------")
-
-        # =====================================
         # PREDICCION
-        # =====================================
 
         prediccion = modelo.predict_one(
             x_stream
@@ -985,13 +917,6 @@ def predecir_stream(valores):
         )
 
         probabilidad = probabilidades.get(1, 0)
-
-        # DEBUG
-        print("--------------------------------")
-        print("VALORES:", valores)
-        print("PREDICCION:", prediccion)
-        print("PROBABILIDAD:", probabilidad)
-        print("--------------------------------")
 
         return {
 
@@ -1012,7 +937,7 @@ def predecir_stream(valores):
             detail=str(e)
         )
     
-
+# Buscar la columna de los tiempos de un archivo.
 def detectar_columna_temporal(df):
 
     posibles = [

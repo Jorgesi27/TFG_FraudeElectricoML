@@ -3,7 +3,7 @@ import {
     comprobarNoAutorizado
 } from "./auth.js";
 
-
+// Realiza peticiones autenticadas.
 export async function fetchAuth(
     url,
     opciones = {}
@@ -28,7 +28,7 @@ export async function fetchAuth(
     return response;
 }
 
-
+// Obtiene y valida peticiones JSON.
 export async function obtenerData(response){
 
     const data = await response.json();

@@ -18,6 +18,19 @@ env/
 .env
 
 # ======================
+# Carpetas del proyecto
+# ======================
+Latex/
+data/
+experiments/
+results/
+
+# ======================
+# Utilidades locales
+# ======================
+app/utils/
+
+# ======================
 # IDE
 # ======================
 .vscode/

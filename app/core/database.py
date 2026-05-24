@@ -14,8 +14,7 @@ DB_CONFIG = {
     "cursorclass": pymysql.cursors.DictCursor
 }
 
-
-# Conexión con la Base de Datos.
+# Conexión con la Base de datos.
 def obtener_conexion():
     try:
         return pymysql.connect(**DB_CONFIG)
@@ -24,7 +23,6 @@ def obtener_conexion():
             status_code=500,
             detail="No ha sido posible conectar con la base de datos."
         )
-
 
 # Recuperar usuario mediante el campo del nombre.
 def obtener_usuario_por_nombre(nombre_usuario: str):
@@ -52,7 +50,6 @@ def obtener_usuario_por_nombre(nombre_usuario: str):
             detail="No ha sido posible consultar el usuario en la base de datos."
         )
     
-
 # Guarda un archivo importado por un usuario.
 def guardar_archivo(id_usuario: int, nombre_archivo: str):
     try:
@@ -121,7 +118,6 @@ def guardar_curva(
             detail="No ha sido posible guardar una curva de consumo."
         )
     
-
 # Recupera todas las curvas asociadas a un archivo importado.
 def obtener_curvas_archivo(
     id_archivo,
@@ -165,7 +161,6 @@ def obtener_curvas_archivo(
     
 
 # Recupera una curva de consumo concreta mediante su identificador.
-# Recupera una curva concreta
 def obtener_curva_por_id(
     id_curva: int,
     id_usuario: int
@@ -228,8 +223,8 @@ def obtener_curva_por_id(
                 "la curva de consumo."
             )
         )
-        
 
+# Recupera los archivos de un usuario por su id.
 def obtener_archivos_usuario(id_usuario):
 
     conexion = obtener_conexion()
@@ -250,7 +245,7 @@ def obtener_archivos_usuario(id_usuario):
 
             return cursor.fetchall()
         
-
+# Guarda una predicción en la Base de datos.
 def guardar_prediccion(
     id_curva,
     tipo_modelo,
@@ -291,11 +286,7 @@ def guardar_prediccion(
 
     conexion.close()
 
-
-# ========================================
-# GUARDAR ESTADISTICAS
-# ========================================
-
+# Guarda las estadísticas de un archivo en la Base de datos.
 def guardar_estadisticas_archivo(
     id_archivo: int,
     estadisticas: dict
@@ -322,11 +313,7 @@ def guardar_estadisticas_archivo(
 
             conexion.commit()
 
-
-# ========================================
-# OBTENER ESTADISTICAS
-# ========================================
-
+# Recupera las estadísticas de un archivo.
 def obtener_estadisticas_archivo(
     id_archivo: int,
     id_usuario: int
@@ -370,7 +357,6 @@ def obtener_estadisticas_archivo(
         estadisticas = json.loads(estadisticas)
 
     return estadisticas
-
 
 # Recupera estadísticas precalculadas
 def obtener_estadisticas_archivo_bd(

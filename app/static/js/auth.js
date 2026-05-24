@@ -1,3 +1,4 @@
+// Recupera el token JWT almacenado.
 export function obtenerHeadersAuth(){
 
     const token =
@@ -9,7 +10,7 @@ export function obtenerHeadersAuth(){
     };
 }
 
-
+// Elimina los datos de autenticación.
 export function limpiarSesion(){
 
     localStorage.removeItem("token");
@@ -17,14 +18,14 @@ export function limpiarSesion(){
     localStorage.removeItem("usuario");
 }
 
-
+// Envía al usuario a la pantalla login.
 export function redirigirLogin(){
 
     window.location.href =
         "/api/operador/login-page";
 }
 
-
+// Verifica si el token es inválido.
 export function comprobarNoAutorizado(response){
 
     if(response.status === 401){
@@ -39,11 +40,7 @@ export function comprobarNoAutorizado(response){
     return false;
 }
 
-
-// ========================================
-// LOGOUT
-// ========================================
-
+// Cierra la sesión del usuario.
 export function logout(){
 
     limpiarSesion();

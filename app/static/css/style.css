@@ -15,11 +15,7 @@ body{
     overflow-x:hidden;
 }
 
-
-/* ========================================
-   LAYOUT
-======================================== */
-
+/* LAYOUT */
 .layout{
 
     display:flex;
@@ -27,11 +23,7 @@ body{
     min-height:100vh;
 }
 
-
-/* ========================================
-   SIDEBAR
-======================================== */
-
+/* SIDEBAR */
 .sidebar{
 
     width:260px;
@@ -135,11 +127,7 @@ body{
         0 0 15px rgba(239,68,68,0.5);
 }
 
-
-/* ========================================
-   CONTENIDO
-======================================== */
-
+/* CONTENIDO */
 .contenido{
 
     flex:1;
@@ -157,10 +145,7 @@ h1{
 }
 
 
-/* ========================================
-   TOP BAR
-======================================== */
-
+/* TOP BAR */
 .top{
 
     display:flex;
@@ -175,10 +160,7 @@ h1{
 }
 
 
-/* ========================================
-   INPUTS
-======================================== */
-
+/* INPUTS */
 select,
 input[type="file"]{
 
@@ -201,10 +183,7 @@ input[type="file"]{
 }
 
 
-/* ========================================
-   BOTONES
-======================================== */
-
+/* BOTONES */
 button{
 
     padding:14px 22px;
@@ -240,10 +219,7 @@ button:hover{
 }
 
 
-/* ========================================
-   CONTAINERS
-======================================== */
-
+/* CONTAINERS */
 .container{
 
     display:grid;
@@ -276,10 +252,7 @@ button:hover{
 }
 
 
-/* ========================================
-   GRAFICA PRINCIPAL
-======================================== */
-
+/* GRAFICA PRINCIPAL */
 .chart-box{
 
     padding:25px;
@@ -288,10 +261,7 @@ button:hover{
 }
 
 
-/* ========================================
-   RESULTADO
-======================================== */
-
+/* RESULTADO */
 .result-box{
 
     padding:30px;
@@ -330,9 +300,7 @@ button:hover{
 }
 
 
-/* ========================================
-   GRAFICAS
-======================================== */
+/* GRAFICAS */
 
 #graficaHistorica,
 #graficaTiempoReal{
@@ -343,10 +311,7 @@ button:hover{
 }
 
 
-/* ========================================
-   KPIs
-======================================== */
-
+/* KPIs */
 .kpis-container{
 
     display:grid;
@@ -394,10 +359,7 @@ button:hover{
 }
 
 
-/* ========================================
-   DASHBOARD
-======================================== */
-
+/* DASHBOARD */
 .graficas-dashboard{
 
     display:grid;
@@ -419,14 +381,12 @@ button:hover{
     flex-direction:column;
 }
 
-
 .chart-card canvas{
 
     width:100% !important;
 
     height:320px !important;
 }
-
 
 .chart-card:hover{
 
@@ -439,10 +399,7 @@ button:hover{
 }
 
 
-/* ========================================
-   RESPONSIVE
-======================================== */
-
+/* RESPONSIVE */
 @media(max-width:1200px){
 
     .container{
@@ -460,7 +417,6 @@ button:hover{
         width:auto;
     }
 }
-
 
 @media(max-width:900px){
 
@@ -492,10 +448,7 @@ button:hover{
 }
 
 
-/* ========================================
-   MENU ACTIVO
-======================================== */
-
+/* MENU ACTIVO */
 .sidebar a.active{
 
     background:
@@ -512,10 +465,7 @@ button:hover{
 }
 
 
-/* ========================================
-   BADGES RESULTADO
-======================================== */
-
+/* BADGES RESULTADO */
 .badge-fraude{
 
     background:
@@ -538,7 +488,6 @@ button:hover{
         1px solid rgba(59,130,246,0.4);
 }
 
-
 .badge-fraude,
 .badge-normal{
 
@@ -548,10 +497,7 @@ button:hover{
 }
 
 
-/* ========================================
-   LOADER
-======================================== */
-
+/* LOADER */
 .loader{
 
     width:60px;
@@ -583,10 +529,7 @@ button:hover{
 }
 
 
-/* ========================================
-   FADE ANIMATION
-======================================== */
-
+/* FADE ANIMATION */
 .fade-in{
 
     animation:
@@ -607,10 +550,7 @@ button:hover{
 }
 
 
-/* ========================================
-HOME
-======================================== */
-
+/* HOME */
 .home-texto{
 
     font-size:18px;
@@ -663,7 +603,6 @@ HOME
     border:
         1px solid rgba(255,255,255,0.05);
 }
-
 
 .card-home h3{
 
@@ -738,7 +677,6 @@ HOME
     animation:spin 1s linear infinite;
 }
 
-
 #graficaPie{
 
     width:100% !important;
@@ -751,7 +689,6 @@ HOME
 
     margin:auto;
 }
-
 
 .chart-card,
 .kpi-card,
@@ -799,7 +736,6 @@ HOME
     transform:
         scale(1.03);
 }
-
 
 .chart-card::before{
 
