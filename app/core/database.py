@@ -53,7 +53,9 @@ def obtener_usuario_por_nombre(nombre_usuario: str):
     
 # Guarda un archivo importado por un usuario.
 def guardar_archivo(id_usuario: int, nombre_archivo: str):
+
     try:
+
         conexion = obtener_conexion()
 
         with conexion:
@@ -63,12 +65,21 @@ def guardar_archivo(id_usuario: int, nombre_archivo: str):
                     INSERT INTO archivos_consumo
                     (
                         id_usuario,
-                        nombre_archivo
+                        nombre_archivo,
+                        total_curvas
                     )
-                    VALUES (%s, %s)
+                    VALUES (%s, %s, %s)
                 """
 
-                cursor.execute(sql, (id_usuario, nombre_archivo))
+                cursor.execute(
+                    sql,
+                    (
+                        id_usuario,
+                        nombre_archivo,
+                        0
+                    )
+                )
+
                 conexion.commit()
 
                 return cursor.lastrowid
@@ -81,7 +92,6 @@ def guardar_archivo(id_usuario: int, nombre_archivo: str):
             status_code=500,
             detail=str(e)
         )
-
 
 # Guarda una curva de consumo asociada a un archivo.
 def guardar_curva(
