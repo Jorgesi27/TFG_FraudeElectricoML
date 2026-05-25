@@ -137,15 +137,8 @@ def preprocesar_datos(
             errors="coerce"
         )
 
-        if df.isnull().values.any():
-
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "Los datos contienen valores "
-                    "incompatibles con el modelo."
-                )
-            )
+        # rellenar valores inválidos
+        df = df.fillna(0)
 
         return df
 
