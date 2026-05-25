@@ -1,6 +1,7 @@
 import json
 import math
 import pickle
+import numpy as np
 from io import BytesIO
 from pathlib import Path
 import pandas as pd
@@ -41,10 +42,12 @@ def limpiar_para_json(obj):
             for v in obj
         ]
 
-    if isinstance(obj, float):
+    if isinstance(obj, (float, np.floating)):
 
         if math.isnan(obj) or math.isinf(obj):
             return None
+
+        return float(obj)
 
     return obj
 

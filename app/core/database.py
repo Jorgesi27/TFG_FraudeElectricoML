@@ -3,6 +3,7 @@ import pymysql
 import os
 from dotenv import load_dotenv
 from fastapi import HTTPException
+from app.services.prediction_service import limpiar_para_json
 
 load_dotenv()
 
@@ -366,6 +367,8 @@ def obtener_estadisticas_archivo(
     if isinstance(estadisticas, str):
         estadisticas = json.loads(estadisticas)
 
+    estadisticas = limpiar_para_json(estadisticas)
+
     return estadisticas
 
 # Recupera estadísticas precalculadas
@@ -410,5 +413,7 @@ def obtener_estadisticas_archivo_bd(
 
     if isinstance(estadisticas, str):
         estadisticas = json.loads(estadisticas)
+
+    estadisticas = limpiar_para_json(estadisticas)
 
     return estadisticas
