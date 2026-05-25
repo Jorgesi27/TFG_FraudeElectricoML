@@ -459,8 +459,6 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
 
     except Exception as e:
 
-        print("ERROR HISTORICA:", e)
-
         raise HTTPException(
             status_code=500,
             detail=(
@@ -611,8 +609,6 @@ def predecir_curva_tiempo_real(
         raise
 
     except Exception as e:
-
-        print("ERROR TIEMPO REAL:", e)
 
         raise HTTPException(
             status_code=500,
@@ -853,10 +849,6 @@ def predecir_stream(valores):
         scaler = ARF_SCALER
 
         columnas = ARF_COLUMNS
-
-        # DEBUG
-        print("COLUMNAS:")
-        print(columnas[:10])
 
         # CREAR DATOS ONLINE
 

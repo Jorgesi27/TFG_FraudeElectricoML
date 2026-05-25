@@ -86,8 +86,6 @@ def guardar_archivo(id_usuario: int, nombre_archivo: str):
 
     except Exception as e:
 
-        print("ERROR MYSQL:", e)
-
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -227,8 +225,6 @@ def obtener_curva_por_id(
         return curva
 
     except Exception as e:
-
-        print("ERROR CURVA:", e)
 
         raise HTTPException(
             status_code=500,
