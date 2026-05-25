@@ -114,6 +114,14 @@ def leer_csv_subido(contenido: bytes):
     if columnas_indice:
         df = df.drop(columns=columnas_indice)
 
+    # Eliminar columnas no necesarias del conjunto de datos de prueba.
+
+    if "CONS_NO" in df.columns:
+        df = df.drop(columns=["CONS_NO"])
+
+    if "FLAG" in df.columns:
+        df = df.drop(columns=["FLAG"])
+
     return df
 
 # Aplica el mismo preprocesamiento usado en entrenamiento.
