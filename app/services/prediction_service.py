@@ -724,7 +724,11 @@ def generar_estadisticas_archivo(
 
         df = pd.DataFrame([datos_modelo])
 
+        print(df.head())
+
         resultado = predecir_xgboost(df)[0]
+
+        print(resultado)
 
         total += 1
 
