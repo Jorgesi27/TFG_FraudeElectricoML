@@ -834,6 +834,8 @@ def generar_estadisticas_archivo(
             top_riesgo
     }
 
+    estadisticas = limpiar_para_json(estadisticas)
+
     guardar_estadisticas_archivo(
         id_archivo,
         estadisticas
