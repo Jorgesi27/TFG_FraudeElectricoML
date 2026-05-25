@@ -55,7 +55,23 @@ def cargar_pickle(path: Path, nombre_recurso: str):
             )
         )
 
+# Carga global de modelos offline.
+XGBOOST_MODEL = cargar_pickle(
+    XGBOOST_MODEL_PATH,
+    "modelo XGBoost"
+)
+
+XGBOOST_COLUMNS = cargar_pickle(
+    XGBOOST_COLUMNS_PATH,
+    "columnas XGBoost"
+)
+
 # Carga global de modelos online.
+ARF_MODEL = cargar_pickle(
+    ARF_MODEL_PATH,
+    "modelo Adaptive Random Forest"
+)
+
 ARF_SCALER = cargar_pickle(
     ARF_SCALER_PATH,
     "escalador Adaptive Random Forest"
@@ -179,15 +195,8 @@ def formatear_prediccion(
 # Predicción histórica con XGBoost.
 def predecir_xgboost(df: pd.DataFrame):
 
-    modelo = cargar_pickle(
-        XGBOOST_MODEL_PATH,
-        "modelo XGBoost"
-    )
-
-    columnas = cargar_pickle(
-        XGBOOST_COLUMNS_PATH,
-        "columnas XGBoost"
-    )
+    modelo = XGBOOST_MODEL
+    columnas = XGBOOST_COLUMNS
 
     X = preprocesar_datos(
         df,
@@ -550,12 +559,7 @@ def predecir_curva_tiempo_real(
 
         df = pd.DataFrame([datos_modelo])
 
-        # CARGAR MODELO
-
-        modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
+        modelo = ARF_MODEL
 
         scaler = ARF_SCALER
 
@@ -824,14 +828,8 @@ def generar_estadisticas_archivo(
 def predecir_stream(valores):
 
     try:
-
-        # RECARGAR MODELO EN CADA REQUEST
-
-        modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
-
+        modelo = ARF_MODEL
+        
         scaler = ARF_SCALER
 
         columnas = ARF_COLUMNS
