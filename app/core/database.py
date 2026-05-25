@@ -3,7 +3,7 @@ import pymysql
 import os
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from app.services.prediction_service import limpiar_para_json
+from app.core.utils import limpiar_para_json
 
 load_dotenv()
 

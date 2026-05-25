@@ -6,6 +6,7 @@ from io import BytesIO
 from pathlib import Path
 import pandas as pd
 from fastapi import HTTPException
+from app.core.utils import limpiar_para_json
 from app.core.database import (
     guardar_archivo,
     guardar_curva,
@@ -26,30 +27,6 @@ XGBOOST_COLUMNS_PATH = MODELS_DIR / "xgboost_columns.pkl"
 ARF_MODEL_PATH = MODELS_DIR / "arf_model.pkl"
 ARF_SCALER_PATH = MODELS_DIR / "arf_scaler.pkl"
 ARF_COLUMNS_PATH = MODELS_DIR / "arf_columns.pkl"
-
-# Convierte valores incompatibles con JSON a None.
-def limpiar_para_json(obj):
-
-    if isinstance(obj, dict):
-        return {
-            k: limpiar_para_json(v)
-            for k, v in obj.items()
-        }
-
-    if isinstance(obj, list):
-        return [
-            limpiar_para_json(v)
-            for v in obj
-        ]
-
-    if isinstance(obj, (float, np.floating)):
-
-        if math.isnan(obj) or math.isinf(obj):
-            return None
-
-        return float(obj)
-
-    return obj
 
 # Carga modelos y recursos serializados.
 def cargar_pickle(path: Path, nombre_recurso: str):
