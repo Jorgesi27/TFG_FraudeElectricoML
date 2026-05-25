@@ -265,10 +265,8 @@ def importar_archivo_csv(
 
     try:
 
-        columna_tiempo = detectar_columna_temporal(df)
-
         for indice, fila in df.iterrows():
-        
+
             identificador_curva = f"CURVA_{indice + 1}"
 
             fila_dict = fila.to_dict()
@@ -278,11 +276,16 @@ def importar_archivo_csv(
 
             for columna, valor in fila_dict.items():
 
-                if columna == columna_tiempo:
+                # ignorar columnas no temporales
+                if columna in ["theft", "Class"]:
                     continue
 
-                timestamps.append(columna)
-                values.append(valor)
+                timestamps.append(str(columna))
+
+                try:
+                    values.append(float(valor))
+                except:
+                    values.append(0.0)
 
             datos_consumo = {
                 "timestamps": timestamps,
@@ -724,11 +727,7 @@ def generar_estadisticas_archivo(
 
         df = pd.DataFrame([datos_modelo])
 
-        print(df.head())
-
         resultado = predecir_xgboost(df)[0]
-
-        print(resultado)
 
         total += 1
 
