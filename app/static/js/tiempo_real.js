@@ -182,10 +182,10 @@ async function iniciarStreaming(){
         const datos =
             curva.datos_consumo || {};
 
-        const valores =
-            datos.values ||
-            curva.valores ||
-            [];
+        // EXTRAER SOLO LOS VALORES NUMÉRICOS
+        const valores = Object.values(datos)
+            .map(v => Number(v))
+            .filter(v => !isNaN(v));
 
         if(!valores.length){
 
@@ -237,9 +237,8 @@ async function iniciarStreaming(){
 
             try{
 
-                // NUEVO PUNTO
                 puntosConsumo.push(
-                    valores[indice]
+                    Number(valores[indice])
                 );
 
                 const minutos =
@@ -265,6 +264,16 @@ async function iniciarStreaming(){
 
                 if(!datosParciales.length){
                     indice++;
+                    return;
+                }
+
+                if(datosParciales.length < 10){
+
+                    resultadoTiempoReal.innerHTML =
+                        "Analizando consumo...";
+
+                    indice++;
+
                     return;
                 }
 

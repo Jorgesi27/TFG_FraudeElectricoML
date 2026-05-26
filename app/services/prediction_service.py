@@ -783,18 +783,14 @@ def predecir_stream(valores):
 
         # PREDICCION
 
-        probabilidades = modelo.predict_proba_one(
-            x_stream
-        )
-
-        probabilidad = probabilidades.get(1, 0)
-
-        prediccion = modelo.predict_one(
-            x_stream
-        )
+        prediccion = modelo.predict_one(x_stream)
 
         if prediccion is None:
             prediccion = 0
+
+        probabilidades = modelo.predict_proba_one(x_stream)
+
+        probabilidad = probabilidades.get(1, 0)
 
         return {
 
