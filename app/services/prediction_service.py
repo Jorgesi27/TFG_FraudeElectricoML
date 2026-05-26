@@ -407,7 +407,12 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
         if isinstance(datos_consumo, str):
             datos_consumo = json.loads(datos_consumo)
 
-        df = pd.DataFrame([datos_consumo])
+        valores = list(datos_consumo.values())
+
+        df = construir_features_desde_curva(
+            valores,
+            XGBOOST_COLUMNS
+        )
 
         resultado = predecir_xgboost(df)[0]
 
@@ -484,7 +489,12 @@ def predecir_curva_tiempo_real(
         if isinstance(datos_consumo, str):
             datos_consumo = json.loads(datos_consumo)
 
-        df = pd.DataFrame([datos_consumo])
+        valores = list(datos_consumo.values())
+
+        df = construir_features_desde_curva(
+            valores,
+            ARF_COLUMNS
+        )
 
         modelo = ARF_MODEL
 
@@ -617,17 +627,23 @@ def generar_estadisticas_archivo(
         if isinstance(datos, str):
             datos = json.loads(datos)
 
-        df = pd.DataFrame([datos])
+        valores = list(datos.values())
 
-        columnas_numericas = df.select_dtypes(
-            include=["number"]
-        ).columns
+        df = construir_features_desde_curva(
+            valores,
+            XGBOOST_COLUMNS
+        )
 
-        if len(columnas_numericas) == 0:
+        valores = pd.to_numeric(
+            pd.Series(valores),
+            errors="coerce"
+        ).fillna(0)
+
+        if len(valores) == 0:
             continue
 
         consumo_medio = round(
-            df[columnas_numericas].mean(axis=1).iloc[0],
+            valores.mean(),
             2
         )
 
@@ -823,3 +839,47 @@ def predecir_stream(valores):
             status_code=500,
             detail=str(e)
         )
+    
+def construir_features_desde_curva(
+    valores,
+    columnas_modelo
+):
+
+    valores = pd.to_numeric(
+        pd.Series(valores),
+        errors="coerce"
+    ).fillna(0)
+
+    features = {
+
+        "mean": valores.mean(),
+        "std": valores.std(),
+        "min": valores.min(),
+        "max": valores.max(),
+        "median": valores.median(),
+        "sum": valores.sum(),
+
+        "q1": valores.quantile(0.25),
+        "q3": valores.quantile(0.75),
+
+        "skew": valores.skew(),
+        "kurtosis": valores.kurtosis(),
+
+        "var": valores.var(),
+
+        "energy": np.sum(valores ** 2),
+
+        "cv": (
+            valores.std() / valores.mean()
+            if valores.mean() != 0 else 0
+        )
+    }
+
+    df = pd.DataFrame([features])
+
+    df = df.reindex(
+        columns=columnas_modelo,
+        fill_value=0
+    )
+
+    return df
