@@ -271,6 +271,14 @@ async function iniciarStreaming(){
                     return;
                 }
 
+                // ESPERAR SUFICIENTES DATOS
+                if(datosParciales.length < 10){
+
+                    indice++;
+
+                    return;
+                }
+
                 // PREDICCION
                 const predResponse =
                     await fetchAuth(

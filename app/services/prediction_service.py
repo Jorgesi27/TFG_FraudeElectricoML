@@ -757,8 +757,7 @@ def predecir_stream(valores):
 
             datos[columnas[i]] = float(valor)
 
-        # RELLENO PARCIAL
-        # SOLO 5 COLUMNAS EXTRA
+        # RELLENAR TODAS LAS COLUMNAS RESTANTES
 
         if valores:
 
@@ -766,12 +765,7 @@ def predecir_stream(valores):
 
             inicio = len(valores)
 
-            fin = min(
-                inicio + 5,
-                len(columnas)
-            )
-
-            for i in range(inicio, fin):
+            for i in range(inicio, len(columnas)):
 
                 datos[columnas[i]] = ultimo
 

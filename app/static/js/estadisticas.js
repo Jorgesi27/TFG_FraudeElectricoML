@@ -27,6 +27,21 @@ let pieChart = null;
 let barChart = null;
 let lineChart = null;
 let radarChart = null;
+let paginaActiva = true;
+
+// Detecta cuando se sale de una pagina
+window.addEventListener("beforeunload", () => {
+
+    paginaActiva = false;
+});
+
+document.addEventListener("visibilitychange", () => {
+
+    if(document.hidden){
+
+        paginaActiva = false;
+    }
+});
 
 // Elimina una gráfica existente antes de recrearla.
 function limpiarChart(chart){
@@ -139,33 +154,39 @@ async function cargarArchivos(){
             "/api/operador/archivos"
         );
 
-        if(!response){
+        if(!response || !paginaActiva){
             return;
         }
 
         const archivos =
             await obtenerData(response);
 
-        archivoSelect.innerHTML =
+        if(!paginaActiva){
+            return;
+        }
 
-            `
+        let opciones = `
             <option value="">
                 Seleccionar archivo
             </option>
-            `;
+        `;
 
         archivos.forEach(archivo => {
 
-            archivoSelect.innerHTML +=
-
-                `
+            opciones += `
                 <option value="${archivo.id_archivo}">
                     ${archivo.nombre_archivo}
                 </option>
-                `;
+            `;
         });
 
+        archivoSelect.innerHTML = opciones;
+
     }catch(error){
+
+        if(!paginaActiva){
+            return;
+        }
 
         mostrarError(
             "Error cargando archivos",
@@ -210,6 +231,10 @@ async function cargarDashboard(){
         const data =
             await obtenerData(response);
 
+        if(!paginaActiva){
+            return;
+        }
+
         cargarKPIs(data);
 
         crearPieChart(data);
@@ -235,12 +260,16 @@ async function cargarDashboard(){
         );
 
     }finally{
-        // OCULTAR LOADER
 
-        loaderDashboard
-            .classList
-            .add("hidden");
+        if(
+            paginaActiva &&
+            loaderDashboard
+        ){
 
+            loaderDashboard
+                .classList
+                .add("hidden");
+        }
     }
 }
 

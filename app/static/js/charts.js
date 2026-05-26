@@ -34,15 +34,13 @@ export function crearGraficaLineal(
 
                 backgroundColor: "rgba(59,130,246,0.2)",
 
-                pointRadius: 4,
+                fill: true,
 
-                pointHoverRadius: 6,
+                pointRadius: 0,
 
-                pointBackgroundColor: "#3b82f6",
+                pointHoverRadius: 4,
 
-                pointBorderColor: "#3b82f6",
-
-                tension: 0.3
+                tension: 0.4
             }]
         },
 
@@ -74,7 +72,7 @@ export function crearGraficaLineal(
 
                         autoSkip: true,
 
-                        maxTicksLimit: 12,
+                        maxTicksLimit: 8,
 
                         maxRotation: 45,
 
