@@ -120,6 +120,33 @@ def leer_csv_subido(contenido: bytes):
 
     return df
 
+# Detecta el tipo de dataset importado.
+def detectar_formato_dataset(df: pd.DataFrame):
+
+    # Detectar columna temporal
+    columna_tiempo = detectar_columna_temporal(df)
+
+    if columna_tiempo:
+        return "temporal"
+
+    # Detectar muchas columnas tipo serie temporal
+    columnas_fecha = 0
+
+    for col in df.columns:
+
+        try:
+            pd.to_datetime(col)
+            columnas_fecha += 1
+
+        except:
+            continue
+
+    if columnas_fecha > 15:
+        return "temporal"
+
+    # Dataset tabular clásico
+    return "curvas"
+
 # Aplica el mismo preprocesamiento usado en entrenamiento.
 def preprocesar_datos(
     df_original: pd.DataFrame,
@@ -254,6 +281,8 @@ def importar_archivo_csv(
     
     df = leer_csv_subido(contenido)
 
+    tipo_dataset = detectar_formato_dataset(df)
+
     try:
         id_archivo = guardar_archivo(
             id_usuario=id_usuario,
@@ -267,76 +296,201 @@ def importar_archivo_csv(
 
     try:
 
-        for indice, fila in df.iterrows():
+        if tipo_dataset == "curvas":
 
-            identificador_curva = f"CURVA_{indice + 1}"
+            for indice, fila in df.iterrows():
 
-            fila_dict = fila.to_dict()
+                identificador_curva = f"CURVA_{indice + 1}"
 
-            # DETECTAR SI EL DATASET YA TIENE FECHAS
+                fila_dict = fila.to_dict()
 
-            tiene_fechas = False
+                # DETECTAR SI EL DATASET YA TIENE FECHAS
 
-            for columna in fila_dict.keys():
+                tiene_fechas = False
 
-                try:
-                    pd.to_datetime(columna)
-                    tiene_fechas = True
-                    break
+                for columna in fila_dict.keys():
 
-                except:
-                    continue
+                    try:
+                        pd.to_datetime(columna)
+                        tiene_fechas = True
+                        break
 
-            # GENERAR TIMESTAMPS
+                    except:
+                        continue
 
-            if tiene_fechas:
+                # GENERAR TIMESTAMPS
 
-                timestamps = [
-                    str(col)
-                    for col in fila_dict.keys()
-                    if col not in ["theft", "Class"]
-                ]
+                if tiene_fechas:
 
-            else:
+                    timestamps = [
+                        str(col)
+                        for col in fila_dict.keys()
+                        if col not in ["theft", "Class"]
+                    ]
 
-                total_valores = len([
-                    c for c in fila_dict.keys()
-                    if c not in ["theft", "Class"]
-                ])
+                else:
 
-                timestamps = generar_timestamps(
-                    total_valores
+                    total_valores = len([
+                        c for c in fila_dict.keys()
+                        if c not in ["theft", "Class"]
+                    ])
+
+                    timestamps = generar_timestamps(
+                        total_valores
+                    )
+
+                # GENERAR VALUES
+
+                values = []
+
+                for columna, valor in fila_dict.items():
+
+                    if columna in ["theft", "Class"]:
+                        continue
+
+                    try:
+                        values.append(float(valor))
+
+                    except:
+                        values.append(0.0)
+
+                datos_consumo = {
+                    "timestamps": timestamps,
+                    "values": values
+                }
+
+                guardar_curva(
+                    id_archivo=id_archivo,
+                    identificador_curva=identificador_curva,
+                    datos_consumo=datos_consumo
                 )
 
-            # GENERAR VALUES
+                total_curvas += 1
 
-            values = []
+        elif tipo_dataset == "temporal":
+            
+            # Detectar columna temporal
+            columna_tiempo = detectar_columna_temporal(df)
 
-            for columna, valor in fila_dict.items():
+            # Si existe columna temporal → ordenar
+            if columna_tiempo:
 
-                if columna in ["theft", "Class"]:
+                df[columna_tiempo] = pd.to_datetime(
+                    df[columna_tiempo],
+                    errors="coerce"
+                )
+
+                df = df.sort_values(
+                    by=columna_tiempo
+                )
+
+            # Eliminar columnas no numéricas
+            columnas_excluir = [
+                "theft",
+                "Class"
+            ]
+
+            if columna_tiempo:
+                columnas_excluir.append(
+                    columna_tiempo
+                )
+
+            columnas_numericas = [
+
+                c for c in df.columns
+
+                if c not in columnas_excluir
+            ]
+
+            # Detectar tamaño automático de curva
+
+            if len(df) >= 8760:
+                TAMANO_CURVA = 8760
+
+            elif len(df) >= 720:
+                TAMANO_CURVA = 720
+
+            elif len(df) >= 168:
+                TAMANO_CURVA = 168
+
+            elif len(df) >= 24:
+                TAMANO_CURVA = 24
+
+            else:
+                TAMANO_CURVA = len(df)
+
+            # Crear curvas agrupadas
+
+            for inicio in range(
+                0,
+                len(df),
+                TAMANO_CURVA
+            ):
+
+                bloque = df.iloc[
+                    inicio:inicio + TAMANO_CURVA
+                ]
+
+                if len(bloque) < TAMANO_CURVA:
                     continue
 
-                try:
-                    values.append(float(valor))
+                values = []
 
-                except:
-                    values.append(0.0)
+                for _, fila in bloque.iterrows():
 
-            datos_consumo = {
-                "timestamps": timestamps,
-                "values": values
-            }
+                    consumo_total = 0.0
 
-            guardar_curva(
-                id_archivo=id_archivo,
-                identificador_curva=identificador_curva,
-                datos_consumo=datos_consumo
-            )
+                    for col in columnas_numericas:
 
-            total_curvas += 1
+                        try:
+                            consumo_total += float(
+                                fila[col]
+                            )
 
-        # GENERAR ESTADISTICAS AL IMPORTAR
+                        except:
+                            continue
+
+                    values.append(consumo_total)
+
+                # FECHAS REALES
+
+                if columna_tiempo:
+
+                    timestamps = [
+
+                        pd.to_datetime(
+                            fila[columna_tiempo]
+                        ).strftime("%Y-%m-%d %H:%M:%S")
+
+                        for _, fila in bloque.iterrows()
+                    ]
+
+                else:
+
+                    timestamps = generar_timestamps(
+                        len(values)
+                    )
+
+                identificador_curva = (
+                    f"CURVA_{total_curvas + 1}"
+                )
+
+                datos_consumo = {
+
+                    "timestamps": timestamps,
+
+                    "values": values
+                }
+
+                guardar_curva(
+                    id_archivo=id_archivo,
+                    identificador_curva=identificador_curva,
+                    datos_consumo=datos_consumo
+                )
+
+                total_curvas += 1
+
+    # GENERAR ESTADISTICAS AL IMPORTAR
 
     except Exception as e:
 
@@ -467,19 +621,10 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
 
     try:
 
-        datos_modelo = {}
-
-        for i, v in enumerate(
-            datos_consumo["values"]
-        ):
-
-            try:
-                datos_modelo[str(i)] = float(v)
-
-            except:
-                datos_modelo[str(i)] = 0.0
-
-        df = pd.DataFrame([datos_modelo])
+        df = construir_features_desde_curva(
+            datos_consumo["values"],
+            XGBOOST_COLUMNS
+        )
 
         resultado = predecir_xgboost(df)[0]
 
@@ -577,19 +722,10 @@ def predecir_curva_tiempo_real(
 
         # CREAR DATAFRAME
 
-        datos_modelo = {}
-
-        for i, v in enumerate(
-            datos_consumo["values"]
-        ):
-
-            try:
-                datos_modelo[str(i)] = float(v)
-
-            except:
-                datos_modelo[str(i)] = 0.0
-
-        df = pd.DataFrame([datos_modelo])
+        df = construir_features_desde_curva(
+            datos_consumo["values"],
+            ARF_COLUMNS
+        )
 
         modelo = ARF_MODEL
 
@@ -747,17 +883,10 @@ def generar_estadisticas_archivo(
             consumo_medio
         )
 
-        datos_modelo = {}
-
-        for i, v in enumerate(valores_numericos):
-
-            try:
-                datos_modelo[str(i)] = float(v)
-
-            except:
-                datos_modelo[str(i)] = 0.0
-
-        df = pd.DataFrame([datos_modelo])
+        df = construir_features_desde_curva(
+            valores_numericos,
+            XGBOOST_COLUMNS
+        )
 
         resultado = predecir_xgboost(df)[0]
 
@@ -982,3 +1111,28 @@ def generar_timestamps(num_valores):
         fecha.strftime("%Y-%m-%d %H:%M:%S")
         for fecha in fechas
     ]
+
+
+# Reconstruir dataframe usando exactamente las columnas esperadas del modelo.
+def construir_features_desde_curva(
+    valores,
+    columnas_modelo
+):
+
+    datos_modelo = {}
+
+    # usar las mismas columnas del entrenamiento
+    for i, columna in enumerate(columnas_modelo):
+
+        if i < len(valores):
+
+            try:
+                datos_modelo[columna] = float(valores[i])
+
+            except:
+                datos_modelo[columna] = 0.0
+
+        else:
+            datos_modelo[columna] = 0.0
+
+    return pd.DataFrame([datos_modelo])
