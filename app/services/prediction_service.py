@@ -273,19 +273,53 @@ def importar_archivo_csv(
 
             fila_dict = fila.to_dict()
 
-            timestamps = []
+            # DETECTAR SI EL DATASET YA TIENE FECHAS
+
+            tiene_fechas = False
+
+            for columna in fila_dict.keys():
+
+                try:
+                    pd.to_datetime(columna)
+                    tiene_fechas = True
+                    break
+
+                except:
+                    continue
+
+            # GENERAR TIMESTAMPS
+
+            if tiene_fechas:
+
+                timestamps = [
+                    str(col)
+                    for col in fila_dict.keys()
+                    if col not in ["theft", "Class"]
+                ]
+
+            else:
+
+                total_valores = len([
+                    c for c in fila_dict.keys()
+                    if c not in ["theft", "Class"]
+                ])
+
+                timestamps = generar_timestamps(
+                    total_valores
+                )
+
+            # GENERAR VALUES
+
             values = []
 
             for columna, valor in fila_dict.items():
 
-                # ignorar columnas no temporales
                 if columna in ["theft", "Class"]:
                     continue
 
-                timestamps.append(str(columna))
-
                 try:
                     values.append(float(valor))
+
                 except:
                     values.append(0.0)
 
@@ -435,16 +469,15 @@ def predecir_curva_historica(id_curva: int, id_usuario: int):
 
         datos_modelo = {}
 
-        for t, v in zip(
-            datos_consumo["timestamps"],
+        for i, v in enumerate(
             datos_consumo["values"]
         ):
 
             try:
-                datos_modelo[str(t)] = float(v)
+                datos_modelo[str(i)] = float(v)
 
             except:
-                datos_modelo[str(t)] = 0.0
+                datos_modelo[str(i)] = 0.0
 
         df = pd.DataFrame([datos_modelo])
 
@@ -546,16 +579,15 @@ def predecir_curva_tiempo_real(
 
         datos_modelo = {}
 
-        for t, v in zip(
-            datos_consumo["timestamps"],
+        for i, v in enumerate(
             datos_consumo["values"]
         ):
 
             try:
-                datos_modelo[str(t)] = float(v)
+                datos_modelo[str(i)] = float(v)
 
             except:
-                datos_modelo[str(t)] = 0.0
+                datos_modelo[str(i)] = 0.0
 
         df = pd.DataFrame([datos_modelo])
 
@@ -715,12 +747,15 @@ def generar_estadisticas_archivo(
             consumo_medio
         )
 
-        datos_modelo = dict(
-            zip(
-                datos["timestamps"],
-                valores_numericos
-            )
-        )
+        datos_modelo = {}
+
+        for i, v in enumerate(valores_numericos):
+
+            try:
+                datos_modelo[str(i)] = float(v)
+
+            except:
+                datos_modelo[str(i)] = 0.0
 
         df = pd.DataFrame([datos_modelo])
 
@@ -933,3 +968,17 @@ def detectar_columna_temporal(df):
             return col
 
     return None
+
+# Genera timestamps artificiales si el dataset no tiene fechas.
+def generar_timestamps(num_valores):
+
+    fechas = pd.date_range(
+        start="2014-01-01 00:00:00",
+        periods=num_valores,
+        freq="h"
+    )
+
+    return [
+        fecha.strftime("%Y-%m-%d %H:%M:%S")
+        for fecha in fechas
+    ]
