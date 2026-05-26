@@ -25,7 +25,6 @@ XGBOOST_MODEL_PATH = MODELS_DIR / "xgboost_model.pkl"
 XGBOOST_COLUMNS_PATH = MODELS_DIR / "xgboost_columns.pkl"
 
 ARF_MODEL_PATH = MODELS_DIR / "arf_model.pkl"
-ARF_SCALER_PATH = MODELS_DIR / "arf_scaler.pkl"
 ARF_COLUMNS_PATH = MODELS_DIR / "arf_columns.pkl"
 
 # Carga modelos y recursos serializados.
@@ -72,11 +71,6 @@ ARF_MODEL = cargar_pickle(
     "modelo Adaptive Random Forest"
 )
 
-ARF_SCALER = cargar_pickle(
-    ARF_SCALER_PATH,
-    "escalador Adaptive Random Forest"
-)
-
 ARF_COLUMNS = cargar_pickle(
     ARF_COLUMNS_PATH,
     "columnas Adaptive Random Forest"
@@ -112,11 +106,14 @@ def leer_csv_subido(contenido: bytes):
 
     # Eliminar columnas no necesarias del conjunto de datos de prueba.
 
-    if "CONS_NO" in df.columns:
-        df = df.drop(columns=["CONS_NO"])
+    COLUMNAS_NO_FEATURES = [
+    "CONS_NO",
+        "FLAG"
+    ]
 
-    if "FLAG" in df.columns:
-        df = df.drop(columns=["FLAG"])
+    for col in COLUMNAS_NO_FEATURES:
+        if col in df.columns:
+            df = df.drop(columns=[col])
 
     return df
 
@@ -130,12 +127,16 @@ def preprocesar_datos(
     try:
         df = df_original.copy()
 
-        if "theft" in df.columns:
-            df = df.drop(columns=["theft"])
+        COLUMNAS_NO_FEATURES = [
+            "CONS_NO",
+            "FLAG"
+        ]
 
-        if "Class" in df.columns:
-            df = pd.get_dummies(df, columns=["Class"])
+        for col in COLUMNAS_NO_FEATURES:
+            if col in df.columns:
+                df = df.drop(columns=[col])
 
+        # limpiar nombres
         if limpiar_nombres:
             df.columns = df.columns.str.replace(
                 r"[\[\]<>\(\)]",
@@ -143,23 +144,30 @@ def preprocesar_datos(
                 regex=True
             )
 
+        # asegurar columnas correctas
         df = df.reindex(
             columns=columnas_esperadas,
             fill_value=0
         )
 
+        try:
+            df = df[sorted(
+                df.columns,
+                key=lambda x: pd.to_datetime(x)
+            )]
+        except:
+            pass
+
+        # convertir a numérico
         df = df.apply(
             pd.to_numeric,
             errors="coerce"
         )
 
-        # rellenar valores inválidos
+        # NaN -> 0
         df = df.fillna(0)
 
         return df
-
-    except HTTPException:
-        raise
 
     except Exception:
 
@@ -488,8 +496,6 @@ def predecir_curva_tiempo_real(
 
         modelo = ARF_MODEL
 
-        scaler = ARF_SCALER
-
         columnas = ARF_COLUMNS
 
         # PREPROCESAR
@@ -499,10 +505,8 @@ def predecir_curva_tiempo_real(
             columnas
         )
 
-        X_scaled = scaler.transform(X)
-
         x_stream = dict(
-            zip(columnas, X_scaled[0])
+            zip(columnas, X.iloc[0])
         )
 
         # PREDICCION
@@ -738,8 +742,6 @@ def predecir_stream(valores):
 
     try:
         modelo = ARF_MODEL
-        
-        scaler = ARF_SCALER
 
         columnas = ARF_COLUMNS
 
@@ -784,10 +786,8 @@ def predecir_stream(valores):
             columnas
         )
 
-        X_scaled = scaler.transform(X)
-
         x_stream = dict(
-            zip(columnas, X_scaled[0])
+            zip(columnas, X.iloc[0])
         )
 
         # PREDICCION
