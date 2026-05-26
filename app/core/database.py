@@ -119,7 +119,7 @@ def guardar_curva(
                     (
                         id_archivo,
                         identificador_curva,
-                        json.dumps(datos_consumo)
+                        json.dumps(limpiar_para_json(datos_consumo))
                     )
                 )
 
