@@ -123,28 +123,24 @@ def leer_csv_subido(contenido: bytes):
 # Detecta el tipo de dataset importado.
 def detectar_formato_dataset(df: pd.DataFrame):
 
-    # Detectar columna temporal
-    columna_tiempo = detectar_columna_temporal(df)
+    columnas = [c.lower() for c in df.columns]
 
-    if columna_tiempo:
-        return "temporal"
+    # Detectar columnas temporales reales
+    posibles_temporales = [
+        "timestamp",
+        "datetime",
+        "date",
+        "fecha",
+        "time",
+        "hora"
+    ]
 
-    # Detectar muchas columnas tipo serie temporal
-    columnas_fecha = 0
+    for col in columnas:
 
-    for col in df.columns:
+        if col in posibles_temporales:
+            return "horario"
 
-        try:
-            pd.to_datetime(col)
-            columnas_fecha += 1
-
-        except:
-            continue
-
-    if columnas_fecha > 15:
-        return "temporal"
-
-    # Dataset tabular clásico
+    # Si no tiene fechas -> dataset tabular
     return "curvas"
 
 # Aplica el mismo preprocesamiento usado en entrenamiento.
