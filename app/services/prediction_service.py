@@ -761,13 +761,10 @@ def predecir_stream(valores):
 
         if valores:
 
-            ultimo = float(valores[-1])
-
             inicio = len(valores)
 
             for i in range(inicio, len(columnas)):
-
-                datos[columnas[i]] = ultimo
+                datos[columnas[i]] = 0.0
 
         # DATAFRAME
 
@@ -786,18 +783,18 @@ def predecir_stream(valores):
 
         # PREDICCION
 
+        probabilidades = modelo.predict_proba_one(
+            x_stream
+        )
+
+        probabilidad = probabilidades.get(1, 0)
+
         prediccion = modelo.predict_one(
             x_stream
         )
 
         if prediccion is None:
             prediccion = 0
-
-        probabilidades = modelo.predict_proba_one(
-            x_stream
-        )
-
-        probabilidad = probabilidades.get(1, 0)
 
         return {
 

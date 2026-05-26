@@ -263,19 +263,8 @@ async function iniciarStreaming(){
                                 !isNaN(v)
                         );
 
-                // EVITAR REQUEST VACIO
                 if(!datosParciales.length){
-
                     indice++;
-
-                    return;
-                }
-
-                // ESPERAR SUFICIENTES DATOS
-                if(datosParciales.length < 10){
-
-                    indice++;
-
                     return;
                 }
 
