@@ -182,10 +182,10 @@ async function mostrarGrafica(){
             await obtenerData(response);
 
         const labels =
-            curva.datos_consumo.timestamps;
+            curva.labels || [];
 
         const valores =
-            curva.datos_consumo.values;
+            curva.valores || [];
 
         chart =
             limpiarGrafica(chart);

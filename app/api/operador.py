@@ -262,7 +262,16 @@ def obtener_estadisticas(
     )
 ):
 
-    return obtener_estadisticas_archivo_bd(
+    estadisticas = obtener_estadisticas_archivo_bd(
         id_archivo,
         usuario_actual["id_usuario"]
     )
+
+    # SI TODAVÍA NO ESTÁN GENERADAS
+    if estadisticas is None:
+
+        return {
+            "procesando": True
+        }
+
+    return estadisticas
