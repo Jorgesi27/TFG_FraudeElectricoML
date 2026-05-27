@@ -95,6 +95,11 @@ async function importarArchivo(){
             }
         );
 
+        if(response && response.ok){
+
+            await cargarArchivos();
+        }
+
         if(!response){
             return;
         }

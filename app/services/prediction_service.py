@@ -491,11 +491,6 @@ def predecir_curva_tiempo_real(
         # SOPORTAR JSON STRING
 
         if isinstance(datos_consumo, str):
-            datos_consumo = json.loads(
-                datos_consumo
-            )
-
-        if isinstance(datos_consumo, str):
             datos_consumo = json.loads(datos_consumo)
 
         df = pd.DataFrame([datos_consumo])
@@ -505,18 +500,23 @@ def predecir_curva_tiempo_real(
         columnas = ARF_COLUMNS
 
         # PREPROCESAR
-
         X = preprocesar_datos(
             df,
             columnas
         )
 
+        # ESCALAR
+        X_scaled = pd.DataFrame(
+            ARF_SCALER.transform(X),
+            columns=columnas
+        )
+
+        # STREAM
         x_stream = dict(
-            zip(columnas, X.iloc[0])
+            zip(columnas, X_scaled.iloc[0])
         )
 
         # PREDICCION
-
         prediccion = modelo.predict_one(
             x_stream
         )
@@ -524,10 +524,14 @@ def predecir_curva_tiempo_real(
         if prediccion is None:
             prediccion = 0
 
+        probabilidades = modelo.predict_proba_one(
+            x_stream
+        )
+
         probabilidad = (
-            modelo.predict_proba_one(
-                x_stream
-            ).get(1, 0)
+            probabilidades.get(1)
+            or probabilidades.get(True)
+            or 0
         )
 
     except HTTPException:
@@ -742,8 +746,6 @@ def generar_estadisticas_archivo(
 
     return estadisticas
 
-
-#Predicción online
 # Predicción online
 def predecir_stream(valores):
 
@@ -753,9 +755,9 @@ def predecir_stream(valores):
 
         columnas = ARF_COLUMNS
 
-        # CREAR VECTOR COMPLETO
         datos = {}
 
+        # ventanas parciales
         for i in range(len(columnas)):
 
             if i < len(valores):
@@ -763,19 +765,28 @@ def predecir_stream(valores):
             else:
                 datos[columnas[i]] = 0.0
 
-        # DATAFRAME
+        # dataframe
         df = pd.DataFrame([datos])
 
-        # ASEGURAR ORDEN COLUMNAS
-        df = df[columnas]
+        df = df.apply(
+            pd.to_numeric,
+            errors="coerce"
+        )
 
-        # SCALER
+        df = df.fillna(0)
+
+        df = df.reindex(
+            columns=columnas,
+            fill_value=0
+        )
+
+        # scaler sklearn
         df_scaled = pd.DataFrame(
             ARF_SCALER.transform(df),
             columns=columnas
         )
 
-        # FORMATO RIVER
+        # formato river
         x_stream = dict(
             zip(
                 columnas,
@@ -783,7 +794,7 @@ def predecir_stream(valores):
             )
         )
 
-        # PREDICCIÓN
+        # predicción
         prediccion = modelo.predict_one(
             x_stream
         )
@@ -795,9 +806,10 @@ def predecir_stream(valores):
             x_stream
         )
 
-        probabilidad = probabilidades.get(
-            1,
-            probabilidades.get(True, 0)
+        probabilidad = (
+            probabilidades.get(1)
+            or probabilidades.get(True)
+            or 0
         )
 
         return {
