@@ -67,6 +67,11 @@ XGBOOST_COLUMNS = cargar_pickle(
 )
 
 # Carga global de modelos online.
+ARF_MODEL = cargar_pickle(
+    ARF_MODEL_PATH, 
+    "modelo Adaptive Random Forest"
+)
+
 ARF_SCALER = cargar_pickle(
     ARF_SCALER_PATH,
     "scaler Adaptive Random Forest"
@@ -495,10 +500,7 @@ def predecir_curva_tiempo_real(
 
         df = pd.DataFrame([datos_consumo])
 
-        modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
+        modelo = ARF_MODEL
 
         columnas = ARF_COLUMNS
 
@@ -752,11 +754,7 @@ def predecir_stream(valores):
 
     try:
 
-        # MODELO LIMPIO SIEMPRE
-        modelo = cargar_pickle(
-            ARF_MODEL_PATH,
-            "modelo Adaptive Random Forest"
-        )
+        modelo = ARF_MODEL
 
         scaler = ARF_SCALER
 
@@ -787,14 +785,10 @@ def predecir_stream(valores):
 
             datos[columnas[i]] = valor
 
-        # COMPLETAR TODA LA CURVA
         if valores:
 
-            ultimo = valores[-1]
-
             for i in range(len(valores), len(columnas)):
-
-                datos[columnas[i]] = ultimo
+                datos[columnas[i]] = 0.0
 
         # DATAFRAME
         df = pd.DataFrame([datos])
