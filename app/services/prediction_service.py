@@ -67,11 +67,6 @@ XGBOOST_COLUMNS = cargar_pickle(
 )
 
 # Carga global de modelos online.
-ARF_MODEL = cargar_pickle(
-    ARF_MODEL_PATH,
-    "modelo Adaptive Random Forest"
-)
-
 ARF_SCALER = cargar_pickle(
     ARF_SCALER_PATH,
     "scaler Adaptive Random Forest"
@@ -500,7 +495,10 @@ def predecir_curva_tiempo_real(
 
         df = pd.DataFrame([datos_consumo])
 
-        modelo = ARF_MODEL
+        modelo = cargar_pickle(
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
 
         columnas = ARF_COLUMNS
 
@@ -752,25 +750,17 @@ def generar_estadisticas_archivo(
 # Predecir online
 def predecir_stream(valores):
 
-    print("\n========== STREAM ==========")
-
-    print(f"PUNTOS RECIBIDOS: {len(valores)}")
-
-    print(valores)
-
-    print("============================\n")
-
     try:
 
-        columnas = ARF_COLUMNS
-
-        modelo = ARF_MODEL
+        # MODELO LIMPIO SIEMPRE
+        modelo = cargar_pickle(
+            ARF_MODEL_PATH,
+            "modelo Adaptive Random Forest"
+        )
 
         scaler = ARF_SCALER
 
-        # ==========================================
-        # VALIDAR
-        # ==========================================
+        columnas = ARF_COLUMNS
 
         if not valores:
 
@@ -779,83 +769,58 @@ def predecir_stream(valores):
                 detail="No se recibieron valores."
             )
 
-        if len(valores) > len(columnas):
-
-            raise HTTPException(
-                status_code=400,
-                detail="Demasiados valores."
-            )
-
-        # ==========================================
         # LIMPIAR
-        # ==========================================
-
         valores = [
 
             float(v) if v is not None else 0.0
 
             for v in valores
-
         ]
 
-        # ==========================================
-        # PADDING
-        # EXACTAMENTE IGUAL QUE TRAIN
-        # ==========================================
+        # CREAR STREAM PARCIAL
+        datos = {}
 
-        ultimo_valor = valores[-1]
+        for i, valor in enumerate(valores):
 
-        valores_completos = valores + (
-            [ultimo_valor] * (
-                len(columnas) - len(valores)
+            if i >= len(columnas):
+                break
+
+            datos[columnas[i]] = valor
+
+        # SOLO 5 COLUMNAS EXTRA
+        if valores:
+
+            ultimo = valores[-1]
+
+            inicio = len(valores)
+
+            fin = min(
+                inicio + 5,
+                len(columnas)
             )
-        )
 
-        # ==========================================
+            for i in range(inicio, fin):
+
+                datos[columnas[i]] = ultimo
+
         # DATAFRAME
-        # ==========================================
+        df = pd.DataFrame([datos])
 
-        df = pd.DataFrame(
-            [valores_completos],
-            columns=columnas
-        )
-
-        print("\n========== INPUT MODELO ==========")
-
-        print(df.head())
-
-        print("===============================\n")
-
-        # ==========================================
         # PREPROCESAR
-        # ==========================================
-
-        df = preprocesar_datos(
+        X = preprocesar_datos(
             df,
             columnas
         )
 
-        # ==========================================
         # ESCALAR
-        # ==========================================
+        X_scaled = scaler.transform(X)
 
-        X_scaled = scaler.transform(df)
-
-        # ==========================================
         # FORMATO RIVER
-        # ==========================================
-
         x_stream = dict(
-            zip(
-                columnas,
-                X_scaled[0]
-            )
+            zip(columnas, X_scaled[0])
         )
 
-        # ==========================================
-        # PREDICCIÓN
-        # ==========================================
-
+        # PREDICCION
         prediccion = modelo.predict_one(
             x_stream
         )
@@ -863,23 +828,13 @@ def predecir_stream(valores):
         if prediccion is None:
             prediccion = 0
 
-        # ==========================================
-        # PROBABILIDADES
-        # ==========================================
-
         probabilidades = modelo.predict_proba_one(
             x_stream
         )
 
-        print(probabilidades)
-
         probabilidad = float(
             probabilidades.get(1, 0.0)
         )
-
-        # ==========================================
-        # RESPUESTA
-        # ==========================================
 
         return {
 
@@ -890,11 +845,8 @@ def predecir_stream(valores):
                 len(valores),
 
             "resultado": (
-
                 "Fraude"
-
                 if int(prediccion) == 1
-
                 else "Normal"
             ),
 
@@ -904,9 +856,6 @@ def predecir_stream(valores):
             "probabilidad_fraude":
                 f"{probabilidad * 100:.2f}%"
         }
-
-    except HTTPException:
-        raise
 
     except Exception as e:
 

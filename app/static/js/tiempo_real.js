@@ -189,6 +189,10 @@ async function iniciarStreaming(){
     // LIMPIAR STREAM ANTERIOR
     // ==========================================
 
+    resultadoTiempoReal.innerHTML = "---";
+
+    probabilidadTiempoReal.innerHTML = "---";
+
     if(intervaloStream){
 
         clearInterval(
@@ -291,7 +295,7 @@ async function iniciarStreaming(){
                 puntosConsumo.push(valorActual);
 
                 labelsTiempo.push(
-                    `${indice * 3}s`
+                    `${(indice + 1) * 3}s`
                 );
 
                 chartTiempoReal.data.labels =
