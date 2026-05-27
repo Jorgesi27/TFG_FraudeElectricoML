@@ -531,9 +531,7 @@ def predecir_curva_tiempo_real(
             x_stream
         )
 
-        probabilidad = float(
-            probabilidades.get(1, 0.0)
-        )
+        probabilidad = max(probabilidades.values()) if probabilidades else 0.0
 
     except HTTPException:
         raise
@@ -774,9 +772,7 @@ def predecir_stream(valores, punto_actual: int = None):
 
         print("PROBABILIDADES:", probabilidades)
     
-        probabilidad = float(
-            probabilidades.get(1, 0.0)
-        )
+        probabilidad = max(probabilidades.values()) if probabilidades else 0.0
 
         prediccion = modelo.predict_one(x_stream)
 
