@@ -738,70 +738,23 @@ def generar_estadisticas_archivo(
 
 
 #Predicción online
-# Predicción online progresiva
 def predecir_stream(valores):
 
     try:
 
         modelo = ARF_MODEL
 
-        columnas = ARF_COLUMNS
-
-        if not valores:
-
-            raise HTTPException(
-                status_code=400,
-                detail="No hay valores para predecir."
-            )
-
-        # CREAR STREAM PARCIAL
         datos = {}
 
         for i, valor in enumerate(valores):
+            datos[str(i)] = float(valor)
 
-            if i >= len(columnas):
-                break
-
-            try:
-                datos[columnas[i]] = float(valor)
-
-            except:
-                datos[columnas[i]] = 0.0
-
-        if valores:
-
-            inicio = len(valores)
-
-            ultimo_valor = float(valores[-1])
-
-            for i in range(inicio, len(columnas)):
-                datos[columnas[i]] = ultimo_valor
-
-        # DATAFRAME
-        df = pd.DataFrame([datos])
-
-        # PREPROCESAR
-        X = preprocesar_datos(
-            df,
-            columnas
-        )
-
-        x_stream = dict(
-            zip(columnas, X.iloc[0])
-        )
-
-        # PREDICCIÓN
-        prediccion = modelo.predict_one(
-            x_stream
-        )
+        prediccion = modelo.predict_one(datos)
 
         if prediccion is None:
             prediccion = 0
 
-        # PROBABILIDADES
-        probabilidades = modelo.predict_proba_one(
-            x_stream
-        )
+        probabilidades = modelo.predict_proba_one(datos)
 
         probabilidad = probabilidades.get(
             True,
@@ -816,10 +769,8 @@ def predecir_stream(valores):
                 else "Normal"
             ),
 
-            "probabilidad": float(probabilidad),
-
             "probabilidad_fraude":
-                f"{probabilidad * 100:.2f}%"
+                f"{probabilidad * 100:.4f}%"
         }
 
     except Exception as e:

@@ -182,8 +182,7 @@ async function iniciarStreaming(){
 
         const valores =
             (curva.valores || [])
-                .map(v => Number(v))
-                .filter(v => !isNaN(v));
+                .map(v => Number(v) || 0)
 
         if(!valores.length){
 
