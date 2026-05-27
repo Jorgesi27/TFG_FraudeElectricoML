@@ -781,14 +781,36 @@ def predecir_stream(valores, punto_actual: int = None):
         probabilidades = modelo.predict_proba_one(x_stream)
 
         print("PROBABILIDADES:", probabilidades)
-    
+
         probabilidad = probabilidades.get(1, 0.0)
 
         prediccion = modelo.predict_one(x_stream)
 
-        y_feedback = 1 if probabilidad > 0.60 else 0
+        # =====================================================
+        # SIMULACIÓN DE APRENDIZAJE ONLINE
+        # =====================================================
 
+        total_puntos = len(columnas)
+
+        progreso = (punto_actual + 1) / total_puntos
+
+        # Simular que al inicio parece normal
+        # y al final el operador detecta fraude
+
+        if progreso < 0.5:
+            y_feedback = 0
+        else:
+            y_feedback = 1
+
+        # Aprendizaje online incremental
         modelo.learn_one(x_stream, y_feedback)
+
+        # Guardar modelo actualizado
+        with open(ARF_MODEL_PATH, "wb") as f:
+            pickle.dump(modelo, f)
+
+        print("FEEDBACK:", y_feedback)
+        print("PROGRESO:", progreso)
 
         if prediccion is None:
             prediccion = 0
