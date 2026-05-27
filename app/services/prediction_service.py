@@ -768,12 +768,9 @@ def predecir_stream(valores):
             except:
                 datos[columnas[i]] = 0.0
 
-        # COMPLETAR COLUMNAS RESTANTES
-        ultimo_valor = float(valores[-1])
-
         for i in range(len(valores), len(columnas)):
 
-            datos[columnas[i]] = ultimo_valor
+            datos[columnas[i]] = 0.0
 
         # DATAFRAME
         df = pd.DataFrame([datos])
@@ -802,14 +799,8 @@ def predecir_stream(valores):
         )
 
         probabilidad = probabilidades.get(
-            1,
-            probabilidades.get(True, 0)
-        )
-
-        # APRENDIZAJE ONLINE
-        modelo.learn_one(
-            x_stream,
-            int(prediccion)
+            True,
+            probabilidades.get(1, 0)
         )
 
         return {
