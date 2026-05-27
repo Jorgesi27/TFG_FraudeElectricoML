@@ -524,7 +524,7 @@ def predecir_curva_tiempo_real(
         )
 
         probabilidad = float(
-            probabilidades.get(1, 0.0)
+            probabilidades.get(1, 0.5)
         )
 
     except HTTPException:
@@ -739,59 +739,37 @@ def generar_estadisticas_archivo(
 
     return estadisticas
 
-# Buffers por usuario
-STREAM_BUFFERS = {}
-
 # Predecir online
-def predecir_stream(
-    id_usuario: int,
-    valores
-):
-
-    global STREAM_BUFFERS
+def predecir_stream(valores):
 
     try:
 
         columnas = ARF_COLUMNS
         modelo = ARF_MODEL
 
-        # crear buffer usuario
-        if id_usuario not in STREAM_BUFFERS:
+        # validar tamaño
+        if len(valores) > len(columnas):
 
-            STREAM_BUFFERS[id_usuario] = []
+            raise HTTPException(
+                status_code=400,
+                detail="Demasiados valores."
+            )
 
-        # añadir datos
-        STREAM_BUFFERS[id_usuario].extend(
-            valores
+        # padding EXACTAMENTE igual que entrenamiento
+        valores_completos = valores + (
+            [0] * (len(columnas) - len(valores))
         )
-
-        buffer_usuario = STREAM_BUFFERS[id_usuario]
 
         print(
-            f"USER {id_usuario} BUFFER:",
-            len(buffer_usuario)
-        )
-
-        # todavía no hay suficientes datos
-        if len(buffer_usuario) < len(columnas):
-
-            return {
-                "estado": "esperando_datos",
-                "recibidos": len(buffer_usuario),
-                "necesarios": len(columnas)
-            }
-
-        # tomar ventana exacta
-        valores_modelo = buffer_usuario[:len(columnas)]
-
-        # limpiar ventana usada
-        STREAM_BUFFERS[id_usuario] = (
-            buffer_usuario[len(columnas):]
+            "VENTANA:",
+            len(valores),
+            "->",
+            len(valores_completos)
         )
 
         # dataframe
         datos = dict(
-            zip(columnas, valores_modelo)
+            zip(columnas, valores_completos)
         )
 
         df = pd.DataFrame([datos])
@@ -829,7 +807,7 @@ def predecir_stream(
         )
 
         probabilidad = float(
-            probabilidades.get(1, 0.0)
+            probabilidades.get(1, 0.5)
         )
 
         return {
@@ -841,6 +819,9 @@ def predecir_stream(
                 if int(prediccion) == 1
                 else "Normal"
             ),
+
+            "probabilidad":
+                round(probabilidad * 100, 4),
 
             "probabilidad_fraude":
                 f"{probabilidad * 100:.4f}%"

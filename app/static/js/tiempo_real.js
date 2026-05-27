@@ -33,6 +33,7 @@ let chartTiempoReal = null;
 let intervaloStream = null;
 let puntosConsumo = [];
 let labelsTiempo = [];
+let prediccionEnCurso = false;
 
 // Limpia los resultados mostrados en pantalla.
 function limpiarResultados(){
@@ -199,6 +200,8 @@ async function iniciarStreaming(){
 
         labelsTiempo = [];
 
+        prediccionEnCurso = false;
+
         chartTiempoReal =
             limpiarGrafica(
                 chartTiempoReal
@@ -259,10 +262,30 @@ async function iniciarStreaming(){
 
                 chartTiempoReal.update();
 
-                // DATOS PARCIALES
+                const PASO_VENTANA = 48;
+
+                // SOLO PREDECIR EN MULTIPLOS DE 48
+                if((indice + 1) % PASO_VENTANA !== 0){
+
+                    indice++;
+
+                    return;
+                }
+
+                if(prediccionEnCurso){
+
+                    indice++;
+
+                    return;
+                }
+
+                prediccionEnCurso = true;
+
+                const tamañoVentana = indice + 1;
+
                 const datosParciales =
                     valores
-                        .slice(0, indice + 1)
+                        .slice(0, tamañoVentana)
                         .filter(
                             v =>
                                 v !== undefined &&
@@ -271,25 +294,18 @@ async function iniciarStreaming(){
                         );
 
                 if(!datosParciales.length){
+                    prediccionEnCurso = false;
                     indice++;
                     return;
                 }
 
-                if(datosParciales.length < 2){
+                resultadoTiempoReal.innerHTML =
+                    `
+                    <div class="badge-analizando fade-in">
+                        🟡 Analizando ventana ${tamañoVentana}
+                    </div>
+                    `;
 
-                    resultadoTiempoReal.innerHTML =
-                        `
-                        <div class="badge-analizando fade-in">
-                            🟡 Analizando consumo...
-                        </div>
-                        `;
-
-                    indice++;
-
-                    return;
-                }
-
-                // PREDICCION
                 const predResponse =
                     await fetchAuth(
                         "/api/operador/prediccion/stream",
@@ -310,21 +326,24 @@ async function iniciarStreaming(){
                 if(predResponse && predResponse.ok){
 
                     const prediccion =
-                        await obtenerData(
-                            predResponse
-                        );
+                        await obtenerData(predResponse);
 
                     mostrarResultado(
                         resultadoTiempoReal,
                         probabilidadTiempoReal,
                         prediccion
                     );
+
                 }
+
+                prediccionEnCurso = false;
 
                 // AUMENTAR INDICE
                 indice++;
 
             }catch(error){
+
+                prediccionEnCurso = false;
 
                 clearInterval(intervaloStream);
 
