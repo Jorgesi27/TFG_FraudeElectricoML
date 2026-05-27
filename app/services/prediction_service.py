@@ -768,9 +768,14 @@ def predecir_stream(valores):
             except:
                 datos[columnas[i]] = 0.0
 
-        for i in range(len(valores), len(columnas)):
+        if valores:
 
-            datos[columnas[i]] = 0.0
+            inicio = len(valores)
+
+            ultimo_valor = float(valores[-1])
+
+            for i in range(inicio, len(columnas)):
+                datos[columnas[i]] = ultimo_valor
 
         # DATAFRAME
         df = pd.DataFrame([datos])
