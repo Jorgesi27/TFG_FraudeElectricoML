@@ -786,6 +786,10 @@ def predecir_stream(valores, punto_actual: int = None):
 
         prediccion = modelo.predict_one(x_stream)
 
+        y_feedback = 1 if probabilidad > 0.60 else 0
+
+        modelo.learn_one(x_stream, y_feedback)
+
         if prediccion is None:
             prediccion = 0
 
