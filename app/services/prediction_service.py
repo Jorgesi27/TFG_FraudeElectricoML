@@ -26,6 +26,7 @@ XGBOOST_COLUMNS_PATH = MODELS_DIR / "xgboost_columns.pkl"
 
 ARF_MODEL_PATH = MODELS_DIR / "arf_model.pkl"
 ARF_COLUMNS_PATH = MODELS_DIR / "arf_columns.pkl"
+ARF_SCALER_PATH = MODELS_DIR / "arf_scaler.pkl"
 
 # Carga modelos y recursos serializados.
 def cargar_pickle(path: Path, nombre_recurso: str):
@@ -69,6 +70,11 @@ XGBOOST_COLUMNS = cargar_pickle(
 ARF_MODEL = cargar_pickle(
     ARF_MODEL_PATH,
     "modelo Adaptive Random Forest"
+)
+
+ARF_SCALER = cargar_pickle(
+    ARF_SCALER_PATH,
+    "scaler Adaptive Random Forest"
 )
 
 ARF_COLUMNS = cargar_pickle(
@@ -738,27 +744,60 @@ def generar_estadisticas_archivo(
 
 
 #Predicción online
+# Predicción online
 def predecir_stream(valores):
 
     try:
 
         modelo = ARF_MODEL
 
+        columnas = ARF_COLUMNS
+
+        # CREAR VECTOR COMPLETO
         datos = {}
 
-        for i, valor in enumerate(valores):
-            datos[str(i)] = float(valor)
+        for i in range(len(columnas)):
 
-        prediccion = modelo.predict_one(datos)
+            if i < len(valores):
+                datos[columnas[i]] = float(valores[i])
+            else:
+                datos[columnas[i]] = 0.0
+
+        # DATAFRAME
+        df = pd.DataFrame([datos])
+
+        # ASEGURAR ORDEN COLUMNAS
+        df = df[columnas]
+
+        # SCALER
+        df_scaled = pd.DataFrame(
+            ARF_SCALER.transform(df),
+            columns=columnas
+        )
+
+        # FORMATO RIVER
+        x_stream = dict(
+            zip(
+                columnas,
+                df_scaled.iloc[0]
+            )
+        )
+
+        # PREDICCIÓN
+        prediccion = modelo.predict_one(
+            x_stream
+        )
 
         if prediccion is None:
             prediccion = 0
 
-        probabilidades = modelo.predict_proba_one(datos)
+        probabilidades = modelo.predict_proba_one(
+            x_stream
+        )
 
         probabilidad = probabilidades.get(
-            True,
-            probabilidades.get(1, 0)
+            1,
+            probabilidades.get(True, 0)
         )
 
         return {
