@@ -82,14 +82,18 @@ def tiempo_real_page(request: Request):
         {"request": request}
     )
 
-@router.post(
-    "/prediccion/stream"
-)
+@router.post("/prediccion/stream")
 def prediccion_stream(
-    request: StreamRequest
+
+    request: StreamRequest,
+
+    usuario_actual: dict = Depends(
+        obtener_operador_actual
+    )
 ):
 
     return predecir_stream(
+        usuario_actual["id_usuario"],
         request.valores
     )
 

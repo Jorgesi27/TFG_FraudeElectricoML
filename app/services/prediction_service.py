@@ -131,6 +131,7 @@ def preprocesar_datos(
 ):
 
     try:
+
         df = df_original.copy()
 
         COLUMNAS_NO_FEATURES = [
@@ -144,25 +145,12 @@ def preprocesar_datos(
 
         # limpiar nombres
         if limpiar_nombres:
+
             df.columns = df.columns.str.replace(
                 r"[\[\]<>\(\)]",
                 "",
                 regex=True
             )
-
-        # asegurar columnas correctas
-        df = df.reindex(
-            columns=columnas_esperadas,
-            fill_value=0
-        )
-
-        try:
-            df = df[sorted(
-                df.columns,
-                key=lambda x: pd.to_datetime(x)
-            )]
-        except:
-            pass
 
         # convertir a numérico
         df = df.apply(
@@ -170,8 +158,15 @@ def preprocesar_datos(
             errors="coerce"
         )
 
-        df = df.fillna(method="ffill", axis=1)
+        df = df.ffill(axis=1)
+
         df = df.fillna(0)
+
+        # asegurar mismas columnas del entrenamiento
+        df = df.reindex(
+            columns=columnas_esperadas,
+            fill_value=0
+        )
 
         return df
 
@@ -744,62 +739,74 @@ def generar_estadisticas_archivo(
 
     return estadisticas
 
-# Predicción online
-def predecir_stream(valores):
+# Buffers por usuario
+STREAM_BUFFERS = {}
+
+# Predecir online
+def predecir_stream(
+    id_usuario: int,
+    valores
+):
+
+    global STREAM_BUFFERS
 
     try:
 
-        print("\n===== STREAM RECIBIDO =====")
-        print(valores[:20])
-        print("TOTAL:", len(valores))
-
+        columnas = ARF_COLUMNS
         modelo = ARF_MODEL
 
-        columnas = ARF_COLUMNS
+        # crear buffer usuario
+        if id_usuario not in STREAM_BUFFERS:
 
-        datos = {}
+            STREAM_BUFFERS[id_usuario] = []
 
-        # ventanas parciales
-        for i in range(len(columnas)):
+        # añadir datos
+        STREAM_BUFFERS[id_usuario].extend(
+            valores
+        )
 
-            if i < len(valores):
-                datos[columnas[i]] = float(valores[i])
-            else:
-                datos[columnas[i]] = 0.0
+        buffer_usuario = STREAM_BUFFERS[id_usuario]
+
+        print(
+            f"USER {id_usuario} BUFFER:",
+            len(buffer_usuario)
+        )
+
+        # todavía no hay suficientes datos
+        if len(buffer_usuario) < len(columnas):
+
+            return {
+                "estado": "esperando_datos",
+                "recibidos": len(buffer_usuario),
+                "necesarios": len(columnas)
+            }
+
+        # tomar ventana exacta
+        valores_modelo = buffer_usuario[:len(columnas)]
+
+        # limpiar ventana usada
+        STREAM_BUFFERS[id_usuario] = (
+            buffer_usuario[len(columnas):]
+        )
 
         # dataframe
+        datos = dict(
+            zip(columnas, valores_modelo)
+        )
+
         df = pd.DataFrame([datos])
 
-        df = df.apply(
-            pd.to_numeric,
-            errors="coerce"
+        # preprocesar
+        df = preprocesar_datos(
+            df,
+            columnas
         )
 
-        df = df.fillna(0)
-
-        df = df.reindex(
-            columns=columnas,
-            fill_value=0
-        )
-
-        print("VALORES RECIBIDOS:", valores)
-
-        print("DATOS:", datos)
-
-        print("DF:")
-        print(df.head())
-
-        # scaler sklearn
+        # escalar
         df_scaled = pd.DataFrame(
             ARF_SCALER.transform(df),
             columns=columnas
         )
-
-        print("DF SCALED:")
-        print(df_scaled.head())
-
-        print("X_STREAM:")
-        print(x_stream)
 
         # formato river
         x_stream = dict(
@@ -826,6 +833,8 @@ def predecir_stream(valores):
         )
 
         return {
+
+            "estado": "prediccion_completa",
 
             "resultado": (
                 "Fraude"
