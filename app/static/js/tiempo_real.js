@@ -177,15 +177,13 @@ async function iniciarStreaming(){
         const curva =
             await obtenerData(response);
 
-        // EXTRAER VALORES
+        const labelsOriginales =
+            curva.labels || [];
 
-        const datos =
-            curva.datos_consumo || {};
-
-        // EXTRAER SOLO LOS VALORES NUMÉRICOS
-        const valores = Object.values(datos)
-            .map(v => Number(v))
-            .filter(v => !isNaN(v));
+        const valores =
+            (curva.valores || [])
+                .map(v => Number(v))
+                .filter(v => !isNaN(v));
 
         if(!valores.length){
 
@@ -237,15 +235,14 @@ async function iniciarStreaming(){
 
             try{
 
+                // NUEVO PUNTO
                 puntosConsumo.push(
                     Number(valores[indice])
                 );
 
-                const minutos =
-                    String(indice).padStart(2, "0");
-
+                // USAR LABELS REALES DEL CSV
                 labelsTiempo.push(
-                    `00:${minutos}`
+                    labelsOriginales[indice]
                 );
 
                 // ACTUALIZAR
@@ -270,7 +267,11 @@ async function iniciarStreaming(){
                 if(datosParciales.length < 10){
 
                     resultadoTiempoReal.innerHTML =
-                        "Analizando consumo...";
+                        `
+                        <div class="badge-analizando fade-in">
+                            🟡 Analizando consumo...
+                        </div>
+                        `;
 
                     indice++;
 

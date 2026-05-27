@@ -763,8 +763,10 @@ def predecir_stream(valores):
 
             inicio = len(valores)
 
+            ultimo_valor = float(valores[-1])
+
             for i in range(inicio, len(columnas)):
-                datos[columnas[i]] = 0.0
+                datos[columnas[i]] = ultimo_valor
 
         # DATAFRAME
 
@@ -790,7 +792,10 @@ def predecir_stream(valores):
 
         probabilidades = modelo.predict_proba_one(x_stream)
 
-        probabilidad = probabilidades.get(1, 0)
+        probabilidad = probabilidades.get(
+            True,
+            probabilidades.get(1, 0)
+        )
 
         return {
 
