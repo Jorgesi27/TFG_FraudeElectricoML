@@ -758,7 +758,17 @@ def predecir_stream(valores, punto_actual: int = None):
         # Limpiar y completar hasta el número de columnas esperado
         valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        datos = dict(zip(columnas, valores_limpios[:len(columnas)]))
+        # Crear vector vacío completo
+        vector_completo = [0.0] * len(columnas)
+
+        # Insertar SOLO los puntos recibidos
+        for i, valor in enumerate(valores_limpios):
+
+            if i < len(vector_completo):
+                vector_completo[i] = valor
+
+        # Convertir a dict usando columnas reales
+        datos = dict(zip(columnas, vector_completo))
 
         df = pd.DataFrame([datos])
 
