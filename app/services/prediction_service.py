@@ -168,8 +168,6 @@ def preprocesar_datos(
             errors="coerce"
         )
 
-        df = df.ffill(axis=1)
-
         df = df.fillna(0)
 
         # asegurar mismas columnas del entrenamiento
@@ -762,10 +760,8 @@ def predecir_stream(valores, punto_actual: int = None):
         # Limpiar y completar hasta el número de columnas esperado
         valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        ultimo = valores_limpios[-1]
-
         while len(valores_limpios) < len(columnas):
-            valores_limpios.append(ultimo)
+            valores_limpios.append(0.0)
 
         datos = dict(zip(columnas, valores_limpios[:len(columnas)]))
 
@@ -779,9 +775,20 @@ def predecir_stream(valores, punto_actual: int = None):
 
         probabilidades = modelo.predict_proba_one(x_stream)
 
-        probabilidad = float(probabilidades.get(1, 0.0))
+        print("PROBABILIDADES:", probabilidades)
+    
+        probabilidad = float(
+            probabilidades.get(1,
+            probabilidades.get(True,
+            probabilidades.get("1", 0.0)))
+        )
 
-        prediccion = 1 if probabilidad >= 0.2 else 0
+        prediccion = modelo.predict_one(x_stream)
+
+        if prediccion is None:
+            prediccion = 0
+
+        print("PREDICCION:", prediccion)
 
         return {
             "estado": "prediccion_online",
