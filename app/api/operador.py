@@ -93,7 +93,6 @@ def prediccion_stream(
 ):
 
     return predecir_stream(
-        usuario_actual["id_usuario"],
         request.valores
     )
 
