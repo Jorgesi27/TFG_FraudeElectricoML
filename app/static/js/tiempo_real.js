@@ -250,7 +250,7 @@ async function iniciarStreaming(){
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            valores: valores.slice(0, indice + 1),
+                            valores: valores,
                             punto_actual: indice    // punto en curso
                         })
                     }

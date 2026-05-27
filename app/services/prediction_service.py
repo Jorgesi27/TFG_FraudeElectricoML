@@ -532,7 +532,7 @@ def predecir_curva_tiempo_real(
         )
 
         probabilidad = float(
-            probabilidades.get(1, 0.5)
+            probabilidades.get(1, 0.0)
         )
 
     except HTTPException:
@@ -760,9 +760,6 @@ def predecir_stream(valores, punto_actual: int = None):
         # Limpiar y completar hasta el número de columnas esperado
         valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        while len(valores_limpios) < len(columnas):
-            valores_limpios.append(0.0)
-
         datos = dict(zip(columnas, valores_limpios[:len(columnas)]))
 
         df = pd.DataFrame([datos])
@@ -778,9 +775,7 @@ def predecir_stream(valores, punto_actual: int = None):
         print("PROBABILIDADES:", probabilidades)
     
         probabilidad = float(
-            probabilidades.get(1,
-            probabilidades.get(True,
-            probabilidades.get("1", 0.0)))
+            probabilidades.get(1, 0.0)
         )
 
         prediccion = modelo.predict_one(x_stream)
