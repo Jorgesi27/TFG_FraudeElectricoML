@@ -250,7 +250,7 @@ async function iniciarStreaming(){
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            valores: valores,       // curva completa siempre
+                            valores: valores.slice(0, indice + 1),
                             punto_actual: indice    // punto en curso
                         })
                     }

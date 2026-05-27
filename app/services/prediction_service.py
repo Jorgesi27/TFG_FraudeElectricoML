@@ -762,10 +762,10 @@ def predecir_stream(valores, punto_actual: int = None):
         # Limpiar y completar hasta el número de columnas esperado
         valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        # Rellenar con la media (0 escalado) si faltan columnas — 
-        # pero aquí llegará la curva COMPLETA, así que no hará falta
+        ultimo = valores_limpios[-1]
+
         while len(valores_limpios) < len(columnas):
-            valores_limpios.append(0.0)
+            valores_limpios.append(ultimo)
 
         datos = dict(zip(columnas, valores_limpios[:len(columnas)]))
 
@@ -778,10 +778,10 @@ def predecir_stream(valores, punto_actual: int = None):
         x_stream = dict(zip(columnas, X_scaled[0]))
 
         probabilidades = modelo.predict_proba_one(x_stream)
-        
+
         probabilidad = float(probabilidades.get(1, 0.0))
 
-        prediccion = 1 if probabilidad >= 0.3 else 0
+        prediccion = 1 if probabilidad >= 0.2 else 0
 
         return {
             "estado": "prediccion_online",
