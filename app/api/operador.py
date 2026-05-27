@@ -36,6 +36,7 @@ from typing import List
 
 class StreamRequest(BaseModel):
     valores: List[float]
+    punto_actual: int = None
 
 router = APIRouter()
 
@@ -93,8 +94,9 @@ def prediccion_stream(
 ):
 
     return predecir_stream(
-        request.valores
-    )
+    request.valores,
+    request.punto_actual
+)
 
 @router.get(
     "/estadisticas",

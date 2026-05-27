@@ -178,166 +178,86 @@ async function cargarCurvas(){
 
 async function iniciarStreaming(){
 
-    const idCurva =
-        curvaSelect.value;
+    const idCurva = curvaSelect.value;
 
-    if(!idCurva){
-        return;
-    }
-
-    // ==========================================
-    // LIMPIAR STREAM ANTERIOR
-    // ==========================================
+    if(!idCurva){ return; }
 
     resultadoTiempoReal.innerHTML = "---";
-
     probabilidadTiempoReal.innerHTML = "---";
 
     if(intervaloStream){
-
-        clearInterval(
-            intervaloStream
-        );
+        clearInterval(intervaloStream);
     }
 
     try{
 
-        // ==========================================
-        // OBTENER CURVA
-        // ==========================================
+        const response = await fetchAuth(`/api/operador/curva/${idCurva}`);
+        if(!response){ return; }
 
-        const response = await fetchAuth(
+        const curva = await obtenerData(response);
 
-            `/api/operador/curva/${idCurva}`
-        );
-
-        if(!response){
-            return;
-        }
-
-        const curva =
-            await obtenerData(response);
-
-        const valores =
-            (curva.valores || [])
-                .map(v => Number(v) || 0);
+        const valores = (curva.valores || []).map(v => Number(v) || 0);
 
         if(!valores.length){
-
-            mostrarError(
-                "La curva no contiene valores"
-            );
-
+            mostrarError("La curva no contiene valores");
             return;
         }
 
-        // ==========================================
-        // REINICIAR VARIABLES
-        // ==========================================
-
         puntosConsumo = [];
-
         labelsTiempo = [];
-
         prediccionEnCurso = false;
-
         limpiarResultados();
 
-        // ==========================================
-        // LIMPIAR GRAFICA
-        // ==========================================
-
-        chartTiempoReal =
-            limpiarGrafica(
-                chartTiempoReal
-            );
-
-        chartTiempoReal =
-            crearGraficaLineal(
-
-                graficaTiempoReal,
-
-                labelsTiempo,
-
-                puntosConsumo,
-
-                curva.identificador_curva
-            );
-
-        // ==========================================
-        // STREAM ONLINE
-        // ==========================================
+        chartTiempoReal = limpiarGrafica(chartTiempoReal);
+        chartTiempoReal = crearGraficaLineal(
+            graficaTiempoReal,
+            labelsTiempo,
+            puntosConsumo,
+            curva.identificador_curva
+        );
 
         let indice = 0;
 
         intervaloStream = setInterval(async () => {
 
             if(indice >= valores.length){
-
                 clearInterval(intervaloStream);
-
                 intervaloStream = null;
-
                 return;
             }
 
-            if(prediccionEnCurso){
-                return;
-            }
+            if(prediccionEnCurso){ return; }
 
             prediccionEnCurso = true;
 
             try{
 
-                const valorActual =
-                    Number(valores[indice]) || 0;
-
-                puntosConsumo.push(valorActual);
-
-                labelsTiempo.push(
-                    `${(indice + 1) * 3}s`
-                );
-
-                chartTiempoReal.data.labels =
-                    labelsTiempo;
-
-                chartTiempoReal.data.datasets[0].data =
-                    puntosConsumo;
-
+                // Añadir punto actual a la gráfica
+                puntosConsumo.push(Number(valores[indice]) || 0);
+                labelsTiempo.push(`${(indice + 1) * 3}s`);
+                chartTiempoReal.data.labels = labelsTiempo;
+                chartTiempoReal.data.datasets[0].data = puntosConsumo;
                 chartTiempoReal.update();
 
-                const datosParciales =
-                    [...puntosConsumo];
-
+                // Mostrar "Analizando..." mientras espera
                 resultadoTiempoReal.innerHTML =
-                    `
-                    <div class="badge-analizando fade-in">
-                        Analizando...
-                    </div>
-                    `;
+                    `<div class="badge-analizando fade-in">Analizando...</div>`;
 
-                const predResponse =
-                    await fetchAuth(
-                        "/api/operador/prediccion/stream",
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                valores: datosParciales
-                            })
-                        }
-                    );
+                // Enviar curva COMPLETA con índice actual
+                const predResponse = await fetchAuth(
+                    "/api/operador/prediccion/stream",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            valores: valores,       // curva completa siempre
+                            punto_actual: indice    // punto en curso
+                        })
+                    }
+                );
 
                 if(predResponse && predResponse.ok){
-
-                    const prediccion =
-                        await obtenerData(predResponse);
-
+                    const prediccion = await obtenerData(predResponse);
                     mostrarResultado(
                         resultadoTiempoReal,
                         probabilidadTiempoReal,
@@ -346,28 +266,16 @@ async function iniciarStreaming(){
                 }
 
             }catch(error){
-
-                mostrarError(
-                    "Error streaming online",
-                    error
-                );
-
+                mostrarError("Error streaming online", error);
             }finally{
-
                 indice++;
-
                 prediccionEnCurso = false;
             }
 
         }, 3000);
+
     }catch(error){
-
-        mostrarError(
-
-            "Error streaming tiempo real",
-
-            error
-        );
+        mostrarError("Error streaming tiempo real", error);
     }
 }
 

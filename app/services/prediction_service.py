@@ -750,103 +750,46 @@ def generar_estadisticas_archivo(
     return estadisticas
 
 # Predecir online
-def predecir_stream(valores):
-
+def predecir_stream(valores, punto_actual: int = None):
     try:
-
         modelo = ARF_MODEL
-
         scaler = ARF_SCALER
-
         columnas = ARF_COLUMNS
 
         if not valores:
+            raise HTTPException(status_code=400, detail="No se recibieron valores.")
 
-            raise HTTPException(
-                status_code=400,
-                detail="No se recibieron valores."
-            )
+        # Limpiar y completar hasta el número de columnas esperado
+        valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        # LIMPIAR
-        valores = [
+        # Rellenar con la media (0 escalado) si faltan columnas — 
+        # pero aquí llegará la curva COMPLETA, así que no hará falta
+        while len(valores_limpios) < len(columnas):
+            valores_limpios.append(0.0)
 
-            float(v) if v is not None else 0.0
+        datos = dict(zip(columnas, valores_limpios[:len(columnas)]))
 
-            for v in valores
-        ]
-
-        # CREAR STREAM PARCIAL
-        datos = {}
-
-        for i, valor in enumerate(valores):
-
-            if i >= len(columnas):
-                break
-
-            datos[columnas[i]] = valor
-
-        if valores:
-
-            for i in range(len(valores), len(columnas)):
-                datos[columnas[i]] = 0.0
-
-        # DATAFRAME
         df = pd.DataFrame([datos])
 
-        # PREPROCESAR
-        X = preprocesar_datos(
-            df,
-            columnas
-        )
+        X = preprocesar_datos(df, columnas)
 
-        # ESCALAR
         X_scaled = scaler.transform(X)
 
-        # FORMATO RIVER
-        x_stream = dict(
-            zip(columnas, X_scaled[0])
-        )
+        x_stream = dict(zip(columnas, X_scaled[0]))
 
-        # PREDICCION
-        prediccion = modelo.predict_one(
-            x_stream
-        )
+        probabilidades = modelo.predict_proba_one(x_stream)
+        
+        probabilidad = float(probabilidades.get(1, 0.0))
 
-        if prediccion is None:
-            prediccion = 0
-
-        probabilidades = modelo.predict_proba_one(
-            x_stream
-        )
-
-        probabilidad = float(
-            probabilidades.get(1, 0.0)
-        )
+        prediccion = 1 if probabilidad >= 0.3 else 0
 
         return {
-
-            "estado":
-                "prediccion_online",
-
-            "puntos_procesados":
-                len(valores),
-
-            "resultado": (
-                "Fraude"
-                if int(prediccion) == 1
-                else "Normal"
-            ),
-
-            "probabilidad":
-                round(probabilidad * 100, 2),
-
-            "probabilidad_fraude":
-                f"{probabilidad * 100:.2f}%"
+            "estado": "prediccion_online",
+            "puntos_procesados": punto_actual + 1 if punto_actual is not None else len(valores),
+            "resultado": "Fraude" if int(prediccion) == 1 else "Normal",
+            "probabilidad": round(probabilidad * 100, 2),
+            "probabilidad_fraude": f"{probabilidad * 100:.2f}%"
         }
 
     except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error predicción online: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Error predicción online: {str(e)}")
