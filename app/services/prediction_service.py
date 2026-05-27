@@ -772,7 +772,7 @@ def predecir_stream(valores, punto_actual: int = None):
 
         print("PROBABILIDADES:", probabilidades)
     
-        probabilidad = max(probabilidades.values()) if probabilidades else 0.0
+        probabilidad = probabilidades.get(1, 0.0)
 
         prediccion = modelo.predict_one(x_stream)
 
