@@ -21,21 +21,43 @@ import {
     redirigirLogin
 } from "./auth.js";
 
-// Elementos DOM
-const archivoSelect = document.getElementById("archivoSelect");
-const curvaSelect = document.getElementById("curvaSelect");
-const resultadoTiempoReal = document.getElementById("resultadoTiempoReal");
-const probabilidadTiempoReal = document.getElementById("probabilidadTiempoReal");
-const graficaTiempoReal = document.getElementById("graficaTiempoReal");
+// =====================================================
+// ELEMENTOS DOM
+// =====================================================
 
-// Variables
+const archivoSelect =
+    document.getElementById("archivoSelect");
+
+const curvaSelect =
+    document.getElementById("curvaSelect");
+
+const resultadoTiempoReal =
+    document.getElementById("resultadoTiempoReal");
+
+const probabilidadTiempoReal =
+    document.getElementById("probabilidadTiempoReal");
+
+const graficaTiempoReal =
+    document.getElementById("graficaTiempoReal");
+
+// =====================================================
+// VARIABLES
+// =====================================================
+
 let chartTiempoReal = null;
+
 let intervaloStream = null;
+
 let puntosConsumo = [];
+
 let labelsTiempo = [];
+
 let prediccionEnCurso = false;
 
-// Limpia los resultados mostrados en pantalla.
+// =====================================================
+// LIMPIAR RESULTADOS
+// =====================================================
+
 function limpiarResultados(){
 
     resultadoTiempoReal.innerText =
@@ -48,7 +70,10 @@ function limpiarResultados(){
         "#ffffff";
 }
 
-// Recupera los archivos importados por el usuario.
+// =====================================================
+// CARGAR ARCHIVOS
+// =====================================================
+
 async function cargarArchivos(){
 
     try{
@@ -92,7 +117,10 @@ async function cargarArchivos(){
     }
 }
 
-// Carga las curvas asociadas al archivo seleccionado.
+// =====================================================
+// CARGAR CURVAS
+// =====================================================
+
 async function cargarCurvas(){
 
     const idArchivo =
@@ -144,7 +172,10 @@ async function cargarCurvas(){
     }
 }
 
-// Simula el flujo de consumo en tiempo real y realiza predicciones online.
+// =====================================================
+// STREAMING ONLINE
+// =====================================================
+
 async function iniciarStreaming(){
 
     const idCurva =
@@ -154,7 +185,9 @@ async function iniciarStreaming(){
         return;
     }
 
-    // LIMPIAR ANTERIOR
+    // ==========================================
+    // LIMPIAR STREAM ANTERIOR
+    // ==========================================
 
     if(intervaloStream){
 
@@ -164,7 +197,10 @@ async function iniciarStreaming(){
     }
 
     try{
+
+        // ==========================================
         // OBTENER CURVA
+        // ==========================================
 
         const response = await fetchAuth(
 
@@ -178,12 +214,9 @@ async function iniciarStreaming(){
         const curva =
             await obtenerData(response);
 
-        const labelsOriginales =
-            curva.labels || [];
-
         const valores =
             (curva.valores || [])
-                .map(v => Number(v) || 0)
+                .map(v => Number(v) || 0);
 
         if(!valores.length){
 
@@ -194,13 +227,21 @@ async function iniciarStreaming(){
             return;
         }
 
-        // REINICIAR GRAFICA
- 
+        // ==========================================
+        // REINICIAR VARIABLES
+        // ==========================================
+
         puntosConsumo = [];
 
         labelsTiempo = [];
 
         prediccionEnCurso = false;
+
+        limpiarResultados();
+
+        // ==========================================
+        // LIMPIAR GRAFICA
+        // ==========================================
 
         chartTiempoReal =
             limpiarGrafica(
@@ -219,13 +260,18 @@ async function iniciarStreaming(){
                 curva.identificador_curva
             );
 
-        // FLUJO ONLINE
+        // ==========================================
+        // STREAM ONLINE
+        // ==========================================
 
         let indice = 0;
 
         intervaloStream = setInterval(async () => {
 
+            // ==========================================
             // FIN STREAM
+            // ==========================================
+
             if(indice >= valores.length){
 
                 clearInterval(intervaloStream);
@@ -235,12 +281,32 @@ async function iniciarStreaming(){
                 return;
             }
 
+            // ==========================================
+            // EVITAR SOLAPAMIENTO REQUESTS
+            // ==========================================
+
+            if(prediccionEnCurso){
+                return;
+            }
+
+            prediccionEnCurso = true;
+
             try{
 
+                // ==========================================
                 // NUEVO PUNTO
+                // ==========================================
+
+                const valorActual =
+                    Number(valores[indice]) || 0;
+
                 puntosConsumo.push(
-                    Number(valores[indice])
+                    valorActual
                 );
+
+                // ==========================================
+                // LABEL TIEMPO
+                // ==========================================
 
                 const minutos = String(
                     Math.floor(indice / 60)
@@ -254,61 +320,64 @@ async function iniciarStreaming(){
                     `${minutos}:${segundos}`
                 );
 
-                // ACTUALIZAR
-                chartTiempoReal.data.labels = labelsTiempo;
+                // ==========================================
+                // ACTUALIZAR GRAFICA
+                // ==========================================
+
+                chartTiempoReal.data.labels =
+                    labelsTiempo;
 
                 chartTiempoReal.data.datasets[0].data =
                     puntosConsumo;
 
                 chartTiempoReal.update();
 
-                const PASO_VENTANA = 48;
+                // ==========================================
+                // PREDECIR CADA 5 PUNTOS
+                // ==========================================
 
-                // SOLO PREDECIR EN MULTIPLOS DE 48
-                if((indice + 1) % PASO_VENTANA !== 0){
+                const PASO_PREDICCION = 5;
+
+                if((indice + 1) % PASO_PREDICCION !== 0){
 
                     indice++;
+
+                    prediccionEnCurso = false;
 
                     return;
                 }
 
-                if(prediccionEnCurso){
-
-                    indice++;
-
-                    return;
-                }
-
-                prediccionEnCurso = true;
-
-                const tamañoVentana = indice + 1;
+                // ==========================================
+                // DATOS PARCIALES
+                // ==========================================
 
                 const datosParciales =
-                    valores
-                        .slice(0, tamañoVentana)
-                        .filter(
-                            v =>
-                                v !== undefined &&
-                                v !== null &&
-                                !isNaN(v)
-                        );
 
-                if(!datosParciales.length){
-                    prediccionEnCurso = false;
-                    indice++;
-                    return;
-                }
+                    valores
+                        .slice(0, indice + 1)
+                        .map(v => Number(v) || 0);
+
+                // ==========================================
+                // MENSAJE
+                // ==========================================
 
                 resultadoTiempoReal.innerHTML =
+
                     `
                     <div class="badge-analizando fade-in">
-                        🟡 Analizando ventana ${tamañoVentana}
+                        Analizando punto ${indice + 1}
                     </div>
                     `;
 
+                // ==========================================
+                // REQUEST API
+                // ==========================================
+
                 const predResponse =
                     await fetchAuth(
+
                         "/api/operador/prediccion/stream",
+
                         {
                             method: "POST",
 
@@ -323,23 +392,28 @@ async function iniciarStreaming(){
                         }
                     );
 
+                // ==========================================
+                // RESPUESTA
+                // ==========================================
+
                 if(predResponse && predResponse.ok){
 
                     const prediccion =
                         await obtenerData(predResponse);
 
                     mostrarResultado(
+
                         resultadoTiempoReal,
+
                         probabilidadTiempoReal,
+
                         prediccion
                     );
-
                 }
 
-                prediccionEnCurso = false;
-
-                // AUMENTAR INDICE
                 indice++;
+
+                prediccionEnCurso = false;
 
             }catch(error){
 
@@ -350,12 +424,12 @@ async function iniciarStreaming(){
                 intervaloStream = null;
 
                 mostrarError(
-                    "Error en streaming",
+                    "Error en streaming online",
                     error
                 );
             }
 
-        }, 3000);
+        }, 500);
 
     }catch(error){
 
@@ -368,7 +442,10 @@ async function iniciarStreaming(){
     }
 }
 
-// Inicializa los eventos principales de la interfaz.
+// =====================================================
+// EVENTOS
+// =====================================================
+
 function inicializarEventos(){
 
     document
@@ -389,7 +466,10 @@ function inicializarEventos(){
     );
 }
 
-// Inicializa la pantalla al cargar la aplicación.
+// =====================================================
+// INIT
+// =====================================================
+
 window.onload = async () => {
 
     const token =

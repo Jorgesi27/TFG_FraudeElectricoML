@@ -740,14 +740,28 @@ def generar_estadisticas_archivo(
     return estadisticas
 
 # Predecir online
+# Predicción online streaming
 def predecir_stream(valores):
 
     try:
 
         columnas = ARF_COLUMNS
+
         modelo = ARF_MODEL
 
-        # validar tamaño
+        scaler = ARF_SCALER
+
+        # ==========================================
+        # VALIDAR
+        # ==========================================
+
+        if not valores:
+
+            raise HTTPException(
+                status_code=400,
+                detail="No se recibieron valores."
+            )
+
         if len(valores) > len(columnas):
 
             raise HTTPException(
@@ -755,46 +769,70 @@ def predecir_stream(valores):
                 detail="Demasiados valores."
             )
 
-        # padding EXACTAMENTE igual que entrenamiento
+        # ==========================================
+        # LIMPIAR
+        # ==========================================
+
+        valores = [
+
+            float(v) if v is not None else 0.0
+
+            for v in valores
+
+        ]
+
+        # ==========================================
+        # PADDING
+        # EXACTAMENTE IGUAL QUE TRAIN
+        # ==========================================
+
         valores_completos = valores + (
-            [0] * (len(columnas) - len(valores))
+
+            [0.0] * (
+                len(columnas) - len(valores)
+            )
+
         )
 
-        print(
-            "VENTANA:",
-            len(valores),
-            "->",
-            len(valores_completos)
+        # ==========================================
+        # DATAFRAME
+        # ==========================================
+
+        df = pd.DataFrame(
+            [valores_completos],
+            columns=columnas
         )
 
-        # dataframe
-        datos = dict(
-            zip(columnas, valores_completos)
-        )
+        # ==========================================
+        # PREPROCESAR
+        # ==========================================
 
-        df = pd.DataFrame([datos])
-
-        # preprocesar
         df = preprocesar_datos(
             df,
             columnas
         )
 
-        # escalar
-        df_scaled = pd.DataFrame(
-            ARF_SCALER.transform(df),
-            columns=columnas
-        )
+        # ==========================================
+        # ESCALAR
+        # ==========================================
 
-        # formato river
+        X_scaled = scaler.transform(df)
+
+        # ==========================================
+        # FORMATO RIVER
+        # ==========================================
+
         x_stream = dict(
             zip(
                 columnas,
-                df_scaled.iloc[0]
+                X_scaled[0]
             )
         )
 
-        # predicción
+        # ==========================================
+        # PREDICCIÓN
+        # ==========================================
+
         prediccion = modelo.predict_one(
             x_stream
         )
@@ -802,34 +840,52 @@ def predecir_stream(valores):
         if prediccion is None:
             prediccion = 0
 
+        # ==========================================
+        # PROBABILIDADES
+        # ==========================================
+
         probabilidades = modelo.predict_proba_one(
             x_stream
         )
 
         probabilidad = float(
-            probabilidades.get(1, 0.5)
+            probabilidades.get(1, 0)
         )
+
+        # ==========================================
+        # RESPUESTA
+        # ==========================================
 
         return {
 
-            "estado": "prediccion_completa",
+            "estado":
+                "prediccion_online",
+
+            "puntos_procesados":
+                len(valores),
 
             "resultado": (
+
                 "Fraude"
+
                 if int(prediccion) == 1
+
                 else "Normal"
             ),
 
             "probabilidad":
-                round(probabilidad * 100, 4),
+                round(probabilidad * 100, 2),
 
             "probabilidad_fraude":
-                f"{probabilidad * 100:.4f}%"
+                f"{probabilidad * 100:.2f}%"
         }
+
+    except HTTPException:
+        raise
 
     except Exception as e:
 
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail=f"Error predicción online: {str(e)}"
         )
