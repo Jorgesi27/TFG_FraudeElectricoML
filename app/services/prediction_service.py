@@ -796,14 +796,14 @@ def predecir_stream(valores):
 
                 datos[columnas[i]] = ultimo
 
-                # DATAFRAME
-                df = pd.DataFrame([datos])
+        # DATAFRAME
+        df = pd.DataFrame([datos])
 
-                # PREPROCESAR
-                X = preprocesar_datos(
-                    df,
-                    columnas
-                )
+        # PREPROCESAR
+        X = preprocesar_datos(
+            df,
+            columnas
+        )
 
         # ESCALAR
         X_scaled = scaler.transform(X)
