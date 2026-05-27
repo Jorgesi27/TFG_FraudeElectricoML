@@ -82,6 +82,16 @@ ARF_COLUMNS = cargar_pickle(
     "columnas Adaptive Random Forest"
 )
 
+print("\n========== ARF COLUMNS ==========")
+
+print(type(ARF_COLUMNS))
+
+print(f"TOTAL COLUMNAS: {len(ARF_COLUMNS)}")
+
+print(ARF_COLUMNS)
+
+print("=================================\n")
+
 # Lee el CSV importado.
 def leer_csv_subido(contenido: bytes):
 
@@ -740,8 +750,15 @@ def generar_estadisticas_archivo(
     return estadisticas
 
 # Predecir online
-# Predicción online streaming
 def predecir_stream(valores):
+
+    print("\n========== STREAM ==========")
+
+    print(f"PUNTOS RECIBIDOS: {len(valores)}")
+
+    print(valores)
+
+    print("============================\n")
 
     try:
 
@@ -786,12 +803,12 @@ def predecir_stream(valores):
         # EXACTAMENTE IGUAL QUE TRAIN
         # ==========================================
 
-        valores_completos = valores + (
+        ultimo_valor = valores[-1]
 
-            [0.0] * (
+        valores_completos = valores + (
+            [ultimo_valor] * (
                 len(columnas) - len(valores)
             )
-
         )
 
         # ==========================================
@@ -802,6 +819,12 @@ def predecir_stream(valores):
             [valores_completos],
             columns=columnas
         )
+
+        print("\n========== INPUT MODELO ==========")
+
+        print(df.head())
+
+        print("===============================\n")
 
         # ==========================================
         # PREPROCESAR
@@ -848,8 +871,10 @@ def predecir_stream(valores):
             x_stream
         )
 
+        print(probabilidades)
+
         probabilidad = float(
-            probabilidades.get(1, 0)
+            probabilidades.get(1, 0.0)
         )
 
         # ==========================================

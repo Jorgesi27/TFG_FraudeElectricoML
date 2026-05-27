@@ -27,21 +27,6 @@ let pieChart = null;
 let barChart = null;
 let lineChart = null;
 let radarChart = null;
-let paginaActiva = true;
-
-// Detecta cuando se sale de una pagina
-window.addEventListener("beforeunload", () => {
-
-    paginaActiva = false;
-});
-
-document.addEventListener("visibilitychange", () => {
-
-    if(document.hidden){
-
-        paginaActiva = false;
-    }
-});
 
 // Elimina una gráfica existente antes de recrearla.
 function limpiarChart(chart){
@@ -159,16 +144,12 @@ async function cargarArchivos(){
             "/api/operador/archivos"
         );
 
-        if(!response || !paginaActiva){
+        if(!response){
             return;
         }
 
         const archivos =
             await obtenerData(response);
-
-        if(!paginaActiva){
-            return;
-        }
 
         let opciones = `
             <option value="">
@@ -188,10 +169,6 @@ async function cargarArchivos(){
         archivoSelect.innerHTML = opciones;
 
     }catch(error){
-
-        if(!paginaActiva){
-            return;
-        }
 
         mostrarError(
             "Error cargando archivos",
@@ -236,10 +213,6 @@ async function cargarDashboard(){
         const data =
             await obtenerData(response);
 
-        if(!paginaActiva){
-            return;
-        }
-
         cargarKPIs(data);
 
         crearPieChart(data);
@@ -266,10 +239,7 @@ async function cargarDashboard(){
 
     }finally{
 
-        if(
-            paginaActiva &&
-            loaderDashboard
-        ){
+        if(loaderDashboard){
 
             loaderDashboard
                 .classList

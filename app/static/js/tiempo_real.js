@@ -268,10 +268,6 @@ async function iniciarStreaming(){
 
         intervaloStream = setInterval(async () => {
 
-            // ==========================================
-            // FIN STREAM
-            // ==========================================
-
             if(indice >= valores.length){
 
                 clearInterval(intervaloStream);
@@ -281,10 +277,6 @@ async function iniciarStreaming(){
                 return;
             }
 
-            // ==========================================
-            // EVITAR SOLAPAMIENTO REQUESTS
-            // ==========================================
-
             if(prediccionEnCurso){
                 return;
             }
@@ -293,36 +285,14 @@ async function iniciarStreaming(){
 
             try{
 
-                // ==========================================
-                // NUEVO PUNTO
-                // ==========================================
-
                 const valorActual =
                     Number(valores[indice]) || 0;
 
-                puntosConsumo.push(
-                    valorActual
-                );
-
-                // ==========================================
-                // LABEL TIEMPO
-                // ==========================================
-
-                const minutos = String(
-                    Math.floor(indice / 60)
-                ).padStart(2, "0");
-
-                const segundos = String(
-                    indice % 60
-                ).padStart(2, "0");
+                puntosConsumo.push(valorActual);
 
                 labelsTiempo.push(
-                    `${minutos}:${segundos}`
+                    `${indice * 3}s`
                 );
-
-                // ==========================================
-                // ACTUALIZAR GRAFICA
-                // ==========================================
 
                 chartTiempoReal.data.labels =
                     labelsTiempo;
@@ -332,56 +302,23 @@ async function iniciarStreaming(){
 
                 chartTiempoReal.update();
 
-                // ==========================================
-                // PREDECIR CADA 5 PUNTOS
-                // ==========================================
-
-                const PASO_PREDICCION = 5;
-
-                if((indice + 1) % PASO_PREDICCION !== 0){
-
-                    indice++;
-
-                    prediccionEnCurso = false;
-
-                    return;
-                }
-
-                // ==========================================
-                // DATOS PARCIALES
-                // ==========================================
-
                 const datosParciales =
-
-                    valores
-                        .slice(0, indice + 1)
-                        .map(v => Number(v) || 0);
-
-                // ==========================================
-                // MENSAJE
-                // ==========================================
+                    [...puntosConsumo];
 
                 resultadoTiempoReal.innerHTML =
-
                     `
                     <div class="badge-analizando fade-in">
-                        Analizando punto ${indice + 1}
+                        Analizando...
                     </div>
                     `;
 
-                // ==========================================
-                // REQUEST API
-                // ==========================================
-
                 const predResponse =
                     await fetchAuth(
-
                         "/api/operador/prediccion/stream",
-
                         {
-                            method: "POST",
+                            method:"POST",
 
-                            headers: {
+                            headers:{
                                 "Content-Type":
                                     "application/json"
                             },
@@ -392,45 +329,33 @@ async function iniciarStreaming(){
                         }
                     );
 
-                // ==========================================
-                // RESPUESTA
-                // ==========================================
-
                 if(predResponse && predResponse.ok){
 
                     const prediccion =
                         await obtenerData(predResponse);
 
                     mostrarResultado(
-
                         resultadoTiempoReal,
-
                         probabilidadTiempoReal,
-
                         prediccion
                     );
                 }
 
+            }catch(error){
+
+                mostrarError(
+                    "Error streaming online",
+                    error
+                );
+
+            }finally{
+
                 indice++;
 
                 prediccionEnCurso = false;
-
-            }catch(error){
-
-                prediccionEnCurso = false;
-
-                clearInterval(intervaloStream);
-
-                intervaloStream = null;
-
-                mostrarError(
-                    "Error en streaming online",
-                    error
-                );
             }
 
-        }, 500);
-
+        }, 3000);
     }catch(error){
 
         mostrarError(
