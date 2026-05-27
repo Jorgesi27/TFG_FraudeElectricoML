@@ -528,10 +528,8 @@ def predecir_curva_tiempo_real(
             x_stream
         )
 
-        probabilidad = (
-            probabilidades.get(1)
-            or probabilidades.get(True)
-            or 0
+        probabilidad = float(
+            probabilidades.get(1, 0.0)
         )
 
     except HTTPException:
@@ -751,6 +749,10 @@ def predecir_stream(valores):
 
     try:
 
+        print("\n===== STREAM RECIBIDO =====")
+        print(valores[:20])
+        print("TOTAL:", len(valores))
+
         modelo = ARF_MODEL
 
         columnas = ARF_COLUMNS
@@ -780,11 +782,24 @@ def predecir_stream(valores):
             fill_value=0
         )
 
+        print("VALORES RECIBIDOS:", valores)
+
+        print("DATOS:", datos)
+
+        print("DF:")
+        print(df.head())
+
         # scaler sklearn
         df_scaled = pd.DataFrame(
             ARF_SCALER.transform(df),
             columns=columnas
         )
+
+        print("DF SCALED:")
+        print(df_scaled.head())
+
+        print("X_STREAM:")
+        print(x_stream)
 
         # formato river
         x_stream = dict(
@@ -806,10 +821,8 @@ def predecir_stream(valores):
             x_stream
         )
 
-        probabilidad = (
-            probabilidades.get(1)
-            or probabilidades.get(True)
-            or 0
+        probabilidad = float(
+            probabilidades.get(1, 0.0)
         )
 
         return {
