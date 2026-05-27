@@ -787,30 +787,23 @@ def predecir_stream(valores):
 
             datos[columnas[i]] = valor
 
-        # SOLO 5 COLUMNAS EXTRA
+        # COMPLETAR TODA LA CURVA
         if valores:
 
             ultimo = valores[-1]
 
-            inicio = len(valores)
-
-            fin = min(
-                inicio + 5,
-                len(columnas)
-            )
-
-            for i in range(inicio, fin):
+            for i in range(len(valores), len(columnas)):
 
                 datos[columnas[i]] = ultimo
 
-        # DATAFRAME
-        df = pd.DataFrame([datos])
+                # DATAFRAME
+                df = pd.DataFrame([datos])
 
-        # PREPROCESAR
-        X = preprocesar_datos(
-            df,
-            columnas
-        )
+                # PREPROCESAR
+                X = preprocesar_datos(
+                    df,
+                    columnas
+                )
 
         # ESCALAR
         X_scaled = scaler.transform(X)
