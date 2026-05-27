@@ -164,7 +164,7 @@ def preprocesar_datos(
             errors="coerce"
         )
 
-        # NaN -> 0
+        df = df.fillna(method="ffill", axis=1)
         df = df.fillna(0)
 
         return df
@@ -738,42 +738,47 @@ def generar_estadisticas_archivo(
 
 
 #Predicción online
+# Predicción online progresiva
 def predecir_stream(valores):
 
     try:
+
         modelo = ARF_MODEL
 
         columnas = ARF_COLUMNS
 
-        # CREAR DATOS ONLINE
+        if not valores:
 
+            raise HTTPException(
+                status_code=400,
+                detail="No hay valores para predecir."
+            )
+
+        # CREAR STREAM PARCIAL
         datos = {}
 
-        # usar solo valores disponibles
         for i, valor in enumerate(valores):
 
             if i >= len(columnas):
                 break
 
-            datos[columnas[i]] = float(valor)
+            try:
+                datos[columnas[i]] = float(valor)
 
-        # RELLENAR TODAS LAS COLUMNAS RESTANTES
+            except:
+                datos[columnas[i]] = 0.0
 
-        if valores:
+        # COMPLETAR COLUMNAS RESTANTES
+        ultimo_valor = float(valores[-1])
 
-            inicio = len(valores)
+        for i in range(len(valores), len(columnas)):
 
-            ultimo_valor = float(valores[-1])
-
-            for i in range(inicio, len(columnas)):
-                datos[columnas[i]] = ultimo_valor
+            datos[columnas[i]] = ultimo_valor
 
         # DATAFRAME
-
         df = pd.DataFrame([datos])
 
         # PREPROCESAR
-
         X = preprocesar_datos(
             df,
             columnas
@@ -783,18 +788,28 @@ def predecir_stream(valores):
             zip(columnas, X.iloc[0])
         )
 
-        # PREDICCION
-
-        prediccion = modelo.predict_one(x_stream)
+        # PREDICCIÓN
+        prediccion = modelo.predict_one(
+            x_stream
+        )
 
         if prediccion is None:
             prediccion = 0
 
-        probabilidades = modelo.predict_proba_one(x_stream)
+        # PROBABILIDADES
+        probabilidades = modelo.predict_proba_one(
+            x_stream
+        )
 
         probabilidad = probabilidades.get(
-            True,
-            probabilidades.get(1, 0)
+            1,
+            probabilidades.get(True, 0)
+        )
+
+        # APRENDIZAJE ONLINE
+        modelo.learn_one(
+            x_stream,
+            int(prediccion)
         )
 
         return {
@@ -804,6 +819,8 @@ def predecir_stream(valores):
                 if int(prediccion) == 1
                 else "Normal"
             ),
+
+            "probabilidad": float(probabilidad),
 
             "probabilidad_fraude":
                 f"{probabilidad * 100:.2f}%"

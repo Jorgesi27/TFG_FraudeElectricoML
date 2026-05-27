@@ -240,12 +240,24 @@ async function iniciarStreaming(){
                     Number(valores[indice])
                 );
 
-                // USAR LABELS REALES DEL CSV
+                const minutos = String(
+                    Math.floor(indice / 60)
+                ).padStart(2, "0");
+
+                const segundos = String(
+                    indice % 60
+                ).padStart(2, "0");
+
                 labelsTiempo.push(
-                    labelsOriginales[indice]
+                    `${minutos}:${segundos}`
                 );
 
                 // ACTUALIZAR
+                chartTiempoReal.data.labels = labelsTiempo;
+
+                chartTiempoReal.data.datasets[0].data =
+                    puntosConsumo;
+
                 chartTiempoReal.update();
 
                 // DATOS PARCIALES
@@ -264,7 +276,7 @@ async function iniciarStreaming(){
                     return;
                 }
 
-                if(datosParciales.length < 10){
+                if(datosParciales.length < 2){
 
                     resultadoTiempoReal.innerHTML =
                         `

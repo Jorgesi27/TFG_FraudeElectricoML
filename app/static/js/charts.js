@@ -36,7 +36,7 @@ export function crearGraficaLineal(
 
                 fill: true,
 
-                pointRadius: 0,
+                pointRadius: 3,
 
                 pointHoverRadius: 4,
 
