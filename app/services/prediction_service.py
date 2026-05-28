@@ -797,13 +797,14 @@ def predecir_stream(valores, punto_actual: int = None):
         # Simular que al inicio parece normal
         # y al final el operador detecta fraude
 
-        if progreso < 0.5:
+        if progreso < 0.05:
             y_feedback = 0
         else:
             y_feedback = 1
 
         # Aprendizaje online incremental
-        modelo.learn_one(x_stream, y_feedback)
+        if punto_actual % 5 == 0:
+            modelo.learn_one(x_stream, y_feedback)
 
         # Guardar modelo actualizado
         with open(ARF_MODEL_PATH, "wb") as f:
