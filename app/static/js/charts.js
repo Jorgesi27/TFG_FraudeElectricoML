@@ -66,19 +66,36 @@ export function crearGraficaLineal(
 
                 x: {
 
+                    title: {
+                        display: true,
+                        text: "Hora",
+                        color: "white"
+                    },
+
                     ticks: {
+                        color: "white"
+                    },
 
-                        color: "white",
-
-                        autoSkip: true,
-
-                        maxTicksLimit: 20
+                    grid: {
+                        color: "rgba(255,255,255,0.1)"
                     }
                 },
 
                 y: {
 
-                    beginAtZero: false
+                    title: {
+                        display: true,
+                        text: "Consumo [kW]",
+                        color: "white"
+                    },
+
+                    ticks: {
+                        color: "white"
+                    },
+
+                    grid: {
+                        color: "rgba(255,255,255,0.1)"
+                    }
                 }
             }
         }
