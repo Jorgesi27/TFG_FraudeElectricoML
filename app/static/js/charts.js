@@ -17,7 +17,8 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
             labels,
             datasets: [{
                 label: titulo,
-                data: valores,
+                data: valores.map(v => v === 0 ? null : v),
+                spanGaps: false,
                 borderColor: "#3b82f6",
                 backgroundColor: "rgba(59,130,246,0.1)",
                 fill: false,
@@ -31,7 +32,6 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
             maintainAspectRatio: false,
             interaction: { mode: "index", intersect: false },
             plugins: {
-                legend: { display: true },
                 zoom: {
                     zoom: {
                         wheel: { enabled: true },
@@ -41,6 +41,13 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
                     pan: {
                         enabled: true,
                         mode: "x"
+                    },
+                    limits: {
+                        x: {
+                            min: "original",
+                            max: "original",
+                            minRange: 100   // mínimo 100 horas visibles, no puede hacer más zoom
+                        }
                     }
                 }
             },
