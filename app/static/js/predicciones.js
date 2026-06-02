@@ -17,7 +17,7 @@ export function mostrarResultado(
     resultadoHistorico.innerHTML =
         "---";
 
-    probabilidadHistorica.innerText =
+    probabilidadHistorica.innerHTML  =
         "---";
 
     if(
@@ -52,9 +52,10 @@ export function mostrarResultado(
         </div>
         `;
 
-    probabilidadHistorica.innerText =
-
-        `Probabilidad de fraude: ${data.probabilidad_fraude}`;
+    probabilidadHistorica.innerHTML = `
+        Probabilidad máxima: ${data.probabilidad_fraude}<br>
+        Probabilidad media: ${data.probabilidad_media}
+    `;
 }
 
 // Realiza una predicción histórica de una curva.

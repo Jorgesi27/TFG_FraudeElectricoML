@@ -144,7 +144,7 @@ function limpiarResultados(){
     resultadoHistorico.innerText =
         "---";
 
-    probabilidadHistorica.innerText =
+    probabilidadHistorica.innerHTML  =
         "---";
 
     resultadoHistorico.style.color =
@@ -186,10 +186,6 @@ async function mostrarGrafica(){
 
         const valores =
             curva.valores || [];
-
-        console.log("Valores mínimos:", Math.min(...valores.filter(v => v > 0)));
-        console.log("Cuántos ceros exactos:", valores.filter(v => v === 0).length);
-        console.log("Cuántos menores a 1:", valores.filter(v => v < 1).length);
 
         chart =
             limpiarGrafica(chart);
