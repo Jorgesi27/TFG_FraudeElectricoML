@@ -28,6 +28,9 @@ ARF_MODEL_PATH = MODELS_DIR / "arf_model.pkl"
 ARF_COLUMNS_PATH = MODELS_DIR / "arf_columns.pkl"
 ARF_SCALER_PATH = MODELS_DIR / "arf_scaler.pkl"
 
+# Contador global de predicciones online
+STREAM_PREDICTION_COUNTER = 0
+
 # Carga modelos y recursos serializados.
 def cargar_pickle(path: Path, nombre_recurso: str):
 
@@ -91,6 +94,28 @@ print(f"TOTAL COLUMNAS: {len(ARF_COLUMNS)}")
 print(ARF_COLUMNS)
 
 print("=================================\n")
+
+def extraer_features_online(valores):
+
+    valores = np.array(valores, dtype=float)
+
+    media = np.mean(valores)
+    maximo = np.max(valores)
+    minimo = np.min(valores)
+    std = np.std(valores)
+
+    return {
+        "Electricity:Facility kWHourly": media,
+        "Fans:Electricity kWHourly": maximo,
+        "Cooling:Electricity kWHourly": minimo,
+        "Heating:Electricity kWHourly": std,
+        "InteriorLights:Electricity kWHourly": media * 0.8,
+        "InteriorEquipment:Electricity kWHourly": media * 1.1,
+        "Gas:Facility kWHourly": maximo * 0.5,
+        "Heating:Gas kWHourly": minimo * 0.5,
+        "InteriorEquipment:Gas kWHourly": std * 0.5,
+        "Water Heater:WaterSystems:Gas kWHourly": media * 0.3
+    }
 
 # Lee el CSV importado.
 def leer_csv_subido(contenido: bytes):
@@ -383,9 +408,32 @@ def obtener_detalle_curva(
     if isinstance(datos_consumo, str):
         datos_consumo = json.loads(datos_consumo)
 
-    labels = list(datos_consumo.keys())
+    datos_consumo = curva["datos_consumo"]
 
-    valores = list(datos_consumo.values())
+    if isinstance(datos_consumo, str):
+        datos_consumo = json.loads(datos_consumo)
+
+    horas = []
+    valores = []
+
+    for key, value in datos_consumo.items():
+
+        try:
+
+            hora = int(key)
+
+            horas.append(hora)
+
+            valores.append(float(value))
+
+        except:
+            continue
+
+    pares = sorted(zip(horas, valores))
+
+    labels = [p[0] for p in pares]
+
+    valores = [p[1] for p in pares]
 
     return {
 
@@ -531,7 +579,7 @@ def predecir_curva_tiempo_real(
             x_stream
         )
 
-        probabilidad = max(probabilidades.values()) if probabilidades else 0.0
+        probabilidad = probabilidades.get(1, 0.0)
 
     except HTTPException:
         raise
@@ -758,17 +806,7 @@ def predecir_stream(valores, punto_actual: int = None):
         # Limpiar y completar hasta el número de columnas esperado
         valores_limpios = [float(v) if v is not None else 0.0 for v in valores]
 
-        # Crear vector vacío completo
-        vector_completo = [0.0] * len(columnas)
-
-        # Insertar SOLO los puntos recibidos
-        for i, valor in enumerate(valores_limpios):
-
-            if i < len(vector_completo):
-                vector_completo[i] = valor
-
-        # Convertir a dict usando columnas reales
-        datos = dict(zip(columnas, vector_completo))
+        datos = extraer_features_online(valores_limpios)
 
         df = pd.DataFrame([datos])
 
@@ -790,7 +828,7 @@ def predecir_stream(valores, punto_actual: int = None):
         # SIMULACIÓN DE APRENDIZAJE ONLINE
         # =====================================================
 
-        total_puntos = len(columnas)
+        total_puntos = max(len(valores), 1)
 
         progreso = (punto_actual + 1) / total_puntos
 
@@ -806,9 +844,18 @@ def predecir_stream(valores, punto_actual: int = None):
         if punto_actual % 5 == 0:
             modelo.learn_one(x_stream, y_feedback)
 
-        # Guardar modelo actualizado
-        with open(ARF_MODEL_PATH, "wb") as f:
-            pickle.dump(modelo, f)
+        # Guardado periódico del modelo
+        global STREAM_PREDICTION_COUNTER
+
+        STREAM_PREDICTION_COUNTER += 1
+
+        # Guardar cada 100 predicciones
+        if STREAM_PREDICTION_COUNTER % 100 == 0:
+
+            with open(ARF_MODEL_PATH, "wb") as f:
+                pickle.dump(modelo, f)
+
+            print(f"Modelo ARF guardado ({STREAM_PREDICTION_COUNTER} predicciones)")
 
         print("FEEDBACK:", y_feedback)
         print("PROGRESO:", progreso)
