@@ -324,53 +324,6 @@ def guardar_estadisticas_archivo(
 
             conexion.commit()
 
-# Recupera las estadísticas de un archivo.
-def obtener_estadisticas_archivo(
-    id_archivo: int,
-    id_usuario: int
-):
-
-    conexion = obtener_conexion()
-
-    with conexion:
-        with conexion.cursor() as cursor:
-
-            sql = """
-                SELECT estadisticas_json
-                FROM archivos_consumo
-                WHERE id_archivo = %s
-                AND id_usuario = %s
-                LIMIT 1
-            """
-
-            cursor.execute(
-                sql,
-                (
-                    id_archivo,
-                    id_usuario
-                )
-            )
-
-            resultado = cursor.fetchone()
-
-    if not resultado:
-        return None
-
-    estadisticas = resultado["estadisticas_json"]
-
-    if not estadisticas:
-        return None
-
-    if isinstance(estadisticas, bytes):
-        estadisticas = estadisticas.decode("utf-8")
-
-    if isinstance(estadisticas, str):
-        estadisticas = json.loads(estadisticas)
-
-    estadisticas = limpiar_para_json(estadisticas)
-
-    return estadisticas
-
 # Recupera estadísticas precalculadas
 def obtener_estadisticas_archivo_bd(
     id_archivo: int,

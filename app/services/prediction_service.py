@@ -14,7 +14,7 @@ from app.core.database import (
     obtener_curva_por_id,
     guardar_prediccion,
     guardar_estadisticas_archivo,
-    obtener_estadisticas_archivo
+    obtener_estadisticas_archivo_bd
 )
 
 # =========================
@@ -114,6 +114,32 @@ def formatear_prediccion(i, pred, prob):
         "probabilidad_fraude": f"{float(prob) * 100:.2f}%"
     }
 
+
+def listar_curvas_archivo(
+    id_archivo: int,
+    id_usuario: int
+):
+
+    curvas = obtener_curvas_archivo(
+        id_archivo,
+        id_usuario
+    )
+
+    if not curvas:
+
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "El archivo no contiene "
+                "curvas registradas."
+            )
+        )
+
+    return {
+        "id_archivo": id_archivo,
+        "total_curvas": len(curvas),
+        "curvas": curvas
+    }
 
 def predecir_xgboost(df):
     X = preprocesar_datos(df, XGBOOST_COLUMNS, True)
@@ -332,7 +358,7 @@ def predecir_curva_historica(id_curva, id_usuario):
 # =========================
 def generar_estadisticas_archivo(id_archivo, id_usuario):
 
-    cached = obtener_estadisticas_archivo(id_archivo, id_usuario)
+    cached = obtener_estadisticas_archivo_bd(id_archivo, id_usuario)
     if cached:
         return cached
 
@@ -433,3 +459,6 @@ def predecir_stream(valores, punto_actual=0):
         "resultado": "Fraude" if pred == 1 else "Normal",
         "probabilidad": round(prob * 100, 2)
     }
+
+def predecir_curva_tiempo_real(id_curva, id_usuario):
+    return predecir_curva_historica(id_curva, id_usuario)
