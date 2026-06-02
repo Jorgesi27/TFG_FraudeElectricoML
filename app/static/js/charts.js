@@ -17,7 +17,7 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
             labels,
             datasets: [{
                 label: titulo,
-                data: valores.map(v => v === 0 ? null : v),
+                data: valores.map(v => (v === null || v < 1) ? null : v),
                 spanGaps: false,
                 borderColor: "#3b82f6",
                 backgroundColor: "rgba(59,130,246,0.1)",
