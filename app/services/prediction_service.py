@@ -318,7 +318,6 @@ def predecir_curva_historica(id_curva, id_usuario):
     preds = XGBOOST_MODEL.predict(X)
     probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
 
-    # 🔥 FIX CRÍTICO: alineación temporal correcta
     offset = len(consumos) - len(preds)
 
     serie_temporal = []
@@ -333,18 +332,17 @@ def predecir_curva_historica(id_curva, id_usuario):
             "probabilidad_fraude": round(float(probs[i]) * 100, 2)
         })
 
-    # 🔥 coherente con entrenamiento: detectar pico
     prob_max = float(np.max(probs))
     prob_mean = float(np.mean(probs))
 
-    resultado_global = "Fraude" if prob_max >= 0.5 else "Normal"
+    resultado_global = "Fraude" if prob_mean >= 0.5 else "Normal"
 
     guardar_prediccion(
         id_curva=id_curva,
         tipo_modelo="xgboost",
         tipo_prediccion="historica",
-        resultado_prediccion=int(prob_max >= 0.5),
-        probabilidad_fraude=prob_max
+        resultado_prediccion=int(prob_mean  >= 0.5),
+        probabilidad_fraude=prob_mean 
     )
 
     return {
@@ -404,12 +402,13 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
         probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
 
         prob_max = float(np.max(probs))
-        pred = prob_max >= 0.5
+        prob_mean = float(np.mean(probs))
+        pred = prob_mean >= 0.5
 
         stats_curvas.append({
             "curva": curva["identificador_curva"],
             "consumo": float(np.mean(consumos)),
-            "probabilidad": round(prob_max * 100, 2)
+            "probabilidad": round(prob_mean * 100, 2)
         })
 
         validas += 1

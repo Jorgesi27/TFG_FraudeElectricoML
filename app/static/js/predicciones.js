@@ -53,8 +53,8 @@ export function mostrarResultado(
         `;
 
     probabilidadHistorica.innerHTML = `
-        Probabilidad máxima: ${data.probabilidad_fraude}<br>
-        Probabilidad media: ${data.probabilidad_media}
+        <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
+        <p>Probabilidad media: ${data.probabilidad_media}</p>
     `;
 }
 
