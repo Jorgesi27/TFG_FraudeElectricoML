@@ -308,7 +308,9 @@ def predecir_curva_historica(id_curva, id_usuario):
     if len(df) == 0:
         raise HTTPException(400, "Curva sin suficientes datos (lags)")
 
-    X = preprocesar_datos(df, XGBOOST_COLUMNS)
+    class_features = datos.get("class_features", {})
+
+    X = preprocesar_datos(df, XGBOOST_COLUMNS, class_features=class_features)
 
     preds = XGBOOST_MODEL.predict(X)
     probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
@@ -392,9 +394,9 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
         if len(df) == 0:
             continue
 
-        validas += 1
-
-        X = preprocesar_datos(df, XGBOOST_COLUMNS)
+        class_features = datos.get("class_features", {})
+        
+        X = preprocesar_datos(df, XGBOOST_COLUMNS, class_features=class_features)
 
         probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
 
@@ -424,7 +426,8 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
         "porcentaje_fraudes": round(fraudes / validas * 100, 2),
         "porcentaje_normales": round(normales / validas * 100, 2),
         "top_riesgo": sorted(stats_curvas, key=lambda x: x["probabilidad"], reverse=True)[:10],
-        "top_consumos": sorted(stats_curvas, key=lambda x: x["consumo"], reverse=True)[:10]
+        "top_consumos": sorted(stats_curvas, key=lambda x: x["consumo"], reverse=True)[:10],
+        "probabilidades": [s["probabilidad"] for s in stats_curvas]
     }
 
     stats = limpiar_para_json(stats)
@@ -445,7 +448,10 @@ def predecir_stream(valores, punto_actual=0):
 
     df = pd.DataFrame([datos])
 
-    X = preprocesar_datos(df, ARF_COLUMNS)
+    class_features = datos.get("class_features", {})
+        
+    X = preprocesar_datos(df, ARF_COLUMNS, class_features=class_features)
+
     Xs = ARF_SCALER.transform(X)
 
     x_stream = dict(zip(ARF_COLUMNS, Xs[0]))
