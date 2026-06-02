@@ -262,25 +262,28 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
 # CURVA DETAIL
 # =========================
 def obtener_detalle_curva(id_curva, id_usuario):
-
     curva = obtener_curva_por_id(id_curva, id_usuario)
-
     if not curva:
         raise HTTPException(404, "No existe curva")
 
     datos = curva["datos_consumo"]
-
     if isinstance(datos, str):
         datos = json.loads(datos)
+
+    consumos = datos["consumos"]
+
+    # Eliminar las primeras 168 horas (offset de los lags)
+    offset = 168
+    consumos_validos = consumos[offset:]
+    horas_validas = list(range(offset, len(consumos)))
 
     return {
         "id_curva": curva["id_curva"],
         "identificador_curva": curva["identificador_curva"],
-        "labels": datos["horas"],
-        "valores": datos["consumos"],
+        "labels": horas_validas,
+        "valores": consumos_validos,
         "datos_consumo": datos
     }
-
 
 # =========================
 # HISTORICAL PREDICT (FIX OFFSET)
