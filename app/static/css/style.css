@@ -769,3 +769,12 @@ button:hover{
 
     font-size: 14px;
 }
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}

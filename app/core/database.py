@@ -370,3 +370,32 @@ def obtener_estadisticas_archivo_bd(
     estadisticas = limpiar_para_json(estadisticas)
 
     return estadisticas
+
+# Eliminar un archivo del usuario, eliminando en cascada las predicciones y curvas del archivo.
+def eliminar_archivo(id_archivo: int, id_usuario: int):
+    try:
+        conexion = obtener_conexion()
+        with conexion:
+            with conexion.cursor() as cursor:
+                cursor.execute("""
+                    DELETE p FROM predicciones p
+                    JOIN curvas_consumo c ON p.id_curva = c.id_curva
+                    WHERE c.id_archivo = %s
+                """, (id_archivo,))
+
+                cursor.execute("""
+                    DELETE FROM curvas_consumo WHERE id_archivo = %s
+                """, (id_archivo,))
+
+                cursor.execute("""
+                    DELETE FROM archivos_consumo 
+                    WHERE id_archivo = %s AND id_usuario = %s
+                """, (id_archivo, id_usuario))
+
+                conexion.commit()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="No ha sido posible eliminar el archivo."
+        )

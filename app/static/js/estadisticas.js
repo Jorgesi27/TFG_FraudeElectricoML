@@ -22,6 +22,7 @@ const archivoSelect = document.getElementById("archivoSelect");
 const loaderDashboard = document.getElementById("loaderDashboard");
 const loaderImportar = document.getElementById("loaderImportar");
 
+
 // Charts
 let pieChart = null;
 let barChart = null;
@@ -611,31 +612,61 @@ function crearRadarChart(data){
     });
 }
 
+//Elimina un archivo del usuario
+async function eliminarArchivo(){
+
+    const idArchivo = archivoSelect.value;
+
+    if(!idArchivo){
+        alert("Selecciona un archivo primero");
+        return;
+    }
+
+    const nombreArchivo = 
+        archivoSelect.options[archivoSelect.selectedIndex].text;
+
+    const confirmado = confirm(
+        `¿Seguro que quieres eliminar "${nombreArchivo}"?\nEsta acción no se puede deshacer.`
+    );
+
+    if(!confirmado) return;
+
+    try{
+        const response = await fetchAuth(
+            `/api/operador/archivo/${idArchivo}`,
+            { method: "DELETE" }
+        );
+
+        if(!response) return;
+
+        await obtenerData(response);
+
+        alert("Archivo eliminado correctamente");
+
+        limpiarDashboard();
+        await cargarArchivos();
+
+    }catch(error){
+        mostrarError("Error eliminando archivo", error);
+    }
+}
+
 // Inicializa los eventos de interacción de la página.
 function inicializarEventos(){
 
     document
-        .getElementById(
-            "btnLogout"
-        )
-        .addEventListener(
-            "click",
-            logout
-        );
+        .getElementById("btnLogout")
+        .addEventListener("click", logout);
     
-    archivoSelect.addEventListener(
-        "change",
-        cargarDashboard
-    );
+    archivoSelect.addEventListener("change", cargarDashboard);
 
     document
-        .getElementById(
-            "btnImportar"
-        )
-        .addEventListener(
-            "click",
-            importarArchivo
-        );
+        .getElementById("btnImportar")
+        .addEventListener("click", importarArchivo);
+    
+    document
+        .getElementById("btnEliminar")
+        .addEventListener("click", eliminarArchivo);
 }
 
 // Inicializa la pantalla de estadísticas al cargar la página.

@@ -29,7 +29,8 @@ from app.services.prediction_service import (
 )
 from app.core.database import (
     obtener_archivos_usuario,
-    obtener_estadisticas_archivo_bd
+    obtener_estadisticas_archivo_bd,
+    eliminar_archivo
 )
 from pydantic import BaseModel
 from typing import List
@@ -202,6 +203,14 @@ def listar_curvas(
         id_archivo,
         usuario_actual["id_usuario"]
     )
+
+@router.delete("/archivo/{id_archivo}")
+def borrar_archivo(
+    id_archivo: int,
+    usuario_actual: dict = Depends(obtener_operador_actual)
+):
+    eliminar_archivo(id_archivo, usuario_actual["id_usuario"])
+    return {"mensaje": "Archivo eliminado correctamente"}
 
 @router.get("/curva/{id_curva}")
 def obtener_curva(
