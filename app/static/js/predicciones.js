@@ -7,7 +7,6 @@ import {
     mostrarError
 } from "./ui.js";
 
-// Muestra el resultado visual de la predicción.
 export function mostrarResultado(
     resultadoEl,
     probabilidadEl,
@@ -31,40 +30,34 @@ export function mostrarResultado(
         ? `<div class="badge-fraude fade-in">🔴 FRAUDE DETECTADO</div>`
         : `<div class="badge-normal fade-in">🟢 CONSUMO NORMAL</div>`;
 
-    probabilidadEl.innerHTML = `
-        <p>Probabilidad fraude: ${data.probabilidad}%</p>
-    `;
+    // Histórica devuelve probabilidad_fraude y probabilidad_media
+    // Stream devuelve probabilidad
+    if(data.probabilidad_fraude){
+        probabilidadEl.innerHTML = `
+            <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
+            <p>Probabilidad media: ${data.probabilidad_media}</p>
+        `;
+    } else {
+        probabilidadEl.innerHTML = `
+            <p>Probabilidad fraude: ${data.probabilidad}%</p>
+        `;
+    }
 }
 
-// Realiza una predicción histórica de una curva.
-export async function prediccionHistorica(
-    idCurva
-){
+export async function prediccionHistorica(idCurva){
 
     try{
-
         const response = await fetchAuth(
-
             `/api/operador/prediccion/historica/${idCurva}`,
-
-            {
-                method:"POST"
-            }
+            { method: "POST" }
         );
 
-        if(!response){
-            return null;
-        }
+        if(!response){ return null; }
 
         return await obtenerData(response);
 
     }catch(error){
-
-        mostrarError(
-            "Error realizando la predicción histórica",
-            error
-        );
-
+        mostrarError("Error realizando la predicción histórica", error);
         return null;
     }
 }

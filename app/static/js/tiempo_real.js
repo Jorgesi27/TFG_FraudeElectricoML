@@ -22,52 +22,27 @@ import {
 } from "./auth.js";
 
 // =====================================================
-// ELEMENTOS DOM
-// =====================================================
-
-const archivoSelect =
-    document.getElementById("archivoSelect");
-
-const curvaSelect =
-    document.getElementById("curvaSelect");
-
-const resultadoTiempoReal =
-    document.getElementById("resultadoTiempoReal");
-
-const probabilidadTiempoReal =
-    document.getElementById("probabilidadTiempoReal");
-
-const graficaTiempoReal =
-    document.getElementById("graficaTiempoReal");
-
-// =====================================================
 // VARIABLES
 // =====================================================
 
+let archivoSelect = null;
+let curvaSelect = null;
+let resultadoTiempoReal = null;
+let probabilidadTiempoReal = null;
+let graficaTiempoReal = null;
+
 let chartTiempoReal = null;
-
 let intervaloStream = null;
-
 let puntosConsumo = [];
-
 let labelsTiempo = [];
-
-let prediccionEnCurso = false;
 
 // =====================================================
 // LIMPIAR RESULTADOS
 // =====================================================
 
 function limpiarResultados(){
-
-    resultadoTiempoReal.innerText =
-        "---";
-
-    probabilidadTiempoReal.innerText =
-        "---";
-
-    resultadoTiempoReal.style.color =
-        "#ffffff";
+    resultadoTiempoReal.innerHTML = "---";
+    probabilidadTiempoReal.innerHTML = "---";
 }
 
 // =====================================================
@@ -77,43 +52,23 @@ function limpiarResultados(){
 async function cargarArchivos(){
 
     try{
+        const response = await fetchAuth("/api/operador/archivos");
+        if(!response){ return; }
 
-        const response = await fetchAuth(
-            "/api/operador/archivos"
-        );
+        const archivos = await obtenerData(response);
 
-        if(!response){
-            return;
-        }
-
-        const archivos =
-            await obtenerData(response);
-
-        archivoSelect.innerHTML =
-
-            `
-            <option value="">
-                Seleccionar archivo
-            </option>
-            `;
+        archivoSelect.innerHTML = `<option value="">Seleccionar archivo</option>`;
 
         archivos.forEach(archivo => {
-
-            archivoSelect.innerHTML +=
-
-                `
+            archivoSelect.innerHTML += `
                 <option value="${archivo.id_archivo}">
                     ${archivo.nombre_archivo}
                 </option>
-                `;
+            `;
         });
 
     }catch(error){
-
-        mostrarError(
-            "Error cargando archivos",
-            error
-        );
+        mostrarError("Error cargando archivos", error);
     }
 }
 
@@ -123,54 +78,34 @@ async function cargarArchivos(){
 
 async function cargarCurvas(){
 
-    const idArchivo =
-        archivoSelect.value;
+    const idArchivo = archivoSelect.value;
 
-    curvaSelect.innerHTML =
+    curvaSelect.innerHTML = `<option value="">Seleccionar curva</option>`;
 
-        `
-        <option value="">
-            Seleccionar curva
-        </option>
-        `;
-
-    if(!idArchivo){
-        return;
-    }
+    if(!idArchivo){ return; }
 
     try{
+        const response = await fetchAuth(`/api/operador/curvas/${idArchivo}`);
+        if(!response){ return; }
 
-        const response = await fetchAuth(
-
-            `/api/operador/curvas/${idArchivo}`
-        );
-
-        if(!response){
-            return;
-        }
-
-        const data =
-            await obtenerData(response);
+        const data = await obtenerData(response);
 
         data.curvas.forEach(curva => {
-
-            curvaSelect.innerHTML +=
-
-                `
+            curvaSelect.innerHTML += `
                 <option value="${curva.id_curva}">
                     ${curva.identificador_curva}
                 </option>
-                `;
+            `;
         });
 
     }catch(error){
-
-        mostrarError(
-            "Error cargando curvas",
-            error
-        );
+        mostrarError("Error cargando curvas", error);
     }
 }
+
+// =====================================================
+// STREAMING ONLINE
+// =====================================================
 
 async function iniciarStreaming(){
 
@@ -192,9 +127,9 @@ async function iniciarStreaming(){
 
     try{
 
-        // Cargar todas las predicciones de una vez
         const response = await fetchAuth(
-            `/api/operador/prediccion/stream-completa/${idCurva}`
+            `/api/operador/prediccion/tiempo-real/${idCurva}`,
+            { method: "POST" }
         );
 
         if(!response){ return; }
@@ -226,14 +161,12 @@ async function iniciarStreaming(){
 
             const punto = predicciones[indice];
 
-            // Añadir punto a la gráfica
             puntosConsumo.push(punto.consumo);
             labelsTiempo.push(punto.hora);
             chartTiempoReal.data.labels = labelsTiempo;
             chartTiempoReal.data.datasets[0].data = puntosConsumo;
-            chartTiempoReal.update("none"); // sin animación para más fluidez
+            chartTiempoReal.update("none");
 
-            // Mostrar resultado del punto actual
             mostrarResultado(
                 resultadoTiempoReal,
                 probabilidadTiempoReal,
@@ -254,113 +187,6 @@ async function iniciarStreaming(){
 }
 
 // =====================================================
-// STREAMING ONLINE
-// =====================================================
-
-async function iniciarStreaming(){
-
-    const idCurva = curvaSelect.value;
-
-    if(!idCurva){ return; }
-
-    resultadoTiempoReal.innerHTML = "---";
-    probabilidadTiempoReal.innerHTML = "---";
-
-    if(intervaloStream){
-        clearInterval(intervaloStream);
-    }
-
-    try{
-
-        const response = await fetchAuth(`/api/operador/curva/${idCurva}`);
-        if(!response){ return; }
-
-        const curva = await obtenerData(response);
-
-        const valores = (curva.valores || []).map(v => Number(v) || 0);
-
-        if(!valores.length){
-            mostrarError("La curva no contiene valores");
-            return;
-        }
-
-        puntosConsumo = [];
-        labelsTiempo = [];
-        prediccionEnCurso = false;
-        limpiarResultados();
-
-        chartTiempoReal = limpiarGrafica(chartTiempoReal);
-        chartTiempoReal = crearGraficaLineal(
-            graficaTiempoReal,
-            labelsTiempo,
-            puntosConsumo,
-            curva.identificador_curva
-        );
-
-        let indice = 0;
-
-        intervaloStream = setInterval(async () => {
-
-            if(indice >= valores.length){
-                clearInterval(intervaloStream);
-                intervaloStream = null;
-                return;
-            }
-
-            if(prediccionEnCurso){ return; }
-
-            prediccionEnCurso = true;
-
-            try{
-
-                // Añadir punto actual a la gráfica
-                puntosConsumo.push(Number(valores[indice]) || 0);
-                labelsTiempo.push(indice + 168); // hora real
-                chartTiempoReal.data.labels = labelsTiempo;
-                chartTiempoReal.data.datasets[0].data = puntosConsumo;
-                chartTiempoReal.update();
-
-                // Mostrar "Analizando..." mientras espera
-                resultadoTiempoReal.innerHTML =
-                    `<div class="badge-analizando fade-in">Analizando...</div>`;
-
-                // Enviar curva COMPLETA con índice actual
-                const predResponse = await fetchAuth(
-                    "/api/operador/prediccion/stream",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            valores: valores.slice(0, indice + 1),
-                            punto_actual: indice    // punto en curso
-                        })
-                    }
-                );
-
-                if(predResponse && predResponse.ok){
-                    const prediccion = await obtenerData(predResponse);
-                    mostrarResultado(
-                        resultadoTiempoReal,
-                        probabilidadTiempoReal,
-                        prediccion
-                    );
-                }
-
-            }catch(error){
-                mostrarError("Error streaming online", error);
-            }finally{
-                indice++;
-                prediccionEnCurso = false;
-            }
-
-        }, 3000);
-
-    }catch(error){
-        mostrarError("Error streaming tiempo real", error);
-    }
-}
-
-// =====================================================
 // EVENTOS
 // =====================================================
 
@@ -368,20 +194,11 @@ function inicializarEventos(){
 
     document
         .getElementById("btnLogout")
-        .addEventListener(
-            "click",
-            logout
-        );
+        .addEventListener("click", logout);
 
-    archivoSelect.addEventListener(
-        "change",
-        cargarCurvas
-    );
+    archivoSelect.addEventListener("change", cargarCurvas);
 
-    curvaSelect.addEventListener(
-        "change",
-        iniciarStreaming
-    );
+    curvaSelect.addEventListener("change", iniciarStreaming);
 }
 
 // =====================================================
@@ -390,19 +207,20 @@ function inicializarEventos(){
 
 window.onload = async () => {
 
-    const token =
-        localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if(!token){
-
         redirigirLogin();
-
         return;
     }
 
+    archivoSelect = document.getElementById("archivoSelect");
+    curvaSelect = document.getElementById("curvaSelect");
+    resultadoTiempoReal = document.getElementById("resultadoTiempoReal");
+    probabilidadTiempoReal = document.getElementById("probabilidadTiempoReal");
+    graficaTiempoReal = document.getElementById("graficaTiempoReal");
+
     inicializarEventos();
-
     limpiarResultados();
-
     await cargarArchivos();
 };
