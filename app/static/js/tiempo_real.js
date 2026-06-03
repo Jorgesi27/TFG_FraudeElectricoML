@@ -172,6 +172,87 @@ async function cargarCurvas(){
     }
 }
 
+async function iniciarStreaming(){
+
+    const idCurva = curvaSelect.value;
+    if(!idCurva){ return; }
+
+    if(intervaloStream){
+        clearInterval(intervaloStream);
+        intervaloStream = null;
+    }
+
+    puntosConsumo = [];
+    labelsTiempo = [];
+    limpiarResultados();
+    chartTiempoReal = limpiarGrafica(chartTiempoReal);
+
+    resultadoTiempoReal.innerHTML =
+        `<div class="badge-analizando">⏳ Cargando predicciones...</div>`;
+
+    try{
+
+        // Cargar todas las predicciones de una vez
+        const response = await fetchAuth(
+            `/api/operador/prediccion/stream-completa/${idCurva}`
+        );
+
+        if(!response){ return; }
+
+        const data = await obtenerData(response);
+        const predicciones = data.predicciones || [];
+
+        if(!predicciones.length){
+            mostrarError("Sin predicciones disponibles");
+            return;
+        }
+
+        chartTiempoReal = crearGraficaLineal(
+            graficaTiempoReal,
+            labelsTiempo,
+            puntosConsumo,
+            data.identificador_curva
+        );
+
+        let indice = 0;
+
+        intervaloStream = setInterval(() => {
+
+            if(indice >= predicciones.length){
+                clearInterval(intervaloStream);
+                intervaloStream = null;
+                return;
+            }
+
+            const punto = predicciones[indice];
+
+            // Añadir punto a la gráfica
+            puntosConsumo.push(punto.consumo);
+            labelsTiempo.push(punto.hora);
+            chartTiempoReal.data.labels = labelsTiempo;
+            chartTiempoReal.data.datasets[0].data = puntosConsumo;
+            chartTiempoReal.update("none"); // sin animación para más fluidez
+
+            // Mostrar resultado del punto actual
+            mostrarResultado(
+                resultadoTiempoReal,
+                probabilidadTiempoReal,
+                {
+                    estado: "online",
+                    resultado: punto.fraude === 1 ? "Fraude" : "Normal",
+                    probabilidad: punto.probabilidad
+                }
+            );
+
+            indice++;
+
+        }, 3000);
+
+    }catch(error){
+        mostrarError("Error iniciando streaming", error);
+    }
+}
+
 // =====================================================
 // STREAMING ONLINE
 // =====================================================
@@ -234,7 +315,7 @@ async function iniciarStreaming(){
 
                 // Añadir punto actual a la gráfica
                 puntosConsumo.push(Number(valores[indice]) || 0);
-                labelsTiempo.push(`${(indice + 1) * 3}s`);
+                labelsTiempo.push(indice + 168); // hora real
                 chartTiempoReal.data.labels = labelsTiempo;
                 chartTiempoReal.data.datasets[0].data = puntosConsumo;
                 chartTiempoReal.update();

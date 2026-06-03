@@ -9,52 +9,30 @@ import {
 
 // Muestra el resultado visual de la predicción.
 export function mostrarResultado(
-    resultadoHistorico,
-    probabilidadHistorica,
+    resultadoEl,
+    probabilidadEl,
     data
 ){
+    if(!data || !data.resultado) return;
 
-    resultadoHistorico.innerHTML =
-        "---";
-
-    probabilidadHistorica.innerHTML  =
-        "---";
-
-    if(
-        !data ||
-        !data.resultado
-    ){
+    if(data.estado === "acumulando"){
+        resultadoEl.innerHTML = `
+            <div class="badge-analizando fade-in">
+                ⏳ Acumulando datos...
+            </div>
+        `;
+        probabilidadEl.innerHTML = "";
         return;
     }
 
-    const esFraude =
+    const esFraude = data.resultado.toLowerCase() === "fraude";
 
-        data.resultado.toLowerCase()
-            === "fraude";
+    resultadoEl.innerHTML = esFraude
+        ? `<div class="badge-fraude fade-in">🔴 FRAUDE DETECTADO</div>`
+        : `<div class="badge-normal fade-in">🟢 CONSUMO NORMAL</div>`;
 
-    resultadoHistorico.innerHTML =
-
-        esFraude
-
-        ?
-
-        `
-        <div class="badge-fraude fade-in">
-            🔴 FRAUDE DETECTADO
-        </div>
-        `
-
-        :
-
-        `
-        <div class="badge-normal fade-in">
-            🟢 CONSUMO NORMAL
-        </div>
-        `;
-
-    probabilidadHistorica.innerHTML = `
-        <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
-        <p>Probabilidad media: ${data.probabilidad_media}</p>
+    probabilidadEl.innerHTML = `
+        <p>Probabilidad fraude: ${data.probabilidad}%</p>
     `;
 }
 

@@ -440,20 +440,39 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
 
 
 # =========================
-# STREAM (OK)
+# STREAM
 # =========================
 def predecir_stream(valores, punto_actual=0):
 
     valores = [float(v or 0) for v in valores]
 
-    datos = generar_features_temporales(valores)
+    # Necesitamos al menos 168 puntos para los lags
+    if len(valores) < 169:
+        return {
+            "estado": "acumulando",
+            "punto": punto_actual,
+            "resultado": "Acumulando datos...",
+            "probabilidad": 0
+        }
 
-    df = pd.DataFrame([datos])
+    df = pd.DataFrame({
+        "Electricity_Facility__kW__Hourly_": valores
+    })
 
-    class_features = datos.get("class_features", {})
-        
-    X = preprocesar_datos(df, ARF_COLUMNS, class_features=class_features)
+    df = generar_features_temporales(df)
 
+    if len(df) == 0:
+        return {
+            "estado": "acumulando",
+            "punto": punto_actual,
+            "resultado": "Acumulando datos...",
+            "probabilidad": 0
+        }
+
+    # Solo predecir el ÚLTIMO punto
+    ultima_fila = df.iloc[[-1]]
+
+    X = preprocesar_datos(ultima_fila, ARF_COLUMNS)
     Xs = ARF_SCALER.transform(X)
 
     x_stream = dict(zip(ARF_COLUMNS, Xs[0]))
@@ -469,4 +488,49 @@ def predecir_stream(valores, punto_actual=0):
     }
 
 def predecir_curva_tiempo_real(id_curva, id_usuario):
-    return predecir_curva_historica(id_curva, id_usuario)
+
+    curva = obtener_curva_por_id(id_curva, id_usuario)
+    if not curva:
+        raise HTTPException(404, "No existe curva")
+
+    datos = curva["datos_consumo"]
+    if isinstance(datos, str):
+        datos = json.loads(datos)
+
+    consumos = datos["consumos"]
+    class_features = datos.get("class_features", {})
+
+    df = pd.DataFrame({
+        "Electricity_Facility__kW__Hourly_": consumos
+    })
+
+    df = generar_features_temporales(df)
+
+    if len(df) == 0:
+        raise HTTPException(400, "Curva sin suficientes datos")
+
+    X = preprocesar_datos(df, ARF_COLUMNS, class_features=class_features)
+    Xs = ARF_SCALER.transform(X)
+
+    offset = len(consumos) - len(df)
+
+    predicciones = []
+
+    for i in range(len(Xs)):
+        x_stream = dict(zip(ARF_COLUMNS, Xs[i]))
+        prob = ARF_MODEL.predict_proba_one(x_stream).get(1, 0.0)
+        pred = ARF_MODEL.predict_one(x_stream) or 0
+
+        idx = i + offset
+        predicciones.append({
+            "hora": idx,
+            "consumo": float(consumos[idx]),
+            "fraude": int(pred),
+            "probabilidad": round(prob * 100, 2)
+        })
+
+    return {
+        "id_curva": curva["id_curva"],
+        "identificador_curva": curva["identificador_curva"],
+        "predicciones": predicciones
+    }
