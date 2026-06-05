@@ -25,7 +25,8 @@ from app.services.prediction_service import (
     predecir_curva_historica,
     obtener_detalle_curva,
     predecir_curva_tiempo_real,
-    predecir_stream
+    predecir_stream,
+    generar_estadisticas_archivo
 )
 from app.core.database import (
     obtener_archivos_usuario,
@@ -289,3 +290,16 @@ def obtener_estadisticas(
         }
 
     return estadisticas
+
+@router.post("/estadisticas/{id_archivo}/generar")
+def generar_estadisticas(
+    id_archivo: int,
+    usuario_actual: dict = Depends(obtener_operador_actual)
+):
+    from app.core.database import guardar_estadisticas_archivo
+    stats = generar_estadisticas_archivo(
+        id_archivo,
+        usuario_actual["id_usuario"]
+    )
+    guardar_estadisticas_archivo(id_archivo, stats)
+    return stats

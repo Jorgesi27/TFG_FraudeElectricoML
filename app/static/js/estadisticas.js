@@ -118,6 +118,12 @@ async function importarArchivo(){
                 ultimoArchivoImportado
             );
 
+            // Lanzar generación de estadísticas
+            fetchAuth(
+                `/api/operador/estadisticas/${ultimoArchivoImportado}/generar`,
+                { method: "POST" }
+            );
+
             await cargarDashboard();
         }
 
@@ -179,72 +185,92 @@ async function cargarArchivos(){
 }
 
 // Genera el dashboard de estadísticas del archivo seleccionado.
+let intervaloEstadisticas = null;
+
 async function cargarDashboard(){
 
-    const idArchivo =
-        archivoSelect.value;
+    const idArchivo = archivoSelect.value;
 
-    localStorage.setItem(
-        "ultimoArchivo",
-        idArchivo
-    );
+    localStorage.setItem("ultimoArchivo", idArchivo);
 
     if(!idArchivo){
         limpiarDashboard();
         return;
     }
 
-    // MOSTRAR LOADER
+    // Cancelar reintento anterior si existía
+    if(intervaloEstadisticas){
+        clearInterval(intervaloEstadisticas);
+        intervaloEstadisticas = null;
+    }
 
-    loaderDashboard
-        .classList
-        .remove("hidden");
+    loaderDashboard.classList.remove("hidden");
 
     try{
 
         const response = await fetchAuth(
-
             `/api/operador/estadisticas/${idArchivo}`
         );
 
-        if(!response){
+        if(!response){ return; }
+
+        const data = await obtenerData(response);
+
+        // Si el backend dice que está procesando, reintentar cada 5 segundos
+        if(data.procesando){
+
+            loaderDashboard.classList.add("hidden");
+
+            document.getElementById("kpiTotal").innerText = "Calculando...";
+            document.getElementById("kpiFraudes").innerText = "---";
+            document.getElementById("kpiNormales").innerText = "---";
+            document.getElementById("kpiPorcentaje").innerText = "---";
+
+            intervaloEstadisticas = setInterval(async () => {
+
+                try{
+                    const r = await fetchAuth(
+                        `/api/operador/estadisticas/${idArchivo}`
+                    );
+                    if(!r){ return; }
+
+                    const d = await obtenerData(r);
+
+                    if(!d.procesando){
+                        clearInterval(intervaloEstadisticas);
+                        intervaloEstadisticas = null;
+                        cargarKPIs(d);
+                        crearPieChart(d);
+                        crearBarChart(d);
+                        crearLineChart(d);
+                        crearRadarChart(d);
+                    }
+
+                }catch(e){
+                    clearInterval(intervaloEstadisticas);
+                    intervaloEstadisticas = null;
+                }
+
+            }, 5000);
+
             return;
         }
 
-        const data =
-            await obtenerData(response);
-
         cargarKPIs(data);
-
         crearPieChart(data);
-
         crearBarChart(data);
-
         crearLineChart(data);
-
         crearRadarChart(data);
 
     }catch(error){
 
-        // Ignorar errores al salir de página
-        if(
-            !document.body.contains(loaderDashboard)
-        ){
-            return;
-        }
-
-        mostrarError(
-            "Error generando dashboard",
-            error
-        );
+        if(!document.body.contains(loaderDashboard)){ return; }
+        mostrarError("Error generando dashboard", error);
 
     }finally{
 
         if(loaderDashboard){
-
-            loaderDashboard
-                .classList
-                .add("hidden");
+            loaderDashboard.classList.add("hidden");
         }
     }
 }

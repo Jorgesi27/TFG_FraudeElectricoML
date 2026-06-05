@@ -205,56 +205,68 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
         if col in df.columns:
             df = df.drop(columns=[col])
 
-    # Obtener clase (debe ser única por archivo)
-    class_value = df["Class"].iloc[0] if "Class" in df.columns else "Unknown"
-
-    # Generar dummy de clase con nombres limpios (igual que entrenamiento)
-    class_dummies = pd.get_dummies(pd.Series([class_value]), prefix="Class")
-    class_dummies.columns = class_dummies.columns.str.replace(
-        r"[^a-zA-Z0-9_]", "_", regex=True
-    )
-    class_features = class_dummies.iloc[0].to_dict()
-
     # Columna de consumo
     col_consumo = "Electricity_Facility__kW__Hourly_"
 
     if col_consumo not in df.columns:
         raise HTTPException(400, f"Columna '{col_consumo}' no encontrada en el CSV")
 
-    consumos_totales = df[col_consumo].tolist()
+    # Eliminar clase "0" si existe
+    if "Class" in df.columns:
+        df = df[df["Class"] != "0"].copy()
 
-    # Dividir en bloques anuales de 8760 horas
     HORAS_AÑO = 8760
-    total_filas = len(consumos_totales)
-    num_curvas = total_filas // HORAS_AÑO
-
-    if num_curvas == 0:
-        raise HTTPException(400, "El CSV no tiene suficientes filas (mínimo 8760)")
-
     id_archivo = guardar_archivo(id_usuario, nombre_archivo)
+    total_curvas = 0
 
-    for year_idx in range(num_curvas):
-        inicio = year_idx * HORAS_AÑO
-        fin = inicio + HORAS_AÑO
-        bloque = consumos_totales[inicio:fin]
+    # Si hay columna Class, iterar por cada clase
+    # Si no, tratar todo como una sola clase
+    if "Class" in df.columns:
+        clases = df["Class"].unique()
+    else:
+        df["Class"] = "Unknown"
+        clases = ["Unknown"]
 
-        guardar_curva(
-            id_archivo=id_archivo,
-            identificador_curva=f"Año {year_idx + 1} - {class_value}",
-            datos_consumo={
-                "horas": list(range(HORAS_AÑO)),
-                "consumos": bloque,
-                "class_features": class_features
-            }
+    for class_value in sorted(clases):
+
+        grupo = df[df["Class"] == class_value].copy().reset_index(drop=True)
+
+        # Generar dummy de clase con nombres limpios
+        class_dummies = pd.get_dummies(pd.Series([class_value]), prefix="Class")
+        class_dummies.columns = class_dummies.columns.str.replace(
+            r"[^a-zA-Z0-9_]", "_", regex=True
         )
+        class_features = class_dummies.iloc[0].to_dict()
 
-    stats = generar_estadisticas_archivo(id_archivo, id_usuario)
-    guardar_estadisticas_archivo(id_archivo, stats)
+        consumos_clase = grupo[col_consumo].tolist()
+        num_curvas = len(consumos_clase) // HORAS_AÑO
+
+        if num_curvas == 0:
+            continue
+
+        for year_idx in range(num_curvas):
+            inicio = year_idx * HORAS_AÑO
+            fin = inicio + HORAS_AÑO
+            bloque = consumos_clase[inicio:fin]
+
+            guardar_curva(
+                id_archivo=id_archivo,
+                identificador_curva=f"Año {year_idx + 1} - {class_value}",
+                datos_consumo={
+                    "horas": list(range(HORAS_AÑO)),
+                    "consumos": bloque,
+                    "class_features": class_features
+                }
+            )
+            total_curvas += 1
+
+    if total_curvas == 0:
+        raise HTTPException(400, "No se encontraron curvas válidas en el CSV")
 
     return {
         "mensaje": "OK",
         "id_archivo": id_archivo,
-        "total_curvas": num_curvas
+        "total_curvas": total_curvas
     }
 
 
