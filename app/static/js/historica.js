@@ -33,7 +33,6 @@ let resultadoHistorico = null;
 let probabilidadHistorica = null;
 let graficaHistorica = null;
 let chart = null;
-let porcentajeHorasFraude = null;
 
 // Carga los archivos disponibles del usuario.
 async function cargarArchivos(){
@@ -330,9 +329,6 @@ document.addEventListener(
 
         graficaHistorica =
             document.getElementById("graficaHistorica");
-
-        porcentajeHorasFraude =
-            document.getElementById("porcentajeHorasFraude");
 
         inicializarEventos();
 
