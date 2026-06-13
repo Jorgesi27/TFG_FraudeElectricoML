@@ -231,11 +231,8 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
 
         grupo = df[df["Class"] == class_value].copy().reset_index(drop=True)
 
-        # Generar dummy de clase con nombres limpios
+        # Generar dummy de clase
         class_dummies = pd.get_dummies(pd.Series([class_value]), prefix="Class")
-        class_dummies.columns = class_dummies.columns.str.replace(
-            r"[^a-zA-Z0-9_]", "_", regex=True
-        )
         class_features = class_dummies.iloc[0].to_dict()
 
         consumos_clase = grupo[col_consumo].tolist()
