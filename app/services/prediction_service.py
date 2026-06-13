@@ -344,7 +344,8 @@ def predecir_curva_historica(id_curva, id_usuario):
     prob_max = float(np.max(probs))
     prob_mean = float(np.mean(probs))
 
-    resultado_global = "Fraude" if prob_mean >= 0.5 else "Normal"
+    porcentaje_horas_fraude = float(np.mean(probs >= 0.5))
+    resultado_global = "Fraude" if porcentaje_horas_fraude >= 0.30 else "Normal"
 
     guardar_prediccion(
         id_curva=id_curva,
@@ -361,6 +362,7 @@ def predecir_curva_historica(id_curva, id_usuario):
         "resultado": resultado_global,
         "probabilidad_fraude": f"{prob_max * 100:.2f}%",
         "probabilidad_media": f"{prob_mean * 100:.2f}%",
+        "porcentaje_horas_fraude": f"{porcentaje_horas_fraude * 100:.2f}%",
         "serie_temporal": serie_temporal
     }
 
@@ -410,9 +412,10 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
 
         probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
 
-        prob_max = float(np.max(probs))
         prob_mean = float(np.mean(probs))
-        pred = prob_mean >= 0.5
+        porcentaje_horas_fraude = float(np.mean(probs >= 0.5))
+
+        pred = porcentaje_horas_fraude >= 0.30
 
         stats_curvas.append({
             "curva": curva["identificador_curva"],

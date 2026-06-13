@@ -36,6 +36,7 @@ export function mostrarResultado(
         probabilidadEl.innerHTML = `
             <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
             <p>Probabilidad media: ${data.probabilidad_media}</p>
+            <p>Horas en fraude: ${data.porcentaje_horas_fraude}</p>
         `;
     } else {
         probabilidadEl.innerHTML = `

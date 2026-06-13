@@ -33,6 +33,7 @@ let resultadoHistorico = null;
 let probabilidadHistorica = null;
 let graficaHistorica = null;
 let chart = null;
+let porcentajeHorasFraude = null;
 
 // Carga los archivos disponibles del usuario.
 async function cargarArchivos(){
@@ -236,6 +237,7 @@ async function ejecutarPrediccionHistorica(){
 
             resultadoHistorico,
             probabilidadHistorica,
+            porcentajeHorasFraude,
             prediccion
         );
 
@@ -329,6 +331,9 @@ document.addEventListener(
 
         graficaHistorica =
             document.getElementById("graficaHistorica");
+
+        porcentajeHorasFraude =
+            document.getElementById("porcentajeHorasFraude");
 
         inicializarEventos();
 
