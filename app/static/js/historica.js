@@ -237,9 +237,13 @@ async function ejecutarPrediccionHistorica(){
 
             resultadoHistorico,
             probabilidadHistorica,
-            porcentajeHorasFraude,
             prediccion
         );
+
+        if(porcentajeHorasFraude){
+            porcentajeHorasFraude.innerText =
+                `Horas en fraude: ${prediccion.porcentaje_horas_fraude}`;
+        }
 
     }catch(error){
 

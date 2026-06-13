@@ -345,7 +345,7 @@ def predecir_curva_historica(id_curva, id_usuario):
     prob_mean = float(np.mean(probs))
 
     porcentaje_horas_fraude = float(np.mean(probs >= 0.5))
-    resultado_global = "Fraude" if porcentaje_horas_fraude >= 0.30 else "Normal"
+    resultado_global = "Fraude" if porcentaje_horas_fraude >= 0.40 else "Normal"
 
     guardar_prediccion(
         id_curva=id_curva,
