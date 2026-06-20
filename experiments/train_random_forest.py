@@ -77,7 +77,6 @@ df["diff_1"] = df[col] - df["lag_1"]
 
 # =========================
 # FEATURE TEMPORAL — FUTURO
-# Solo posible en offline: el modelo dispone del año completo
 # =========================
 df["lead_1"] = df.groupby(["Class", "year_block"])[col].shift(-1)
 df["lead_24"] = df.groupby(["Class", "year_block"])[col].shift(-24)
