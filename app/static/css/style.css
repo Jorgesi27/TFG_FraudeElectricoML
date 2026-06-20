@@ -783,7 +783,7 @@ button:hover{
 
     margin: 0;
 
-    font-size: 17px;
+    font-size: 25px;
 
     font-weight: normal;
 
@@ -797,13 +797,7 @@ button:hover{
 #probabilidadHistorica p,
 #probabilidadTiempoReal p{
 
-    margin: 12px 0;
-
-    color: #cbd5e1;
-}
-
-#probabilidadHistorica p strong,
-#probabilidadTiempoReal p strong{
+    margin: 20px 0;
 
     color: white;
 }
