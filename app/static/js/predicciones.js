@@ -29,8 +29,8 @@ export function mostrarResultado(
     if(data.probabilidad_fraude){
         resultadoEl.innerHTML = "";
         probabilidadEl.innerHTML = `
-            <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
-            <p>Probabilidad media: ${data.probabilidad_media}</p>
+            <p>Probabilidad máxima de fraude: ${data.probabilidad_fraude}</p>
+            <p>Probabilidad media de fraude: ${data.probabilidad_media}</p>
             <p>Horas en fraude: ${data.porcentaje_horas_fraude}</p>
         `;
     } else {
