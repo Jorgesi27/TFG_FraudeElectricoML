@@ -29,9 +29,9 @@ export function mostrarResultado(
     if(data.probabilidad_fraude){
         resultadoEl.innerHTML = "";
         probabilidadEl.innerHTML = `
-            <p>Probabilidad máxima de fraude: ${data.probabilidad_fraude}</p>
-            <p>Probabilidad media de fraude: ${data.probabilidad_media}</p>
-            <p>Horas en fraude: ${data.porcentaje_horas_fraude}</p>
+            <p><strong>Probabilidad máxima de fraude:</strong> ${data.probabilidad_fraude}</p>
+            <p><strong>Probabilidad media de fraude:</strong> ${data.probabilidad_media}</p>
+            <p><strong>Horas en fraude:</strong> ${data.porcentaje_horas_fraude}</p>
         `;
     } else {
         const esFraude = data.resultado.toLowerCase() === "fraude";
@@ -41,7 +41,7 @@ export function mostrarResultado(
             : `<div class="badge-normal fade-in">🟢 CONSUMO NORMAL</div>`;
 
         probabilidadEl.innerHTML = `
-            <p>Probabilidad fraude: ${data.probabilidad}%</p>
+            <p><strong>Probabilidad fraude:</strong> ${data.probabilidad}%</p>
         `;
     }
 }

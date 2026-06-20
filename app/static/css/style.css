@@ -230,8 +230,6 @@ button:hover{
     gap:25px;
 
     align-items:stretch;
-
-    grid-auto-rows: 520px;
 }
 
 .chart-box,
@@ -277,6 +275,8 @@ button:hover{
     align-items:center;
 
     box-sizing:border-box;
+
+    align-self:stretch;
 }
 
 .result-box h2{
@@ -775,4 +775,35 @@ button:hover{
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
+}
+
+/* PROBABILIDADES EN RESULT-BOX */
+#probabilidadHistorica,
+#probabilidadTiempoReal{
+
+    margin: 0;
+
+    font-size: 15px;
+
+    font-weight: normal;
+
+    text-align: left;
+
+    width: 100%;
+
+    padding: 0 10px;
+}
+
+#probabilidadHistorica p,
+#probabilidadTiempoReal p{
+
+    margin: 8px 0;
+
+    color: #cbd5e1;
+}
+
+#probabilidadHistorica p strong,
+#probabilidadTiempoReal p strong{
+
+    color: white;
 }
