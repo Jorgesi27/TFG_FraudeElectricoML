@@ -230,6 +230,8 @@ button:hover{
     gap:25px;
 
     align-items:stretch;
+
+    grid-auto-rows: 520px;
 }
 
 .chart-box,
@@ -265,10 +267,6 @@ button:hover{
 .result-box{
 
     padding:30px;
-
-    min-height:220px;
-
-    height:100%;
 
     display:flex;
 
