@@ -22,8 +22,6 @@ env/
 # ======================
 Latex/
 data/
-experiments/
-results/
 
 # ======================
 # Utilidades locales
@@ -63,13 +61,6 @@ Thumbs.db
 data/df.csv
 
 # ======================
-# Resultados experimentos
-# ======================
-results/*.csv
-results/*.json
-results/*.png
-
-# ======================
 # Archivos auxiliares LaTeX
 # ======================
 *.aux
@@ -87,3 +78,8 @@ results/*.png
 # ======================
 *.pdf
 !Latex/main.pdf
+
+# ======================
+# Modelos entrenados
+# ======================
+models/

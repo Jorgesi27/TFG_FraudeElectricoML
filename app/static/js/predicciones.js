@@ -24,21 +24,22 @@ export function mostrarResultado(
         return;
     }
 
-    const esFraude = data.resultado.toLowerCase() === "fraude";
-
-    resultadoEl.innerHTML = esFraude
-        ? `<div class="badge-fraude fade-in">🔴 FRAUDE DETECTADO</div>`
-        : `<div class="badge-normal fade-in">🟢 CONSUMO NORMAL</div>`;
-
     // Histórica devuelve probabilidad_fraude y probabilidad_media
     // Stream devuelve probabilidad
     if(data.probabilidad_fraude){
+        resultadoEl.innerHTML = "";
         probabilidadEl.innerHTML = `
             <p>Probabilidad máxima: ${data.probabilidad_fraude}</p>
             <p>Probabilidad media: ${data.probabilidad_media}</p>
             <p>Horas en fraude: ${data.porcentaje_horas_fraude}</p>
         `;
     } else {
+        const esFraude = data.resultado.toLowerCase() === "fraude";
+
+        resultadoEl.innerHTML = esFraude
+            ? `<div class="badge-fraude fade-in">🔴 FRAUDE DETECTADO</div>`
+            : `<div class="badge-normal fade-in">🟢 CONSUMO NORMAL</div>`;
+
         probabilidadEl.innerHTML = `
             <p>Probabilidad fraude: ${data.probabilidad}%</p>
         `;

@@ -56,7 +56,50 @@ ARF_SCALER = cargar_pickle(ARF_SCALER_PATH, "ARF scaler")
 
 
 # =========================
-# FEATURES TEMPORALES (IGUAL ENTRENAMIENTO)
+# COLUMNAS DE SUBSISTEMAS (usadas por el modelo offline XGBoost)
+# =========================
+COLS_SUBSISTEMAS = [
+    "Fans_Electricity__kW__Hourly_",
+    "Cooling_Electricity__kW__Hourly_",
+    "Heating_Electricity__kW__Hourly_",
+    "InteriorLights_Electricity__kW__Hourly_",
+    "InteriorEquipment_Electricity__kW__Hourly_",
+    "Gas_Facility__kW__Hourly_",
+    "Heating_Gas__kW__Hourly_",
+    "InteriorEquipment_Gas__kW__Hourly_",
+    "Water_Heater_WaterSystems_Gas__kW__Hourly_"
+]
+
+
+# =========================
+# FEATURES TEMPORALES OFFLINE
+# =========================
+def generar_features_temporales_offline(df: pd.DataFrame):
+    col = "Electricity_Facility__kW__Hourly_"
+    df = df.copy()
+
+    # Pasado
+    df["lag_1"] = df[col].shift(1)
+    df["lag_24"] = df[col].shift(24)
+    df["lag_168"] = df[col].shift(168)
+
+    df["roll_mean_24"] = df[col].rolling(24).mean()
+    df["roll_std_24"] = df[col].rolling(24).std()
+    df["roll_mean_168"] = df[col].rolling(168).mean()
+
+    df["diff_1"] = df[col] - df["lag_1"]
+
+    # Futuro
+    df["lead_1"] = df[col].shift(-1)
+    df["lead_24"] = df[col].shift(-24)
+    df["roll_mean_24_forward"] = df[col].shift(-23).rolling(24).mean()
+    df["diff_lead_1"] = df["lead_1"] - df[col]
+
+    return df.dropna().reset_index(drop=True)
+
+
+# =========================
+# FEATURES TEMPORALES ONLINE
 # =========================
 def generar_features_temporales(df: pd.DataFrame):
     col = "Electricity_Facility__kW__Hourly_"
@@ -74,9 +117,8 @@ def generar_features_temporales(df: pd.DataFrame):
 
     return df.dropna().reset_index(drop=True)
 
-
 # =========================
-# PREPROCESS (CORREGIDO COMO TRAINING)
+# PREPROCESS
 # =========================
 def preprocesar_datos(df_original: pd.DataFrame, columnas_esperadas, class_features=None, limpiar_nombres=False):
 
@@ -197,21 +239,17 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
 
     df = leer_csv_subido(contenido)
 
-    # Limpiar nombres de columnas igual que en entrenamiento
     df.columns = df.columns.str.replace(r"[^a-zA-Z0-9_]", "_", regex=True)
 
-    # Eliminar columnas irrelevantes
     for col in ["theft", "CONS_NO", "FLAG"]:
         if col in df.columns:
             df = df.drop(columns=[col])
 
-    # Columna de consumo
     col_consumo = "Electricity_Facility__kW__Hourly_"
 
     if col_consumo not in df.columns:
         raise HTTPException(400, f"Columna '{col_consumo}' no encontrada en el CSV")
 
-    # Eliminar clase "0" si existe
     if "Class" in df.columns:
         df = df[df["Class"] != "0"].copy()
 
@@ -219,23 +257,29 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
     id_archivo = guardar_archivo(id_usuario, nombre_archivo)
     total_curvas = 0
 
-    # Si hay columna Class, iterar por cada clase
-    # Si no, tratar todo como una sola clase
     if "Class" in df.columns:
         clases = df["Class"].unique()
     else:
         df["Class"] = "Unknown"
         clases = ["Unknown"]
 
+    # Columnas de subsistemas presentes en el CSV
+    cols_subsistemas_presentes = [c for c in COLS_SUBSISTEMAS if c in df.columns]
+
     for class_value in sorted(clases):
 
         grupo = df[df["Class"] == class_value].copy().reset_index(drop=True)
 
-        # Generar dummy de clase
         class_dummies = pd.get_dummies(pd.Series([class_value]), prefix="Class")
         class_features = class_dummies.iloc[0].to_dict()
 
         consumos_clase = grupo[col_consumo].tolist()
+
+        # NUEVO: subsistemas por clase
+        subsistemas_clase = {
+            c: grupo[c].tolist() for c in cols_subsistemas_presentes
+        }
+
         num_curvas = len(consumos_clase) // HORAS_AÑO
 
         if num_curvas == 0:
@@ -246,12 +290,19 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
             fin = inicio + HORAS_AÑO
             bloque = consumos_clase[inicio:fin]
 
+            # NUEVO: bloque de subsistemas para este año
+            bloque_subsistemas = {
+                c: subsistemas_clase[c][inicio:fin]
+                for c in cols_subsistemas_presentes
+            }
+
             guardar_curva(
                 id_archivo=id_archivo,
                 identificador_curva=f"Año {year_idx + 1} - {class_value}",
                 datos_consumo={
                     "horas": list(range(HORAS_AÑO)),
                     "consumos": bloque,
+                    "subsistemas": bloque_subsistemas,
                     "class_features": class_features
                 }
             )
@@ -265,7 +316,6 @@ def importar_archivo_csv(contenido, nombre_archivo, id_usuario):
         "id_archivo": id_archivo,
         "total_curvas": total_curvas
     }
-
 
 # =========================
 # CURVA DETAIL
@@ -295,7 +345,7 @@ def obtener_detalle_curva(id_curva, id_usuario):
     }
 
 # =========================
-# HISTORICAL PREDICT (FIX OFFSET)
+# HISTORICAL PREDICT
 # =========================
 def predecir_curva_historica(id_curva, id_usuario):
 
@@ -310,15 +360,19 @@ def predecir_curva_historica(id_curva, id_usuario):
         datos = json.loads(datos)
 
     consumos = datos["consumos"]
+    subsistemas = datos.get("subsistemas", {})
 
-    df = pd.DataFrame({
-        "Electricity_Facility__kW__Hourly_": consumos
-    })
+    # Construir DataFrame con consumo total + subsistemas disponibles
+    data_dict = {"Electricity_Facility__kW__Hourly_": consumos}
+    for col_nombre, valores in subsistemas.items():
+        data_dict[col_nombre] = valores
 
-    df = generar_features_temporales(df)
+    df = pd.DataFrame(data_dict)
+
+    df = generar_features_temporales_offline(df)
 
     if len(df) == 0:
-        raise HTTPException(400, "Curva sin suficientes datos (lags)")
+        raise HTTPException(400, "Curva sin suficientes datos (lags/leads)")
 
     class_features = datos.get("class_features", {})
 
@@ -351,8 +405,8 @@ def predecir_curva_historica(id_curva, id_usuario):
         id_curva=id_curva,
         tipo_modelo="xgboost",
         tipo_prediccion="historica",
-        resultado_prediccion=int(prob_mean  >= 0.5),
-        probabilidad_fraude=prob_mean 
+        resultado_prediccion=int(prob_mean >= 0.5),
+        probabilidad_fraude=prob_mean
     )
 
     return {
@@ -366,9 +420,8 @@ def predecir_curva_historica(id_curva, id_usuario):
         "serie_temporal": serie_temporal
     }
 
-
 # =========================
-# STATS (ROBUSTO)
+# ESTADÍSTICAS
 # =========================
 def generar_estadisticas_archivo(id_archivo, id_usuario):
 
@@ -396,18 +449,21 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
             datos = json.loads(datos)
 
         consumos = datos["consumos"]
+        subsistemas = datos.get("subsistemas", {})
 
-        df = pd.DataFrame({
-            "Electricity_Facility__kW__Hourly_": consumos
-        })
+        data_dict = {"Electricity_Facility__kW__Hourly_": consumos}
+        for col_nombre, valores in subsistemas.items():
+            data_dict[col_nombre] = valores
 
-        df = generar_features_temporales(df)
+        df = pd.DataFrame(data_dict)
+
+        df = generar_features_temporales_offline(df)
 
         if len(df) == 0:
             continue
 
         class_features = datos.get("class_features", {})
-        
+
         X = preprocesar_datos(df, XGBOOST_COLUMNS, class_features=class_features)
 
         probs = XGBOOST_MODEL.predict_proba(X)[:, 1]
@@ -450,15 +506,13 @@ def generar_estadisticas_archivo(id_archivo, id_usuario):
 
     return stats
 
-
 # =========================
-# STREAM
+# PREDECIR ONLINE
 # =========================
 def predecir_stream(valores, punto_actual=0):
 
     valores = [float(v or 0) for v in valores]
 
-    # Necesitamos al menos 168 puntos para los lags
     if len(valores) < 169:
         return {
             "estado": "acumulando",
@@ -481,7 +535,7 @@ def predecir_stream(valores, punto_actual=0):
             "probabilidad": 0
         }
 
-    # Solo predecir el ÚLTIMO punto
+    # Solo predecir el último punto
     ultima_fila = df.iloc[[-1]]
 
     X = preprocesar_datos(ultima_fila, ARF_COLUMNS)
@@ -526,6 +580,12 @@ def predecir_curva_tiempo_real(id_curva, id_usuario):
 
     offset = len(consumos) - len(df)
 
+    # NUEVO: tramo inicial sin predicción (las horas usadas para calcular lags)
+    tramo_inicial = [
+        {"hora": i, "consumo": float(consumos[i])}
+        for i in range(offset)
+    ]
+
     predicciones = []
 
     for i in range(len(Xs)):
@@ -544,5 +604,6 @@ def predecir_curva_tiempo_real(id_curva, id_usuario):
     return {
         "id_curva": curva["id_curva"],
         "identificador_curva": curva["identificador_curva"],
+        "tramo_inicial": tramo_inicial,
         "predicciones": predicciones
     }

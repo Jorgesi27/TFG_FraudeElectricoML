@@ -9,7 +9,8 @@ export function limpiarGrafica(chartInstance){
 }
 
 // Crea una gráfica lineal para representar curvas de consumo.
-export function crearGraficaLineal(ctx, labels, valores, titulo) {
+// Crea una gráfica lineal para representar curvas de consumo.
+export function crearGraficaLineal(ctx, labels, valores, titulo, yMin = null, yMax = null) {
 
     return new Chart(ctx, {
         type: "line",
@@ -45,7 +46,7 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
                         x: {
                             min: "original",
                             max: "original",
-                            minRange: 100   // mínimo 100 horas visibles, no puede hacer más zoom
+                            minRange: 100
                         }
                     }
                 }
@@ -55,14 +56,16 @@ export function crearGraficaLineal(ctx, labels, valores, titulo) {
                     title: { display: true, text: "Hora", color: "white" },
                     ticks: {
                         color: "white",
-                        maxTicksLimit: 12  // solo 12 etiquetas en el eje X
+                        maxTicksLimit: 12
                     },
                     grid: { color: "rgba(255,255,255,0.1)" }
                 },
                 y: {
                     title: { display: true, text: "Consumo [kW]", color: "white" },
                     ticks: { color: "white" },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    grid: { color: "rgba(255,255,255,0.1)" },
+                    min: yMin,
+                    max: yMax
                 }
             }
         }
@@ -142,6 +145,73 @@ export function crearGraficaBarras(
                     "#3b82f6"
                 ]
             }]
+        }
+    });
+}
+
+// Crea una gráfica lineal coloreando en rojo los tramos marcados como fraude.
+export function crearGraficaLinealConFraude(ctx, labels, valores, fraudes, titulo) {
+
+    return new Chart(ctx, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: titulo,
+                data: valores,
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59,130,246,0.1)",
+                segment: {
+                    borderColor: (ctx) => {
+                        const idx = ctx.p1DataIndex;
+                        return fraudes[idx] === 1 ? "#ef4444" : "#3b82f6";
+                    }
+                },
+                fill: false,
+                pointRadius: 0,
+                borderWidth: 1.5,
+                tension: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: "x"
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: "x"
+                    },
+                    limits: {
+                        x: {
+                            min: "original",
+                            max: "original",
+                            minRange: 100
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: "Hora", color: "white" },
+                    ticks: {
+                        color: "white",
+                        maxTicksLimit: 12
+                    },
+                    grid: { color: "rgba(255,255,255,0.1)" }
+                },
+                y: {
+                    title: { display: true, text: "Consumo [kW]", color: "white" },
+                    ticks: { color: "white" },
+                    grid: { color: "rgba(255,255,255,0.1)" }
+                }
+            }
         }
     });
 }

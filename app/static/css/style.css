@@ -229,7 +229,7 @@ button:hover{
 
     gap:25px;
 
-    align-items:start;
+    align-items:stretch;
 }
 
 .chart-box,

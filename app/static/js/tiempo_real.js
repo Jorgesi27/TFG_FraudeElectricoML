@@ -106,7 +106,6 @@ async function cargarCurvas(){
 // =====================================================
 // STREAMING ONLINE
 // =====================================================
-
 async function iniciarStreaming(){
 
     const idCurva = curvaSelect.value;
@@ -136,18 +135,39 @@ async function iniciarStreaming(){
 
         const data = await obtenerData(response);
         const predicciones = data.predicciones || [];
+        const tramoInicial = data.tramo_inicial || [];
 
         if(!predicciones.length){
             mostrarError("Sin predicciones disponibles");
             return;
         }
 
+        // Rango fijo del eje Y considerando TODO el consumo (tramo inicial + predicciones)
+        const consumosCurva = [
+            ...tramoInicial.map(p => p.consumo),
+            ...predicciones.map(p => p.consumo)
+        ];
+        const minConsumo = Math.min(...consumosCurva);
+        const maxConsumo = Math.max(...consumosCurva);
+        const margen = (maxConsumo - minConsumo) * 0.1;
+
+        const yMin = Math.max(0, minConsumo - margen);
+        const yMax = maxConsumo + margen;
+
+        // Pintar de golpe el tramo inicial (sin clasificar)
+        puntosConsumo = tramoInicial.map(p => p.consumo);
+        labelsTiempo = tramoInicial.map(p => p.hora);
+
         chartTiempoReal = crearGraficaLineal(
             graficaTiempoReal,
             labelsTiempo,
             puntosConsumo,
-            data.identificador_curva
+            data.identificador_curva,
+            yMin,
+            yMax
         );
+
+        limpiarResultados();
 
         let indice = 0;
 

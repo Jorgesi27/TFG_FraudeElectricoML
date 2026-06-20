@@ -9,7 +9,7 @@ import {
 
 import {
     limpiarGrafica,
-    crearGraficaLineal
+    crearGraficaLinealConFraude
 } from "./charts.js";
 
 import {
@@ -141,82 +141,25 @@ async function cargarCurvas(){
 // Limpia los resultados mostrados en pantalla.
 function limpiarResultados(){
 
-    resultadoHistorico.innerText =
+    resultadoHistorico.innerHTML =
         "---";
 
     probabilidadHistorica.innerHTML  =
         "---";
-
-    resultadoHistorico.style.color =
-        "#ffffff";
 }
 
-// Muestra la gráfica de la curva seleccionada.
-async function mostrarGrafica(){
+// Ejecuta la predicción histórica y dibuja la gráfica coloreada según fraude.
+async function ejecutarPrediccionYGrafica(){
 
     const idCurva =
         curvaSelect.value;
 
     limpiarResultados();
 
-    if(!idCurva){
-
-        chart =
-            limpiarGrafica(chart);
-
-        return;
-    }
-
-    try{
-
-        const response = await fetchAuth(
-
-            `/api/operador/curva/${idCurva}`
-        );
-
-        if(!response){
-            return;
-        }
-
-        const curva =
-            await obtenerData(response);
-
-        const labels =
-            curva.labels || [];
-
-        const valores =
-            curva.valores || [];
-
-        chart =
-            limpiarGrafica(chart);
-
-        chart = crearGraficaLineal(
-
-            graficaHistorica,
-            labels,
-            valores,
-            curva.identificador_curva
-        );
-
-    }catch(error){
-
-        mostrarError(
-            "Error mostrando gráfica",
-            error
-        );
-    }
-}
-
-// Ejecuta la predicción histórica de la curva.
-async function ejecutarPrediccionHistorica(){
-
-    const idCurva =
-        curvaSelect.value;
+    chart =
+        limpiarGrafica(chart);
 
     if(!idCurva){
-
-        alert("Seleccione una curva");
-
         return;
     }
 
@@ -237,6 +180,30 @@ async function ejecutarPrediccionHistorica(){
             resultadoHistorico,
             probabilidadHistorica,
             prediccion
+        );
+
+        const serie =
+            prediccion.serie_temporal || [];
+
+        const labels =
+            serie.map(p => p.hora);
+
+        const valores =
+            serie.map(p => p.consumo);
+
+        const fraudes =
+            serie.map(p => p.fraude);
+
+        chart =
+            limpiarGrafica(chart);
+
+        chart = crearGraficaLinealConFraude(
+
+            graficaHistorica,
+            labels,
+            valores,
+            fraudes,
+            prediccion.identificador_curva
         );
 
     }catch(error){
@@ -284,12 +251,7 @@ function inicializarEventos(){
 
         curvaSelect.addEventListener(
             "change",
-            async () => {
-
-                await mostrarGrafica();
-
-                await ejecutarPrediccionHistorica();
-            }
+            ejecutarPrediccionYGrafica
         );
 
     }else{
