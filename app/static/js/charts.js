@@ -8,9 +8,7 @@ export function limpiarGrafica(chartInstance){
     return null;
 }
 
-// Crea una gráfica lineal para representar curvas de consumo.
-// Crea una gráfica lineal para representar curvas de consumo.
-export function crearGraficaLineal(ctx, labels, valores, titulo, yMin = null, yMax = null) {
+export function crearGraficaLineal(ctx, labels, valores, titulo, yMin = null, yMax = null, xMin = null, xMax = null) {
 
     return new Chart(ctx, {
         type: "line",
@@ -58,7 +56,9 @@ export function crearGraficaLineal(ctx, labels, valores, titulo, yMin = null, yM
                         color: "white",
                         maxTicksLimit: 12
                     },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    grid: { color: "rgba(255,255,255,0.1)" },
+                    min: xMin,
+                    max: xMax
                 },
                 y: {
                     title: { display: true, text: "Consumo [kW]", color: "white" },

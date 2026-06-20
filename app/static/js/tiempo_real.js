@@ -154,6 +154,14 @@ async function iniciarStreaming(){
         const yMin = Math.max(0, minConsumo - margen);
         const yMax = maxConsumo + margen;
 
+        // Rango fijo del eje X para todo el año
+        const todasLasHoras = [
+            ...tramoInicial.map(p => p.hora),
+            ...predicciones.map(p => p.hora)
+        ];
+        const xMin = Math.min(...todasLasHoras);
+        const xMax = Math.max(...todasLasHoras);
+
         // Pintar de golpe el tramo inicial (sin clasificar)
         puntosConsumo = tramoInicial.map(p => p.consumo);
         labelsTiempo = tramoInicial.map(p => p.hora);
@@ -164,7 +172,9 @@ async function iniciarStreaming(){
             puntosConsumo,
             data.identificador_curva,
             yMin,
-            yMax
+            yMax,
+            xMin,
+            xMax
         );
 
         limpiarResultados();
