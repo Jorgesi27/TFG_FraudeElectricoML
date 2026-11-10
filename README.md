@@ -2,6 +2,9 @@
 
 Este proyecto forma parte de mi Trabajo de Fin de Grado y tiene como objetivo desarrollar modelos de Machine Learning para la detección de fraude en el consumo eléctrico.
 
+Desarrollo de un sistema de detección de fraude en el consumo eléctrico mediante técnicas de aprendizaje automático, comparando modelos de aprendizaje offline y online. El sistema incluye un prototipo web funcional desplegado en producción que permite analizar curvas de consumo eléctrico e identificar patrones fraudulentos tanto de forma histórica como en tiempo real. Este proyecto constituye mi trabajo final de la carrera de Ingeniería Informática. El proyecto fue desarrollado con Python y FastAPI para el backend, y HTML, CSS, JavaScript y Chart.js para el frontend.
+
+
 El proyecto incluye:
 - Implementación y entrenamiento offline y online de distintos modelos de clasificación
 - Evaluación mediante métricas como F1-score, precision, recall y Cohen's Kappa
